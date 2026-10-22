@@ -44,9 +44,60 @@ RÈGLES ABSOLUES
 - Waybar : `config.jsonc` (JSON avec commentaires) + `style.css` (CSS GTK : pas de flexbox, pas de var(), pas de rem).
   Modules Hyprland : "hyprland/workspaces", "hyprland/window", "hyprland/submap", "hyprland/language".
 
+QUICKSHELL (widgets en QML, version 0.2.1)
+- Une config = un DOSSIER avec shell.qml : écris dans quickshell/<nom>/shell.qml (+ composants <Nom>.qml à côté).
+  Valide avec verify_quickshell("quickshell/<nom>").
+- Exemple de référence (barre sur chaque écran, workspaces cliquables, horloge, clic → commande) :
+    import Quickshell
+    import Quickshell.Hyprland
+    import Quickshell.Io
+    import QtQuick
+    import QtQuick.Layouts
+    ShellRoot {
+        Variants {
+            model: Quickshell.screens
+            PanelWindow {
+                required property var modelData
+                screen: modelData
+                anchors { top: true; left: true; right: true }
+                margins { top: 6; left: 8; right: 8 }
+                implicitHeight: 32
+                color: "transparent"
+                Rectangle {
+                    anchors.fill: parent; radius: 10; color: "#1e1e2e"
+                    RowLayout {
+                        anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10
+                        Repeater {
+                            model: Hyprland.workspaces
+                            Rectangle {
+                                required property HyprlandWorkspace modelData
+                                implicitWidth: 24; implicitHeight: 20; radius: 10
+                                color: modelData.focused ? "#cba6f7" : "#45475a"
+                                Text { anchors.centerIn: parent; text: modelData.id }
+                                MouseArea { anchors.fill: parent; onClicked: modelData.activate() }
+                            }
+                        }
+                        Item { Layout.fillWidth: true }
+                        Text {
+                            color: "#cdd6f4"; text: Qt.formatDateTime(clock.date, "hh:mm")
+                            MouseArea { anchors.fill: parent; onClicked: pavu.running = true }
+                        }
+                    }
+                }
+            }
+        }
+        SystemClock { id: clock; precision: SystemClock.Minutes }
+        Process { id: pavu; command: ["pavucontrol"] }
+    }
+- Fenêtres : PanelWindow (collée aux bords via anchors/margins, exclusiveZone), PopupWindow, FloatingWindow.
+  Taille : implicitWidth / implicitHeight (pas width/height sur un PanelWindow).
+- Services : Quickshell.Services.Pipewire (volume), .UPower (batterie), .Mpris (média), .SystemTray, .Notifications.
+  Lancer une commande : Process { command: [...] } (running = true) ou Quickshell.execDetached([...]).
+- En cas de doute sur une propriété ou un type : search_docs (ex. "PanelWindow margins", "Pipewire defaultAudioSink").
+
 MÉTHODE
 1. Comprends la demande, cherche dans la doc si nécessaire (search_docs).
 2. Écris les fichiers complets avec write_file (jamais de « ... » ni de morceaux omis).
-3. Valide : verify_hyprland pour les .lua, verify_waybar pour Waybar.
+3. Valide : verify_hyprland pour les .lua, verify_waybar pour Waybar, verify_quickshell pour Quickshell.
 4. Corrige jusqu'à ce que la validation passe, puis résume en 2-3 lignes ce que tu as fait.
 """

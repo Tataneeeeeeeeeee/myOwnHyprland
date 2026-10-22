@@ -85,6 +85,10 @@ def collect_chunks() -> list[dict]:
         if WAYBAR_KEEP.match(md.name):
             chunks += _chunk_markdown(md, f"waybar-wiki/{md.name}")
 
+    qs_docs = DOCS_RAW / "quickshell"
+    for md in sorted(qs_docs.rglob("*.md")):
+        chunks += _chunk_markdown(md, f"quickshell/{md.relative_to(qs_docs).as_posix()}")
+
     # Les stubs = référence exacte de l'API Lua installée (une classe par chunk)
     if HYPR_STUBS.exists():
         chunks += _chunk_lua_blocks(HYPR_STUBS, "hl.meta.lua", r"\n(?=---@(?:class|alias) )")
@@ -94,7 +98,7 @@ def collect_chunks() -> list[dict]:
     # Tes propres exemples : docs/examples/**/* (configs que tu aimes)
     examples = DOCS_RAW.parent / "examples"
     for f in sorted(examples.rglob("*")) if examples.exists() else []:
-        if f.is_file() and f.suffix in {".lua", ".jsonc", ".json", ".css"}:
+        if f.is_file() and f.suffix in {".lua", ".jsonc", ".json", ".css", ".qml"}:
             text = f.read_text(errors="ignore")
             for part in _split(text):
                 rel = f.relative_to(examples)

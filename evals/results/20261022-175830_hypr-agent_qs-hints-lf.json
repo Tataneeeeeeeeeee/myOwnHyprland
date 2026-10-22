@@ -1,0 +1,111 @@
+{
+ "date": "20261022-175830",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 2,
+  "valid": 1.0,
+  "first_try": 0.5,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 80.55,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "qs-hints-lf"
+ },
+ "filter": {
+  "pattern": "^qs-(launcher|floating)$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "qs-launcher",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 40.3,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(Process|execDetached)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /rofi/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /drun/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(onClicked|TapHandler)/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-175830/qs-launcher"
+  },
+  {
+   "id": "qs-floating",
+   "tags": [
+    "quickshell",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 120.8,
+   "model_calls": 19,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /margins/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /margins[^}]*(top|left|right)\\s*:\\s*10/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /radius:\\s*12/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(?i)#1e1e2e/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-175830/qs-floating"
+  }
+ ]
+}

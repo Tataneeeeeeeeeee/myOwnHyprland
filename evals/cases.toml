@@ -15,6 +15,8 @@
 #   { window_rule = "pavucontrol", match = '"float":\s*true' }   règle dont le match contient le texte
 #   { layer_rule = "waybar", match = '"blur":\s*true' }
 #   { hypr = "...colors", hue = [255, 300] }   au moins une couleur dans cette plage de teinte (violet)
+#   { qml = 'regex' } / { qml_not = 'regex' }  sur tous les .qml produits sous quickshell/
+#   { qml_hue = [255, 300] }                   au moins une couleur de cette teinte dans le QML
 #   { exec = "waybar" }                        lancé au démarrage (hl.exec_cmd / hl.on)
 #   { answer = "follow_mouse" }                regex sur la réponse texte finale
 
@@ -295,6 +297,84 @@ checks = [
   { waybar = "position", eq = "bottom" },
   { waybar = "height", eq = 36 },
   { waybar = "modules-right", has = "pulseaudio" },
+]
+
+# ------------------------------------------------------------------- Quickshell (QML)
+
+[[case]]
+id = "qs-clock"
+tags = ["quickshell", "new"]
+request = "Crée un widget Quickshell : une barre en haut sur tous les écrans, avec l'heure au centre au format HH:mm."
+checks = [
+  { only = ["quickshell/"] },
+  { file = "quickshell" },
+  { qml = 'PanelWindow' },
+  { qml = 'top:\s*true' },
+  { qml = 'Quickshell\.screens' },
+  { qml = '(SystemClock|new Date)' },
+  { qml = '(hh|HH):mm' },
+]
+
+[[case]]
+id = "qs-workspaces"
+tags = ["quickshell", "new"]
+request = "Crée une barre Quickshell en bas avec les workspaces Hyprland cliquables, le workspace actif en violet."
+checks = [
+  { only = ["quickshell/"] },
+  { qml = 'bottom:\s*true' },
+  { qml = 'Hyprland\.workspaces' },
+  { qml = '(\.activate\(\)|dispatch)' },
+  { qml = '(focused|active)' },
+  { qml_hue = [255, 300] },
+]
+
+[[case]]
+id = "qs-battery"
+tags = ["quickshell", "new", "services"]
+request = "Crée un widget Quickshell : une petite barre en haut à droite qui affiche le pourcentage de batterie via UPower."
+checks = [
+  { only = ["quickshell/"] },
+  { qml = 'import Quickshell\.Services\.UPower' },
+  { qml = 'UPower\.displayDevice' },
+  { qml = 'percentage' },
+  { qml = 'right:\s*true' },
+]
+
+[[case]]
+id = "qs-volume"
+tags = ["quickshell", "new", "services"]
+request = "Crée un widget Quickshell qui affiche le volume de la sortie audio par défaut (Pipewire) et coupe ou rétablit le son au clic."
+checks = [
+  { only = ["quickshell/"] },
+  { qml = 'import Quickshell\.Services\.Pipewire' },
+  { qml = 'defaultAudioSink' },
+  { qml = 'PwObjectTracker\s*\{[^}]*objects\s*:\s*\[[^\]]*Pipewire\.defaultAudioSink' },
+  { qml = 'muted' },
+  { qml = '(onClicked|TapHandler)' },
+]
+
+[[case]]
+id = "qs-launcher"
+tags = ["quickshell", "new"]
+request = "Crée une barre Quickshell en haut avec, à gauche, un bouton qui lance « rofi -show drun » au clic."
+checks = [
+  { only = ["quickshell/"] },
+  { qml = '(Process|execDetached)' },
+  { qml = 'rofi' },
+  { qml = 'drun' },
+  { qml = '(onClicked|TapHandler)' },
+]
+
+[[case]]
+id = "qs-floating"
+tags = ["quickshell", "new", "style"]
+request = "Crée une barre Quickshell flottante en haut : détachée des bords de l'écran de 10 px, coins arrondis de 12, fond #1e1e2e."
+checks = [
+  { only = ["quickshell/"] },
+  { qml = 'margins' },
+  { qml = 'margins[^}]*(top|left|right)\s*:\s*10' },
+  { qml = 'radius:\s*12' },
+  { qml = '(?i)#1e1e2e' },
 ]
 
 # ------------------------------------------------------------------------ Questions

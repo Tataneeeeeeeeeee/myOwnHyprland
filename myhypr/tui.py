@@ -89,7 +89,7 @@ class SlashCompleter(Completer):
         cmd, _, arg = text.partition(" ")
         word = arg.rsplit(" ", 1)[-1]
         choices = {"/show": self.app.ws.files, "/diff": self.app.ws.files, "/restore": ops.backups,
-                   "/from": lambda: ["hypr", "waybar", "rofi", "kitty", "swaync", "wlogout"]}
+                   "/from": lambda: ["hypr", "waybar", "quickshell", "rofi", "kitty", "swaync", "wlogout"]}
         for c in choices.get(cmd, list)():
             if c.startswith(word):
                 yield Completion(c, -len(word))
@@ -191,6 +191,7 @@ class Renderer:
             "search_docs": "Recherche dans la doc…",
             "verify_hyprland": "Validation Hyprland…",
             "verify_waybar": "Validation Waybar (test live 3 s)…",
+            "verify_quickshell": "Validation Quickshell (qmllint + test live 4 s)…",
         }.get(name, f"{name}…")
         self.args = args
 
@@ -222,9 +223,9 @@ class Renderer:
             body = Text.assemble(("doc ", C["teal"]), (f"« {args.get('query', '')} »", C["subtext"]))
             self.print(row("⌕", C["teal"], body, Text(" · ".join(pages)[:48], style=C["overlay0"])))
         elif name.startswith("verify"):
-            what = "Hyprland" if name == "verify_hyprland" else "Waybar"
+            what = {"verify_hyprland": "Hyprland", "verify_waybar": "Waybar"}.get(name, "Quickshell")
             lines = [LOG_PREFIX.sub("", ln) for ln in out.splitlines() if ln.strip()]
-            if lines and lines[0].startswith(("config ok", "waybar ok")):
+            if lines and lines[0].startswith(("config ok", "waybar ok", "quickshell ok")):
                 self.print(row("✓", f"bold {C['green']}", Text(f"{what} valide", style=C["green"])))
             else:
                 errors = [ln for ln in lines if not ln.startswith("Indice")]
@@ -555,6 +556,8 @@ class App:
                 self.note("Hyprland recharge sa config tout seul ; sinon : hyprctl reload")
             if any(f.startswith("waybar/") for f in files):
                 self.note("Waybar : pkill waybar; waybar & disown")
+            for name in sorted({f.split("/")[1] for f in files if f.startswith("quickshell/") and f.count("/") >= 2}):
+                self.note(f"Quickshell : qs -p ~/.config/quickshell/{name}")
 
     # ---- boucle
     def run(self):

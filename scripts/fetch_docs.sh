@@ -10,4 +10,6 @@ sync_repo() {
 sync_repo https://github.com/hyprwm/hyprland-wiki hyprland-wiki
 sync_repo https://github.com/Alexays/Waybar.wiki.git waybar-wiki
 
+cd ../..
+uv run python scripts/fetch_quickshell_docs.py   # doc Quickshell de la version installée
 echo "Pense à relancer : uv run myhypr index"

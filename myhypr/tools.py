@@ -157,9 +157,26 @@ class Workspace:
         css = self.path(style)
         return verify_waybar_files(cfg, css if css.exists() else None)
 
+    def verify_quickshell(self, path: str = "quickshell/bar") -> str:
+        """Valide une config Quickshell (QML) : qmllint puis lancement test de 4 s avec `qs -p`.
+
+        Args:
+            path: Dossier de la config (contenant shell.qml), ex. "quickshell/bar"
+
+        Returns:
+            "quickshell ok" ou la liste des erreurs
+        """
+        p = self.path(path)
+        if p.is_file():
+            p = p.parent
+        if not (p / "shell.qml").exists():
+            return f"ERREUR : {path}/shell.qml n'existe pas (une config Quickshell = un dossier avec shell.qml)"
+        return verify_quickshell_dir(p)
+
     def tools(self) -> dict:
         return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
-                                         self.search_docs, self.verify_hyprland, self.verify_waybar)}
+                                         self.search_docs, self.verify_hyprland, self.verify_waybar,
+                                         self.verify_quickshell)}
 
     def validate_all(self) -> list[str]:
         """Validation automatique de tout ce qui a été produit. Renvoie les erreurs."""
@@ -175,6 +192,10 @@ class Workspace:
             out = verify_waybar_files(cfg, css if css.exists() else None)
             if out != "waybar ok":
                 errors.append(f"{cfg.relative_to(self.root)} :\n{out}")
+        for shell in sorted(self.root.glob("quickshell/**/shell.qml")):
+            out = verify_quickshell_dir(shell.parent)
+            if not out.startswith("quickshell ok"):
+                errors.append(f"{shell.parent.relative_to(self.root)} :\n{out}")
         return errors
 
 
@@ -377,3 +398,108 @@ def verify_waybar_files(cfg: Path, css: Path | None) -> str:
         issues.append("Indice : les modules personnalisés s'écrivent \"custom/<nom>\" (avec un slash), "
                       "dans modules-* ET comme clé de configuration.")
     return "waybar ok" if not issues else "\n".join(issues)[:TOOL_OUTPUT_LIMIT]
+
+
+# ---------------------------------------------------------------- Quickshell
+
+QMLLINT = next((c for c in ("/usr/lib/qt6/bin/qmllint", shutil.which("qmllint6") or "") if c and Path(c).exists()), None)
+QS_NOISE = re.compile(r"built against Qt|Shell ID|Saving logs|Launching config|Configuration Loaded|^\s*$")
+QS_IMPORTS = ("Indice : type inconnu = import manquant. PanelWindow, FloatingWindow, PopupWindow, SystemClock, Variants, "
+              "ShellRoot, Scope → import Quickshell ; Hyprland, HyprlandWorkspace → import Quickshell.Hyprland ; "
+              "Process, FileView, IpcHandler → import Quickshell.Io ; Pipewire → import Quickshell.Services.Pipewire ; "
+              "UPower → import Quickshell.Services.UPower ; Mpris → import Quickshell.Services.Mpris ; "
+              "SystemTray → import Quickshell.Services.SystemTray ; Text, Rectangle, Item, MouseArea, Repeater, Row → "
+              "import QtQuick ; RowLayout, ColumnLayout → import QtQuick.Layouts.")
+
+
+# Erreurs QML fréquentes d'un petit modèle → indice précis (règles générales de QML, pas spécifiques à un cas)
+QML_HINTS = [
+    (r'non-existent property "(centerIn|fill|verticalCenter|horizontalCenter|leftMargin|rightMargin|topMargin|'
+     r'bottomMargin|margins)"',
+     "Indice : les ancrages s'écrivent avec le préfixe anchors. : anchors.centerIn: parent, anchors.fill: parent, "
+     "anchors.verticalCenter: parent.verticalCenter, anchors.leftMargin: 8. Dans un RowLayout/ColumnLayout, "
+     "pas d'anchors sur les enfants : utilise Layout.alignment / Layout.fillWidth."),
+    (r'non-existent property "(fontSize|pixelSize|pointSize|bold|family|fontFamily|fontWeight)"',
+     "Indice : la police se règle via le groupe font : font.pixelSize: 14, font.bold: true, font.family: \"...\"."),
+    (r'non-existent property "(textColor|fontColor|foreground|backgroundColor|background)"',
+     "Indice : Text → color ; fond → un Rectangle avec color (Rectangle n'a pas de backgroundColor)."),
+    (r"Optional chains are not permitted on the left-hand-side",
+     "Indice : pas de ?. à gauche d'une affectation. Écris : if (obj) obj.prop = valeur"),
+    (r"cannot be created directly",
+     "Indice : ce type ne s'instancie pas, on l'obtient par une propriété (ex. Pipewire.defaultAudioSink.audio, "
+     "UPower.displayDevice). Pour suivre un nœud Pipewire : PwObjectTracker { objects: [Pipewire.defaultAudioSink] }"),
+    (r"ReferenceError: (\w+) is not defined",
+     "Indice : identifiant inconnu → donne un id à l'objet (id: monId) ou déclare property var monNom ; "
+     "les propriétés d'un autre objet s'écrivent idObjet.propriete."),
+    (r"Cannot read property '\w+' of (undefined|null)",
+     "Indice : objet pas encore prêt au démarrage → protège avec ?. en lecture (a?.b) ou une valeur par défaut (a ?? 0)."),
+]
+
+
+def _qmllint(cfg_dir: Path) -> list[str]:
+    """Seulement ce que qmllint signale de façon fiable : syntaxe, et propriétés inconnues AVEC suggestion
+    (faute de frappe). Le reste (imports qs.*, unqualified…) est trop bruité sur des configs réelles."""
+    if not QMLLINT:
+        return []
+    issues = []
+    for f in sorted(cfg_dir.rglob("*.qml")):
+        r = subprocess.run([QMLLINT, str(f)], capture_output=True, text=True, timeout=60)
+        lines = (r.stdout + r.stderr).splitlines()
+        for i, line in enumerate(lines):
+            m = re.match(r"Warning: .*?:(\d+):(\d+): (.*) \[(syntax|missing-property)\]$", line)
+            if not m:
+                continue
+            nxt = " ".join(lines[i + 1:i + 4])
+            hint = re.search(r'Did you mean "([^"]+)"', nxt)
+            if m.group(4) == "syntax":
+                issues.append(f"{f.relative_to(cfg_dir)}:{m.group(1)}: {m.group(3)}")
+            elif hint:
+                issues.append(f"{f.relative_to(cfg_dir)}:{m.group(1)}: {m.group(3)} → vouliez-vous dire \"{hint.group(1)}\" ?")
+    return issues
+
+
+def verify_quickshell_dir(cfg_dir: Path) -> str:
+    cfg_dir = cfg_dir.resolve()
+    issues, warnings = _qmllint(cfg_dir), []
+    if any("Expected token" in i or "Syntax" in i or "syntax" in i or "not permitted" in i for i in issues):
+        text = "\n".join(issues)
+        issues += [hint for pattern, hint in QML_HINTS if re.search(pattern, text)]
+        return "\n".join(issues)[:TOOL_OUTPUT_LIMIT]
+
+    if not os.environ.get("MYHYPR_NO_LIVE") and os.environ.get("WAYLAND_DISPLAY") and shutil.which("qs"):
+        proc = subprocess.Popen(["qs", "-p", str(cfg_dir), "--no-color"], stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT, text=True)
+        time.sleep(4)
+        proc.terminate()
+        try:
+            out, _ = proc.communicate(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            out, _ = proc.communicate()
+        loaded = "Configuration Loaded" in out
+        for line in out.splitlines():
+            if QS_NOISE.search(line):
+                continue
+            if loaded and re.search(r"Unable to assign \[undefined\]", line):
+                # Bénin : une liaison vaut undefined au démarrage (service pas encore prêt), le widget marche
+                warnings.append(line.strip().replace(str(cfg_dir) + "/", ""))
+                continue
+            if re.search(r"ERROR|ReferenceError|TypeError|Error:|Cannot assign|Unable to assign|is not a type|"
+                         r"is not installed|not found|Invalid", line):
+                issues.append(line.strip().replace(str(cfg_dir) + "/", "").replace("file://", ""))
+        if not loaded and not issues:
+            issues.append("La config ne s'est pas chargée :\n" + out[-1500:])
+        text = "\n".join(issues)
+        if "is not a type" in text or "is not installed" in text:
+            issues.append(QS_IMPORTS)
+        specific = [hint for pattern, hint in QML_HINTS if re.search(pattern, text)]
+        issues += specific
+        if "non-existent property" in text and not specific:
+            issues.append("Indice : propriété inexistante sur ce type. Vérifie le nom exact avec search_docs "
+                          "(ex. \"PanelWindow properties\"). Taille d'un PanelWindow : implicitWidth / implicitHeight.")
+    if issues:
+        return "\n".join(dict.fromkeys(issues))[:TOOL_OUTPUT_LIMIT]
+    if warnings:
+        return ("quickshell ok (avertissements non bloquants, à corriger seulement si simple — "
+                "ex. `target: x ?? null`) :\n" + "\n".join(dict.fromkeys(warnings)))[:TOOL_OUTPUT_LIMIT]
+    return "quickshell ok"

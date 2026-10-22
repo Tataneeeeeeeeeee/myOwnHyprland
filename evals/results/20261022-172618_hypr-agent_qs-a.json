@@ -1,0 +1,170 @@
+{
+ "date": "20261022-172618",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 3,
+  "valid": 1.0,
+  "first_try": 0.6666666666666666,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 63.0,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "qs-a"
+ },
+ "filter": {
+  "pattern": "^qs-(clock|workspaces|battery)$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "qs-clock",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 7,
+   "total": 7,
+   "seconds": 46.0,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "fichier quickshell",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /PanelWindow/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /top:\\s*true/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /Quickshell\\.screens/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(SystemClock|new Date)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(hh|HH):mm/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-172618/qs-clock"
+  },
+  {
+   "id": "qs-workspaces",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 40.4,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /bottom:\\s*true/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /Hyprland\\.workspaces/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(\\.activate\\(\\)|dispatch)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(focused|active)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml contient une couleur de teinte [255, 300]",
+     "ok": true,
+     "got": "267° 226°"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-172618/qs-workspaces"
+  },
+  {
+   "id": "qs-battery",
+   "tags": [
+    "quickshell",
+    "new",
+    "services"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 102.6,
+   "model_calls": 13,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /import Quickshell\\.Services\\.UPower/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /UPower\\.displayDevice/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /percentage/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /right:\\s*true/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-172618/qs-battery"
+  }
+ ]
+}

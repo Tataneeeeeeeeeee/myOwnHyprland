@@ -153,6 +153,16 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
                 values = [v.get(check["waybar_custom"]) for k, v in wb.items()
                           if k.startswith("custom/") and isinstance(v, dict)]
                 ok, got = compare([v for v in values if v is not None] or KeyError, check)
+        elif "qml" in check or "qml_not" in check or "qml_hue" in check:
+            qml = "\n".join(f.read_text(errors="ignore") for f in sorted(ws.glob("quickshell/**/*.qml")))
+            if "qml_hue" in check:
+                label = f"qml contient une couleur de teinte {check['qml_hue']}"
+                ok, got = compare(qml or KeyError, {"hue": check["qml_hue"]})
+            else:
+                pattern = check.get("qml") or check["qml_not"]
+                found = re.search(pattern, qml, re.S) is not None
+                ok = found if "qml" in check else not found
+                label = f"qml {'~' if 'qml' in check else '!~'} /{pattern[:40]}/"
         elif "css" in check or "css_not" in check:
             css_path = ws / "waybar" / "style.css"
             css = css_path.read_text() if css_path.exists() else ""
@@ -234,7 +244,7 @@ def run_case(case: dict, model: str, think: bool, out_dir: Path) -> CaseRun:
             elif ev.kind == "status" and ev.name == "fix":
                 fixes += 1
             elif ev.kind == "tool_result" and ev.name.startswith("verify") \
-                    and not ev.text.startswith(("config ok", "waybar ok")):
+                    and not ev.text.startswith(("config ok", "waybar ok", "quickshell ok")):
                 verify_failed = True
     except Exception as e:
         error = f"{type(e).__name__}: {e}"

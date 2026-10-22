@@ -2,7 +2,7 @@
 
 Généré par `scripts/fetch_examples.py`. Les fichiers eux-mêmes ne sont pas versionnés (configs tierces) : relance le script pour les récupérer.
 
-Filtre : Lua validé par `Hyprland --verify-config` de la version installée, JSON Waybar parsé.
+Filtre : Lua validé par `Hyprland --verify-config` de la version installée, JSON Waybar parsé, QML sans erreur de syntaxe ni faute de propriété (qmllint).
 
 - **ml4w (local)** `/home/ethan/.mydotfiles/com.ml4w.dotfiles.stable/.config/hypr` · 50 fichiers Lua · 8 configs Waybar · 18 CSS
 - [0xsam1r/hyprdots](https://github.com/0xsam1r/hyprdots) `config/hypr/hyprland.lua` · 1 fichiers Lua (config complète valide)
@@ -54,3 +54,6 @@ Filtre : Lua validé par `Hyprland --verify-config` de la version installée, JS
 - [Alexays/Waybar](https://github.com/Alexays/Waybar) · 1 configs/modules Waybar · 1 CSS
 - [HyDE-Project/HyDE](https://github.com/HyDE-Project/HyDE) · 68 configs/modules Waybar · 0 CSS
 - [JaKooLit/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots) · 8 configs/modules Waybar · 8 CSS
+- **ml4w (local)** `/home/ethan/.mydotfiles/com.ml4w.dotfiles.stable/.config/quickshell` · 65 fichiers QML
+- [quickshell-mirror/quickshell-examples](https://github.com/quickshell-mirror/quickshell-examples) · 14 fichiers QML Quickshell
+- [caelestia-dots/shell](https://github.com/caelestia-dots/shell) · 32 fichiers QML Quickshell

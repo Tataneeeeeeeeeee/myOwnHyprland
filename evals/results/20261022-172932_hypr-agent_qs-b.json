@@ -1,0 +1,161 @@
+{
+ "date": "20261022-172932",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 3,
+  "valid": 0.6666666666666666,
+  "first_try": 0.0,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 150.33333333333334,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "qs-b"
+ },
+ "filter": {
+  "pattern": "^qs-(volume|launcher|floating)$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "qs-volume",
+   "tags": [
+    "quickshell",
+    "new",
+    "services"
+   ],
+   "valid": false,
+   "first_try": false,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 306.4,
+   "model_calls": 25,
+   "fixes": 3,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /import Quickshell\\.Services\\.Pipewire/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /defaultAudioSink/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /PwObjectTracker/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /muted/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(onClicked|TapHandler)/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-172932/qs-volume"
+  },
+  {
+   "id": "qs-launcher",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 69.2,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(Process|execDetached)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /rofi/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /drun/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(onClicked|TapHandler)/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-172932/qs-launcher"
+  },
+  {
+   "id": "qs-floating",
+   "tags": [
+    "quickshell",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 75.4,
+   "model_calls": 13,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /margins/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /margins[^}]*(top|left|right)\\s*:\\s*10/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /radius:\\s*12/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(?i)#1e1e2e/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-172932/qs-floating"
+  }
+ ]
+}

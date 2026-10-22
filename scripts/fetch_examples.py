@@ -9,6 +9,7 @@ Usage : uv run python scripts/fetch_examples.py
 
 import hashlib
 import json
+import re
 import urllib.parse
 import shutil
 import subprocess
@@ -18,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from myhypr.tools import _strip_jsonc, verify_hyprland_file  # noqa: E402
+from myhypr.tools import _qmllint, _strip_jsonc, verify_hyprland_file  # noqa: E402
 
 OUT = ROOT / "docs" / "examples"
 HOME_CFG = Path.home() / ".config"
@@ -41,7 +42,7 @@ WAYBAR_REMOTE = {
 MAX_LUA_FILES_PER_REPO = 60
 
 sources: list[str] = []
-kept = {"lua": 0, "waybar": 0, "css": 0}
+kept = {"lua": 0, "waybar": 0, "css": 0, "qml": 0}
 seen_hashes: set[str] = set()
 
 
@@ -170,6 +171,49 @@ def remote_lua():
                 sources.append(f"- [{repo}](https://github.com/{repo}) `{entry}` · {n} fichiers Lua ({status})")
 
 
+# ------------------------------------------------------------------------------- Quickshell
+
+# (dépôt, regex des chemins à prendre)
+QS_REMOTE = {
+    "quickshell-mirror/quickshell-examples": r".*\.qml$",           # exemples officiels, petits et ciblés
+    "caelestia-dots/shell": r"^modules/bar/.*\.qml$",              # barre d'une config populaire
+}
+
+
+def qml_files_ok(root: Path) -> list[Path]:
+    """Fichiers QML sans erreur fiable (syntaxe, faute de propriété) selon qmllint."""
+    bad = {line.split(":", 1)[0] for line in _qmllint(root)}
+    return [f for f in sorted(root.rglob("*.qml")) if f.relative_to(root).as_posix() not in bad]
+
+
+def quickshell_examples():
+    local = (HOME_CFG / "quickshell").resolve()
+    if local.exists():
+        before = kept["qml"]
+        for f in qml_files_ok(local):
+            save(f"ml4w/quickshell/{f.relative_to(local)}", f.read_bytes(), "qml")
+        sources.append(f"- **ml4w (local)** `{local}` · {kept['qml'] - before} fichiers QML")
+        print(f"  ✓ ml4w quickshell (local)                   {kept['qml'] - before} fichiers QML")
+    for repo, pattern in QS_REMOTE.items():
+        tree = gh(f"repos/{repo}/git/trees/HEAD?recursive=1")
+        paths = [t["path"] for t in json.loads(tree).get("tree", []) if t["type"] == "blob"
+                 and re.match(pattern, t["path"])] if tree else []
+        before = kept["qml"]
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            for path in paths:
+                content = gh_raw(repo, path)
+                if content:
+                    (tmp / path).parent.mkdir(parents=True, exist_ok=True)
+                    (tmp / path).write_bytes(content)
+            for f in qml_files_ok(tmp):
+                save(f"github/{repo.replace('/', '__')}/quickshell/{f.relative_to(tmp)}", f.read_bytes(), "qml")
+        n = kept["qml"] - before
+        print(f"  {'✓' if n else '✗'} {repo:<40} {n} fichiers QML (sur {len(paths)})")
+        if n:
+            sources.append(f"- [{repo}](https://github.com/{repo}) · {n} fichiers QML Quickshell")
+
+
 # ------------------------------------------------------------------------------- Waybar (GitHub)
 
 def remote_waybar():
@@ -208,12 +252,16 @@ def main():
     remote_lua()
     print("== Waybar sur GitHub")
     remote_waybar()
+    print("== Quickshell")
+    quickshell_examples()
     (OUT / "SOURCES.md").write_text(
         "# Sources des exemples\n\nGénéré par `scripts/fetch_examples.py`. Les fichiers eux-mêmes ne sont pas "
         "versionnés (configs tierces) : relance le script pour les récupérer.\n\n"
-        "Filtre : Lua validé par `Hyprland --verify-config` de la version installée, JSON Waybar parsé.\n\n"
+        "Filtre : Lua validé par `Hyprland --verify-config` de la version installée, JSON Waybar parsé, "
+        "QML sans erreur de syntaxe ni faute de propriété (qmllint).\n\n"
         + "\n".join(sources) + "\n")
-    print(f"\nTotal : {kept['lua']} Lua · {kept['waybar']} configs Waybar · {kept['css']} CSS → {OUT}")
+    print(f"\nTotal : {kept['lua']} Lua · {kept['waybar']} configs Waybar · {kept['css']} CSS · "
+          f"{kept['qml']} QML → {OUT}")
 
 
 if __name__ == "__main__":

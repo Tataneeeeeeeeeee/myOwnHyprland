@@ -1,0 +1,72 @@
+{
+ "date": "20261022-175544",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 1,
+  "valid": 1.0,
+  "first_try": 0.0,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 162.0,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "qs-hints-volume"
+ },
+ "filter": {
+  "pattern": "^qs-volume$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "qs-volume",
+   "tags": [
+    "quickshell",
+    "new",
+    "services"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 162.0,
+   "model_calls": 23,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /import Quickshell\\.Services\\.Pipewire/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /defaultAudioSink/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /PwObjectTracker\\s*\\{[^}]*objects\\s*:\\s*\\/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /muted/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(onClicked|TapHandler)/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261022-175544/qs-volume"
+  }
+ ]
+}

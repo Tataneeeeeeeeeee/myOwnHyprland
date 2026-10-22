@@ -1,6 +1,7 @@
 # myOwnHyprland
 
-Agent IA **100 % local** (Ollama + qwen3.5:9b) qui écrit, valide et corrige des configs Hyprland (Lua, 0.56+) et Waybar.
+Agent IA **100 % local** (Ollama + qwen3.5:9b) qui écrit, valide et corrige des configs Hyprland (Lua, 0.56+),
+Waybar et des widgets **Quickshell** (QML).
 
 ```
 demande ─► RAG (wiki Hyprland + wiki Waybar + stubs hl.*) ─► qwen3.5 + outils
@@ -58,10 +59,21 @@ uv run myhypr dataset                      # avancement du dataset de fine-tunin
 L'agent travaille **toujours** dans `workspaces/<date>/` (miroir de `~/.config`). Rien ne touche ta config
 tant que tu ne lances pas `apply`. Note : `verify_waybar` affiche une waybar de test pendant 3 s.
 
+## Quickshell (widgets QML)
+
+- Une config = un dossier `quickshell/<nom>/shell.qml` dans le dossier de travail ; après `/apply`, lance-la avec
+  `qs -p ~/.config/quickshell/<nom>` (ta config ml4w occupe `~/.config/quickshell/shell.qml`, donc les noms de
+  config `qs -c` sont ignorés par Quickshell : passe par `-p`).
+- Doc : `scripts/fetch_quickshell_docs.py` récupère guide + 138 types de **la version installée** (`qs --version`).
+- Validation (`verify_quickshell`) : `qmllint` (Qt6) limité aux signaux fiables (syntaxe, faute de propriété avec
+  suggestion), puis lancement réel `qs -p` de 4 s (échec de chargement, ReferenceError, TypeError…). Des indices
+  ciblés corrigent les erreurs QML fréquentes (`centerIn` sans `anchors.`, `fontSize` au lieu de `font.pixelSize`…).
+- Exemples : exemples officiels quickshell-examples, ta config ml4w, la barre de caelestia (filtrés par qmllint).
+
 ## Banc d'évaluation
 
-Avant de toucher au prompt, à la doc ou au modèle : mesurer. `evals/cases.toml` contient 25 demandes fixes
-(Waybar, Hyprland, modification d'une config existante, question) avec des vérifications déterministes.
+Avant de toucher au prompt, à la doc ou au modèle : mesurer. `evals/cases.toml` contient 31 demandes fixes
+(Waybar, Hyprland, Quickshell, modification d'une config existante, question) avec des vérifications déterministes.
 Les configs Lua sont **exécutées** avec une fausse API `hl` (`evals/hl_mock.lua`) : on vérifie le sens
 (« SUPER+Return lance kitty », `input.kb_layout == "fr"`), pas une regex sur le texte.
 
