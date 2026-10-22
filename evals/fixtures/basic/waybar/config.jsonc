@@ -1,0 +1,24 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network"],
+
+    "clock": {
+        "format": "{:%H:%M}",
+        "tooltip-format": "{:%A %d %B %Y}"
+    },
+    "pulseaudio": {
+        "format": "{volume}% {icon}",
+        "format-muted": "muet",
+        "format-icons": { "default": ["", "", ""] },
+        "on-click": "pavucontrol"
+    },
+    "network": {
+        "format-wifi": "{essid} ",
+        "format-ethernet": "eth ",
+        "format-disconnected": "hors ligne"
+    }
+}

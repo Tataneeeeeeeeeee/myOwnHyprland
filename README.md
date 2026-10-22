@@ -58,6 +58,28 @@ uv run myhypr dataset                      # avancement du dataset de fine-tunin
 L'agent travaille **toujours** dans `workspaces/<date>/` (miroir de `~/.config`). Rien ne touche ta config
 tant que tu ne lances pas `apply`. Note : `verify_waybar` affiche une waybar de test pendant 3 s.
 
+## Banc d'évaluation
+
+Avant de toucher au prompt, à la doc ou au modèle : mesurer. `evals/cases.toml` contient 25 demandes fixes
+(Waybar, Hyprland, modification d'une config existante, question) avec des vérifications déterministes.
+Les configs Lua sont **exécutées** avec une fausse API `hl` (`evals/hl_mock.lua`) : on vérifie le sens
+(« SUPER+Return lance kitty », `input.kb_layout == "fr"`), pas une regex sur le texte.
+
+```bash
+uv run myhypr eval                       # tout (~40 min)
+uv run myhypr eval '^wb-'                # seulement les cas Waybar
+uv run myhypr eval --tag modify          # seulement les modifications de config existante
+uv run myhypr eval -n 3                  # 3 répétitions par cas (le modèle n'est pas déterministe)
+uv run myhypr eval --model hypr-agent-ft --label apres-finetune
+```
+
+Mesures : **valide** (passe la validation), **1er coup** (sans aucune correction), **conforme** (toutes les
+vérifications OK), temps. Un run complet s'affiche avec l'écart par rapport au précédent run complet du même
+modèle. Résultats dans `evals/results/` (versionnés), fichiers produits dans `evals/runs/` (non versionnés).
+
+Ajouter un cas : un bloc `[[case]]` dans `cases.toml` (la syntaxe des vérifications est en tête de fichier).
+Pour partir d'une config existante : `seed = "basic"` (→ `evals/fixtures/basic/`).
+
 ## Les 5 étapes
 
 | # | Étape | État | Où |
@@ -74,8 +96,18 @@ le résultat toi-même** : la validation garantit une syntaxe correcte, pas que 
 (ex. observé : couleurs « violet-cyan » demandées, cyan-vert produites). Un dataset de 300 bons exemples vaut
 mieux que 3000 moyens.
 
-Pour améliorer le RAG sans entraîner : dépose des configs que tu aimes dans `docs/examples/` puis relance
-`myhypr index`.
+### Exemples de configs réelles (`docs/examples/`)
+`uv run python scripts/fetch_examples.py` puis `uv run myhypr index` construit une base d'exemples :
+- **ml4w** (ta config locale) : variantes d'animations, décorations, raccourcis (avec AZERTY), modules et thèmes Waybar ;
+- **GitHub** : ~45 dotfiles Hyprland en Lua trouvés via la recherche de code, plus Waybar d'Alexays, HyDE et JaKooLit.
+
+Filtre strict : un Lua n'entre que s'il passe `Hyprland --verify-config` sur ta version (la plupart des
+dotfiles publics sont encore en ancienne syntaxe `.conf`, qui ferait régresser l'agent). Les fichiers tiers ne
+sont pas versionnés ; `docs/examples/SOURCES.md` liste les origines. Tes propres exemples : dépose-les dans
+`docs/examples/perso/` (versionné) puis `myhypr index`.
+
+À chaque demande, l'agent reçoit 3 passages de doc + 2 exemples réels. `MYHYPR_NO_EXAMPLES=1` désactive les
+exemples (pour mesurer leur apport avec le banc).
 
 ### Étape 5 — fine-tuning (plus tard)
 - Outil : [Unsloth](https://github.com/unslothai/unsloth), QLoRA 4 bits sur le modèle de base Qwen3.5-9B (HF).

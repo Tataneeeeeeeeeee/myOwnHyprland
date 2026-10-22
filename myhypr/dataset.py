@@ -8,14 +8,14 @@ from .config import DATASET
 
 
 def written_files(result: Result) -> dict[str, str]:
-    """Contenu final de chaque fichier écrit par l'agent pendant la session."""
-    files: dict[str, str] = {}
+    """Contenu final de chaque fichier écrit ou modifié par l'agent pendant la session."""
+    paths: list[str] = []
     for m in result.messages:
         for call in m.get("tool_calls", []):
             f = call["function"]
-            if f["name"] == "write_file":
-                files[f["arguments"]["path"]] = f["arguments"]["content"]
-    return files
+            if f["name"] in ("write_file", "edit_file") and f["arguments"].get("path") not in paths:
+                paths.append(f["arguments"]["path"])
+    return {p: (result.workspace / p).read_text() for p in paths if (result.workspace / p).exists()}
 
 
 def to_example(result: Result) -> dict:

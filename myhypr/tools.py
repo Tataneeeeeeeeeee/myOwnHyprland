@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from . import rag
-from .config import TOOL_OUTPUT_LIMIT
+from .config import DOCS_RAW, TOOL_OUTPUT_LIMIT
 
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
 
@@ -44,9 +44,57 @@ class Workspace:
             Confirmation
         """
         p = self.path(path)
+        if p.exists():
+            old_lines, new_lines = len(p.read_text().splitlines()), len(content.splitlines())
+            if old_lines >= 30 and new_lines < 0.6 * old_lines:
+                return (f"ERREUR : write_file réduirait {path} de {old_lines} à {new_lines} lignes, le reste de la "
+                        f"config serait perdu. Refusé. Pour modifier, utilise edit_file sur les lignes concernées.")
         p.parent.mkdir(parents=True, exist_ok=True)
+        previous = p.read_text() if p.exists() else None
         p.write_text(content)
-        return f"OK : {path} écrit ({len(content)} caractères)"
+        return self._guard(path, previous) or f"OK : {path} écrit ({len(content)} caractères)"
+
+    def edit_file(self, path: str, old: str, new: str) -> str:
+        """Modifie un fichier existant en remplaçant un passage exact. À préférer à write_file pour toute retouche.
+
+        Args:
+            path: Chemin relatif du fichier à modifier
+            old: Texte exact à remplacer, copié du fichier (doit y apparaître une seule fois ; ajoute du contexte sinon)
+            new: Texte de remplacement
+
+        Returns:
+            Confirmation ou erreur
+        """
+        p = self.path(path)
+        if not p.exists():
+            return f"ERREUR : {path} n'existe pas (utilise write_file pour le créer)"
+        text = p.read_text()
+        count = text.count(old)
+        if count == 0:
+            return f"ERREUR : texte introuvable dans {path}. Relis le fichier avec read_file et copie le passage exact."
+        if count > 1:
+            return f"ERREUR : texte trouvé {count} fois dans {path}. Ajoute des lignes de contexte pour le rendre unique."
+        p.write_text(text.replace(old, new, 1))
+        if (refused := self._guard(path, text)):
+            return refused
+        return f"OK : {path} modifié ({old.count(chr(10)) + 1} ligne(s) → {new.count(chr(10)) + 1})"
+
+    def _guard(self, path: str, previous: str | None) -> str | None:
+        """Annule une modification qui casse une config Hyprland qui était valide avant."""
+        entry = self.root / "hypr" / "hyprland.lua"
+        if previous is None or not path.startswith("hypr/") or not path.endswith(".lua") or not entry.exists():
+            return None
+        p = self.path(path)
+        new = p.read_text()
+        after = verify_hyprland_file(entry)
+        if after == "config ok":
+            return None
+        p.write_text(previous)
+        if verify_hyprland_file(entry) != "config ok":  # c'était déjà cassé avant : on garde la modification
+            p.write_text(new)
+            return None
+        return (f"ERREUR : cette modification casse la config, elle a été ANNULÉE ({path} est inchangé).\n{after}\n"
+                f"Relis le passage avec read_file et refais une modification plus précise.")
 
     def read_file(self, path: str) -> str:
         """Lit un fichier du dossier de travail.
@@ -69,7 +117,7 @@ class Workspace:
         return "\n".join(self.files()) or "(dossier vide)"
 
     def search_docs(self, query: str) -> str:
-        """Cherche dans la documentation officielle Hyprland (Lua), Waybar et l'API hl.*.
+        """Cherche dans la documentation officielle Hyprland (Lua), Waybar, l'API hl.* et des configs réelles.
 
         Args:
             query: Ce que tu cherches, ex. "window rule float by class", "waybar clock format"
@@ -77,7 +125,7 @@ class Workspace:
         Returns:
             Les passages de doc les plus pertinents
         """
-        return rag.format_hits(rag.search(query, k=4))
+        return rag.search_mixed(query, docs=3, examples=1)
 
     def verify_hyprland(self, path: str = "hypr/hyprland.lua") -> str:
         """Valide une config Hyprland Lua avec `Hyprland --verify-config` (sans toucher la session).
@@ -110,7 +158,7 @@ class Workspace:
         return verify_waybar_files(cfg, css if css.exists() else None)
 
     def tools(self) -> dict:
-        return {f.__name__: f for f in (self.write_file, self.read_file, self.list_files,
+        return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
                                          self.search_docs, self.verify_hyprland, self.verify_waybar)}
 
     def validate_all(self) -> list[str]:
@@ -132,7 +180,83 @@ class Workspace:
 
 # ---------------------------------------------------------------- validateurs
 
+STUBS = Path("/usr/share/hypr/stubs/hl.meta.lua")
+
+
+def _stub_names() -> tuple[list[str], list[str]]:
+    """(fonctions de hl.*, clés de config valides) lues dans les stubs installés."""
+    if not STUBS.exists():
+        return [], []
+    text = STUBS.read_text(errors="ignore")
+    api = re.search(r"---@class HL\.API\n(.*?)\nlocal", text, re.S)
+    funcs = re.findall(r"---@field (\w+) fun", api.group(1)) if api else []
+    keys_block = re.search(r'---@alias HL\.ConfigKey\n(.*?)\n\n', text, re.S)
+    keys = re.findall(r'"([\w.:-]+)"', keys_block.group(1)) if keys_block else []
+    return funcs, keys
+
+
+def _hypr_hints(out: str) -> list[str]:
+    hints = []
+    if re.search(r"module '(hl|hyprland)' not found|error loading module 'hyprland'|C stack overflow", out):
+        hints.append("Indice : `hl` est une variable GLOBALE fournie par Hyprland. Supprime tout require(\"hl\") "
+                     "ou require(\"hyprland\") : le fichier ne doit jamais se require lui-même.")
+    funcs, keys = _stub_names()
+    for name in dict.fromkeys(re.findall(r"attempt to call a nil value \(field '(\w+)'\)", out)):
+        hints.append(f"Indice : hl.{name} n'existe pas. Fonctions hl.* disponibles : "
+                     + ", ".join(f for f in funcs if not f.startswith("get_")) + ". Actions de bind : hl.dsp.*")
+    for name in dict.fromkeys(re.findall(r"attempt to call a nil value \(global '(\w+)'\)", out)):
+        hints.append(f"Indice : `{name}` n'est défini nulle part : texte probablement coupé par une modification "
+                     f"ou fonction inventée. Relis la ligne indiquée avec read_file.")
+    for key in dict.fromkeys(re.findall(r"unknown config key '([\w.:-]+)'", out)):
+        section = key.rsplit(".", 1)[0]
+        valid = [k.rsplit(".", 1)[-1] for k in keys if k.rsplit(".", 1)[0] == section]
+        if valid:
+            hints.append(f"Indice : clés valides dans {section} : " + ", ".join(valid[:60]))
+        else:
+            sections = sorted({k.split(".")[0] for k in keys})
+            hints.append(f"Indice : section '{section}' inconnue. Sections valides : " + ", ".join(sections))
+    return hints
+
+
+MOCK = Path(__file__).with_name("hl_mock.lua")
+
+
+def _lint_hypr(entry: Path) -> list[str]:
+    """Erreurs silencieuses : `gaps_in = 10` ou `general = {...}` en variable globale sont du Lua valide
+    mais n'ont AUCUN effet (Hyprland ne lit que les appels hl.*). On exécute la config avec une fausse
+    API hl (hl_mock.lua) pour lister les globales réellement créées."""
+    if not shutil.which("lua"):
+        return []
+    try:
+        r = subprocess.run(["lua", str(MOCK), str(entry)], capture_output=True, text=True, timeout=20)
+        created = json.loads(r.stdout).get("globals", [])
+    except (subprocess.TimeoutExpired, json.JSONDecodeError):
+        return []
+    funcs, keys = _stub_names()
+    leaf = {}
+    for k in keys:
+        leaf.setdefault(k.rsplit(".", 1)[-1], k)
+    sections = {k.split(".")[0] for k in keys} | {"config", "monitor", "binds", "bind", "env", "exec"}
+    issues = []
+    for name in sorted(created):
+        target = next((k for k in keys if k == name.replace("_", ".")), None) or leaf.get(name)
+        if not (target or name in sections or name in funcs):
+            continue
+        if target:
+            sec, _, opt = target.rpartition(".")
+            parts = sec.split(".")
+            fix = "hl.config({ " + "".join(f"{p} = {{ " for p in parts) + f"{opt} = ..." + " }" * len(parts) + " })"
+        elif name in funcs:
+            fix = f"hl.{name}({{ ... }})"
+        else:
+            fix = "hl.config({ ... })" if name == "config" else f"hl.config({{ {name} = {{ ... }} }})"
+        issues.append(f"`{name} = ...` crée une variable globale IGNORÉE par Hyprland (aucun effet). "
+                      f"Écris plutôt : {fix}")
+    return issues
+
+
 def verify_hyprland_file(path: Path) -> str:
+    path = path.resolve()
     try:
         r = subprocess.run(["Hyprland", "--verify-config", "-c", str(path)],
                            capture_output=True, text=True, timeout=30, cwd=path.parent)
@@ -141,9 +265,12 @@ def verify_hyprland_file(path: Path) -> str:
     out = ANSI.sub("", r.stdout + r.stderr)
     result = out.split("Config parsing result:", 1)[-1].strip()
     if result == "config ok":
-        return "config ok"
-    result = result.replace(str(path.parent) + "/", "")
-    return result[:TOOL_OUTPUT_LIMIT] or out[-TOOL_OUTPUT_LIMIT:]
+        lint = _lint_hypr(path)
+        return "\n".join(["[lint] la config se charge mais certaines lignes n'ont aucun effet :", *lint]) \
+            if lint else "config ok"
+    result = (result.replace(str(path.parent) + "/", "") or out[-3000:])
+    result = "\n".join(ln for ln in result.splitlines() if not re.match(r"\s*no (field|file) ", ln))
+    return "\n".join([result[:3000], *_hypr_hints(out)])[:TOOL_OUTPUT_LIMIT]
 
 
 def _strip_jsonc(text: str) -> str:
@@ -188,6 +315,23 @@ WAYBAR_HINTS = {
 }
 
 
+def _format_doc(module: str) -> str:
+    """Section FORMAT REPLACEMENTS de la page wiki du module (placeholders valides)."""
+    base, _, sub = module.partition("/")
+    wiki = DOCS_RAW / "waybar-wiki"
+    page = next((p for p in wiki.glob("Module:-*.md") if p.stem.lower() == f"module:-{base.lower()}"), None)
+    if page is None:
+        return ""
+    text = page.read_text(errors="ignore")
+    sections = []
+    for m in re.finditer(r"^#{1,3} FORMAT REPLACEMENTS\n(.*?)(?=\n#{1,3} |\Z)", text, re.S | re.M):
+        before = text[max(0, m.start() - 4000):m.start()].lower()
+        if not sub or sub.lower() in before:
+            sections.append(m.group(1).strip())
+    body = re.sub(r"\*\*", "", "\n".join(sections[-1:] or sections))
+    return body[:700]
+
+
 def _lint_waybar(conf: dict) -> list[str]:
     """Erreurs silencieuses que waybar ne signale pas."""
     issues = []
@@ -206,7 +350,7 @@ def verify_waybar_files(cfg: Path, css: Path | None) -> str:
     if lint:
         return "\n".join(lint)
 
-    if not os.environ.get("WAYLAND_DISPLAY") or not shutil.which("waybar"):
+    if os.environ.get("MYHYPR_NO_LIVE") or not os.environ.get("WAYLAND_DISPLAY") or not shutil.which("waybar"):
         return "waybar ok (JSON valide ; test live ignoré : pas de session Wayland)"
 
     cmd = ["waybar", "-c", str(cfg), "-l", "warning"]
@@ -225,4 +369,11 @@ def verify_waybar_files(cfg: Path, css: Path | None) -> str:
     if proc.returncode not in (0, -15, 143) and not issues:
         issues = [ANSI.sub("", out[-2000:])]
     issues += [hint for key, hint in WAYBAR_HINTS.items() if any(key in i for i in issues)]
+    for module in dict.fromkeys(re.findall(r"\]\s*([\w/-]+): (?:argument not found|format error)", out)):
+        doc = _format_doc(module)
+        if doc:
+            issues.append(f"Placeholders valides pour {module} (doc officielle) :\n{doc}")
+    if re.search(r"Unknown module: custom-", out):
+        issues.append("Indice : les modules personnalisés s'écrivent \"custom/<nom>\" (avec un slash), "
+                      "dans modules-* ET comme clé de configuration.")
     return "waybar ok" if not issues else "\n".join(issues)[:TOOL_OUTPUT_LIMIT]

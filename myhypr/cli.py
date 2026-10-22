@@ -76,6 +76,13 @@ def cmd_chat(args):
     tui.main(args.model)
 
 
+def cmd_eval(args):
+    from . import evaluate
+    if args.rescore:
+        return evaluate.rescore(args.rescore)
+    evaluate.main(args.filter, args.tag, args.model, args.think, args.repeat, not args.no_live, args.label)
+
+
 def cmd_dataset(_args):
     print(dataset.stats())
 
@@ -114,6 +121,17 @@ def main():
     s = sub.add_parser("restore", help="restaure une sauvegarde de data/backups/")
     s.add_argument("backup")
     s.set_defaults(func=cmd_restore)
+
+    s = sub.add_parser("eval", help="banc d'évaluation (evals/cases.toml)")
+    s.add_argument("filter", nargs="?", help="regex sur l'id des cas, ex. '^wb-'")
+    s.add_argument("--tag", help="ne lancer que les cas avec ce tag (waybar, hypr, modify…)")
+    s.add_argument("--model", default=CHAT_MODEL)
+    s.add_argument("--think", action="store_true")
+    s.add_argument("-n", "--repeat", type=int, default=1, help="répéter chaque cas (mesure la variance)")
+    s.add_argument("--no-live", action="store_true", help="ne pas lancer waybar pour valider (plus rapide)")
+    s.add_argument("--label", default="", help="étiquette du run, ex. 'avant-exemples'")
+    s.add_argument("--rescore", metavar="RESULTS.json", help="recalcule les vérifications d'un run existant")
+    s.set_defaults(func=cmd_eval)
 
     s = sub.add_parser("dataset", help="statistiques du dataset de fine-tuning")
     s.set_defaults(func=cmd_dataset)

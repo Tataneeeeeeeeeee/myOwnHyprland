@@ -1,6 +1,7 @@
 """Étape 2 — RAG : indexation de la doc (wiki Hyprland, wiki Waybar, stubs Lua) et recherche."""
 
 import json
+import os
 import re
 from pathlib import Path
 
@@ -93,10 +94,11 @@ def collect_chunks() -> list[dict]:
     # Tes propres exemples : docs/examples/**/* (configs que tu aimes)
     examples = DOCS_RAW.parent / "examples"
     for f in sorted(examples.rglob("*")) if examples.exists() else []:
-        if f.is_file() and f.suffix in {".lua", ".jsonc", ".json", ".css", ".md"}:
+        if f.is_file() and f.suffix in {".lua", ".jsonc", ".json", ".css"}:
             text = f.read_text(errors="ignore")
             for part in _split(text):
-                chunks.append({"source": f"examples/{f.relative_to(examples)}", "title": f.name, "text": part})
+                rel = f.relative_to(examples)
+                chunks.append({"source": f"examples/{rel}", "title": "/".join(rel.parts[-3:]), "text": part})
     return chunks
 
 
@@ -123,7 +125,8 @@ def build_index() -> int:
 _cache: tuple[np.ndarray, list[dict]] | None = None
 
 
-def search(query: str, k: int = 5) -> list[dict]:
+def search(query: str, k: int = 5, kind: str | None = None) -> list[dict]:
+    """kind = "docs" (doc officielle), "examples" (configs réelles) ou None (tout)."""
     global _cache
     if _cache is None:
         if not (INDEX_DIR / "vectors.npy").exists():
@@ -133,7 +136,26 @@ def search(query: str, k: int = 5) -> list[dict]:
     vecs, chunks = _cache
     q = _embed([query], "search_query: ")[0]
     scores = vecs @ q
-    return [{**chunks[i], "score": float(scores[i])} for i in np.argsort(-scores)[:k]]
+    hits = []
+    for i in np.argsort(-scores):
+        is_example = chunks[i]["source"].startswith("examples/")
+        if kind == "docs" and is_example or kind == "examples" and not is_example:
+            continue
+        hits.append({**chunks[i], "score": float(scores[i])})
+        if len(hits) == k:
+            break
+    return hits
+
+
+def search_mixed(query: str, docs: int = 3, examples: int = 2) -> str:
+    if os.environ.get("MYHYPR_NO_EXAMPLES"):  # pour mesurer l'apport des exemples dans le banc
+        examples = 0
+    out = format_hits(search(query, k=docs, kind="docs"))
+    ex = search(query, k=examples, kind="examples") if examples else []
+    if ex:
+        out += "\n\n## Exemples de configs réelles (validées sur ta version) — inspire-toi du style, " \
+               "adapte les valeurs à la demande\n\n" + format_hits(ex)
+    return out
 
 
 def format_hits(hits: list[dict]) -> str:

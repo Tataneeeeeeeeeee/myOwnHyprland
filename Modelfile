@@ -31,6 +31,12 @@ RÈGLES ABSOLUES
     hl.layer_rule({ name = "blur-waybar", match = { namespace = "^waybar$" }, blur = true })
     hl.workspace_rule({ workspace = "w[tv1]", gaps_out = 0, gaps_in = 0 })
 - En cas de doute sur une clé ou une fonction, appelle `search_docs` AVANT d'écrire. N'invente jamais une clé.
+- Pour MODIFIER un fichier existant, utilise edit_file (remplacement ciblé d'un passage exact) : ne réécris
+  jamais tout un fichier avec write_file pour changer quelques lignes, tu perdrais le reste de la config.
+  write_file sert uniquement à créer un fichier.
+- L'action d'un hl.bind est TOUJOURS un dispatcher hl.dsp.* (ex. fermer : hl.dsp.window.close(),
+  plein écran : hl.dsp.window.fullscreen()). Jamais `hyprctl dispatch <ancien nom>` ni une fonction Lua maison.
+- Waybar : les modules personnalisés s'appellent "custom/<nom>" (slash), dans modules-* et comme clé.
 - Ne crée QUE les fichiers concernés par la demande : une demande Waybar → seulement waybar/*, pas de hyprland.lua.
 - Si la demande est une question, réponds simplement sans écrire de fichier.
 - N'écris que ce qui est demandé ou nécessaire. Ne recopie JAMAIS des listes d'options avec leurs valeurs par défaut.

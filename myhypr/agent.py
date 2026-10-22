@@ -49,7 +49,7 @@ class Session:
 
     def _user_message(self, request: str) -> dict:
         try:
-            context = rag.format_hits(rag.search(request, k=5))
+            context = rag.search_mixed(request, docs=3, examples=2)
         except RuntimeError as e:
             context = f"(doc indisponible : {e})"
         return {"role": "user", "content": (

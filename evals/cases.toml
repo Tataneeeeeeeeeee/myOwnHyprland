@@ -1,0 +1,309 @@
+# Banc d'évaluation de l'agent : `uv run myhypr eval`
+#
+# Chaque cas = une demande + des vérifications déterministes sur les fichiers produits.
+#   seed = "basic"        part de evals/fixtures/basic/ (sinon dossier vide)
+#
+# Vérifications disponibles (une clé principale par ligne, + eq / has / lacks / match) :
+#   { only = ["waybar/"] }                     fichiers écrits/modifiés uniquement sous ces préfixes ([] = aucun)
+#   { file = "waybar/style.css" }              le fichier existe
+#   { waybar = "position", eq = "bottom" }     valeur dans config.jsonc (chemin pointé)
+#   { waybar = "modules-right", has = "battery" }   / lacks = "..."
+#   { waybar = "custom/power.on-click", match = "wlogout" }   regex sur la valeur
+#   { css = 'regex' }  /  { css_not = 'regex' }  sur waybar/style.css
+#   { hypr = "config.input.kb_layout", eq = "fr" }   valeur extraite en exécutant le Lua (evals/hl_mock.lua)
+#   { bind = "SUPER + Return", match = "kitty" }     un bind sur ces touches dont l'action matche
+#   { window_rule = "pavucontrol", match = '"float":\s*true' }   règle dont le match contient le texte
+#   { layer_rule = "waybar", match = '"blur":\s*true' }
+#   { hypr = "...colors", hue = [255, 300] }   au moins une couleur dans cette plage de teinte (violet)
+#   { exec = "waybar" }                        lancé au démarrage (hl.exec_cmd / hl.on)
+#   { answer = "follow_mouse" }                regex sur la réponse texte finale
+
+# ------------------------------------------------------------------ Waybar, création
+
+[[case]]
+id = "wb-bottom"
+tags = ["waybar", "new"]
+request = "Crée une waybar en bas avec les workspaces à gauche, l'horloge au centre, la batterie à droite, fond semi-transparent."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "position", eq = "bottom" },
+  { waybar = "modules-left", has = "hyprland/workspaces" },
+  { waybar = "modules-center", has = "clock" },
+  { waybar = "modules-right", has = "battery" },
+  { css = 'background(-color)?\s*:\s*(rgba\(|alpha\()' },
+]
+
+[[case]]
+id = "wb-audio-net"
+tags = ["waybar", "new"]
+request = "Une waybar avec l'horloge à gauche, et le volume puis le réseau à droite."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-left", has = "clock" },
+  { waybar = "modules-right", match = '(pulseaudio|wireplumber)' },
+  { waybar = "modules-right", has = "network" },
+  { waybar = "clock.format", match = '\{:' },
+]
+
+[[case]]
+id = "wb-pills"
+tags = ["waybar", "new", "style"]
+request = "Une waybar avec des workspaces en forme de pastilles arrondies, le workspace actif en violet."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-left", has = "hyprland/workspaces" },
+  { css = '#workspaces\s+button[^{]*\{[^}]*border-radius' },
+  { css = 'button\.active[^{]*\{[^}]*(#[a-fA-F0-9]{6}|rgba?\(|purple|violet)' },
+]
+
+[[case]]
+id = "wb-floating"
+tags = ["waybar", "new", "style"]
+request = "Une waybar flottante : détachée des bords de l'écran avec une marge de 8px, coins arrondis."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "margin-top", match = '^\d+$' },
+  { waybar = "margin-left", match = '^\d+$' },
+  { css = 'window#waybar[^{]*\{[^}]*border-radius' },
+]
+
+[[case]]
+id = "wb-power"
+tags = ["waybar", "new", "custom"]
+request = "Ajoute à droite d'une waybar un bouton power (module custom) qui lance wlogout au clic."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-right", match = 'custom/' },
+  { waybar_custom = "on-click", match = "wlogout" },
+]
+
+[[case]]
+id = "wb-date-format"
+tags = ["waybar", "new"]
+request = "Une waybar minimaliste avec seulement l'horloge au centre au format jour/mois heure:minute, par exemple 22/10 14:05."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-center", has = "clock" },
+  { waybar = "clock.format", match = '\{:.*%d/%m.*%H:%M' },
+]
+
+[[case]]
+id = "wb-cpu-mem"
+tags = ["waybar", "new"]
+request = "Une waybar avec CPU et mémoire à droite, rafraîchis toutes les 5 secondes."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-right", has = "cpu" },
+  { waybar = "modules-right", has = "memory" },
+  { waybar = "cpu.interval", eq = 5 },
+  { waybar = "memory.interval", eq = 5 },
+]
+
+[[case]]
+id = "wb-colors"
+tags = ["waybar", "new", "style"]
+request = "Une waybar avec le fond exactement #1e1e2e et le texte #cdd6f4, police JetBrainsMono Nerd Font 12px."
+checks = [
+  { only = ["waybar/"] },
+  { css = '(?i)background(-color)?\s*:\s*#1e1e2e' },
+  { css = '(?i)color\s*:\s*#cdd6f4' },
+  { css = 'JetBrainsMono' },
+  { css = 'font-size\s*:\s*12px' },
+]
+
+# --------------------------------------------------------------- Hyprland, création
+
+[[case]]
+id = "hy-basics"
+tags = ["hypr", "new"]
+request = "Crée hypr/hyprland.lua : clavier français, gaps intérieurs 8 et extérieurs 16."
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.input.kb_layout", eq = "fr" },
+  { hypr = "config.general.gaps_in", eq = 8 },
+  { hypr = "config.general.gaps_out", eq = 16 },
+]
+
+[[case]]
+id = "hy-binds"
+tags = ["hypr", "new", "binds"]
+request = "Crée hypr/hyprland.lua avec : SUPER+Return lance kitty, SUPER+D lance rofi -show drun, SUPER+Q ferme la fenêtre active."
+checks = [
+  { only = ["hypr/"] },
+  { bind = "SUPER + Return", match = "kitty" },
+  { bind = "SUPER + D", match = 'rofi.*drun' },
+  { bind = "SUPER + Q", match = '^window\.(close|kill)' },
+]
+
+[[case]]
+id = "hy-workspaces"
+tags = ["hypr", "new", "binds"]
+request = "Crée hypr/hyprland.lua : SUPER+1 à 5 pour aller sur les workspaces 1 à 5, SUPER+SHIFT+1 à 5 pour y déplacer la fenêtre."
+checks = [
+  { only = ["hypr/"] },
+  { bind = "SUPER + 1", match = '^focus .*"workspace": "?1\b' },
+  { bind = "SUPER + 5", match = '^focus .*"workspace": "?5\b' },
+  { bind = "SUPER + SHIFT + 1", match = '^window\.move .*"workspace": "?1\b' },
+  { bind = "SUPER + SHIFT + 5", match = '^window\.move .*"workspace": "?5\b' },
+]
+
+[[case]]
+id = "hy-rules"
+tags = ["hypr", "new", "rules"]
+request = "Crée hypr/hyprland.lua avec des règles : pavucontrol toujours en flottant, firefox toujours sur le workspace 2."
+checks = [
+  { only = ["hypr/"] },
+  { window_rule = "pavucontrol", match = '"float":\s*true' },
+  { window_rule = "firefox", match = '"workspace":\s*"?2' },
+]
+
+[[case]]
+id = "hy-border"
+tags = ["hypr", "new", "style"]
+request = "Crée hypr/hyprland.lua : bordures de 3 pixels, dégradé violet vers cyan sur la fenêtre active, coins arrondis de 12."
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.general.border_size", eq = 3 },
+  { hypr = "config.general.col.active_border.colors", hue = [255, 300] },
+  { hypr = "config.general.col.active_border.colors", hue = [165, 200] },
+  { hypr = "config.decoration.rounding", eq = 12 },
+]
+
+[[case]]
+id = "hy-no-anim"
+tags = ["hypr", "new"]
+request = "Crée hypr/hyprland.lua qui désactive complètement les animations."
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.animations.enabled", eq = false },
+]
+
+[[case]]
+id = "hy-autostart"
+tags = ["hypr", "new"]
+request = "Crée hypr/hyprland.lua qui lance au démarrage waybar, hyprpaper et nm-applet."
+checks = [
+  { only = ["hypr/"] },
+  { exec = "waybar" },
+  { exec = "hyprpaper" },
+  { exec = "nm-applet" },
+]
+
+[[case]]
+id = "hy-blur-waybar"
+tags = ["hypr", "new", "rules"]
+request = "Crée hypr/hyprland.lua avec une layer rule qui active le blur derrière waybar."
+checks = [
+  { only = ["hypr/"] },
+  { layer_rule = "waybar", match = '"blur":\s*true' },
+]
+
+[[case]]
+id = "hy-media-keys"
+tags = ["hypr", "new", "binds"]
+request = "Crée hypr/hyprland.lua avec les touches multimédia : volume +/- 5% et mute via wpctl, utilisables même écran verrouillé."
+checks = [
+  { only = ["hypr/"] },
+  { bind = "XF86AudioRaiseVolume", match = 'wpctl.*5%\+' },
+  { bind = "XF86AudioLowerVolume", match = 'wpctl.*5%-' },
+  { bind = "XF86AudioMute", match = 'wpctl.*mute' },
+  { bind = "XF86AudioMute", match = '"locked":\s*true' },
+]
+
+[[case]]
+id = "hy-touchpad"
+tags = ["hypr", "new"]
+request = "Crée hypr/hyprland.lua : défilement naturel sur le touchpad et sensibilité de la souris à 0.3."
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.input.touchpad.natural_scroll", eq = true },
+  { hypr = "config.input.sensitivity", eq = 0.3 },
+]
+
+# ------------------------------------------------- Modification d'une config existante
+
+[[case]]
+id = "mod-gaps"
+tags = ["hypr", "modify"]
+seed = "basic"
+request = "Réduis les gaps : 2 à l'intérieur et 4 à l'extérieur. Ne change rien d'autre."
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.general.gaps_in", eq = 2 },
+  { hypr = "config.general.gaps_out", eq = 4 },
+  { hypr = "config.input.kb_layout", eq = "us" },
+  { bind = "SUPER + Q", match = "kitty" },
+  { bind = "SUPER + 5", match = "workspace" },
+]
+
+[[case]]
+id = "mod-layout"
+tags = ["hypr", "modify"]
+seed = "basic"
+request = "Passe le layout en master au lieu de dwindle."
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.general.layout", eq = "master" },
+  { bind = "SUPER + Q", match = "kitty" },
+]
+
+[[case]]
+id = "mod-rule"
+tags = ["hypr", "modify", "rules"]
+seed = "basic"
+request = "Ajoute une règle pour que la calculatrice (classe org.gnome.Calculator) s'ouvre en flottant."
+checks = [
+  { only = ["hypr/"] },
+  { window_rule = "Calculator", match = '"float":\s*true' },
+  { window_rule = "hyprland-run", match = '"float":\s*true' },
+  { bind = "SUPER + Q", match = "kitty" },
+]
+
+[[case]]
+id = "mod-wb-add"
+tags = ["waybar", "modify"]
+seed = "basic"
+request = "Ajoute la batterie à droite de ma waybar, sans rien enlever."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-right", has = "battery" },
+  { waybar = "modules-right", has = "pulseaudio" },
+  { waybar = "modules-right", has = "network" },
+  { waybar = "modules-center", has = "clock" },
+]
+
+[[case]]
+id = "mod-wb-move"
+tags = ["waybar", "modify"]
+seed = "basic"
+request = "Déplace l'horloge à gauche, après les workspaces."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-left", has = "clock" },
+  { waybar = "modules-left", has = "hyprland/workspaces" },
+  { waybar = "modules-center", lacks = "clock" },
+  { waybar = "modules-right", has = "network" },
+]
+
+[[case]]
+id = "mod-wb-bottom"
+tags = ["waybar", "modify"]
+seed = "basic"
+request = "Mets ma waybar en bas de l'écran et augmente sa hauteur à 36."
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "position", eq = "bottom" },
+  { waybar = "height", eq = 36 },
+  { waybar = "modules-right", has = "pulseaudio" },
+]
+
+# ------------------------------------------------------------------------ Questions
+
+[[case]]
+id = "q-follow-mouse"
+tags = ["question"]
+request = "Question : quelle option Hyprland fait que le focus suit la souris ? Réponds sans créer de fichier."
+checks = [
+  { only = [] },
+  { answer = 'follow_mouse' },
+]

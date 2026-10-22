@@ -181,11 +181,12 @@ class Renderer:
     def on_tool_call(self, name: str, args: dict):
         self.flush(final=False)
         self.before = None
-        if name == "write_file":
+        if name in ("write_file", "edit_file"):
             p = self.ws.path(args.get("path", ""))
             self.before = p.read_text(errors="ignore") if p.exists() else ""
         self.phase = {
             "write_file": f"Écriture de {args.get('path', '')}…",
+            "edit_file": f"Modification de {args.get('path', '')}…",
             "read_file": f"Lecture de {args.get('path', '')}…",
             "search_docs": "Recherche dans la doc…",
             "verify_hyprland": "Validation Hyprland…",
@@ -196,8 +197,9 @@ class Renderer:
     def on_tool_result(self, name: str, out: str):
         args = getattr(self, "args", {})
         path = args.get("path", "")
-        if name == "write_file":
-            new = args.get("content", "")
+        if name in ("write_file", "edit_file") and not out.startswith("ERREUR"):
+            p = self.ws.path(path)
+            new = p.read_text(errors="ignore") if p.exists() else args.get("content", "")
             meta = Text()
             if self.before:
                 sm = difflib.SequenceMatcher(None, self.before.splitlines(), new.splitlines())
@@ -207,6 +209,8 @@ class Renderer:
             else:
                 meta.append(f"nouveau · {len(new.splitlines())} lignes", style=C["green"])
             self.print(row("✎", C["blue"], Text(path, style=C["text"]), meta))
+        elif name == "edit_file":
+            self.print(row("✎", C["peach"], Text(path, style=C["text"]), Text(out[:60], style=C["peach"])))
         elif name == "read_file":
             self.print(row("◌", C["overlay0"], Text(f"lu {path}", style=C["overlay1"]),
                            Text(f"{len(out.splitlines())} lignes", style=C["overlay0"])))
