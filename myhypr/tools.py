@@ -74,10 +74,31 @@ class Workspace:
             return f"ERREUR : texte introuvable dans {path}. Relis le fichier avec read_file et copie le passage exact."
         if count > 1:
             return f"ERREUR : texte trouvé {count} fois dans {path}. Ajoute des lignes de contexte pour le rendre unique."
+        # `old` multi-lignes coupé au milieu d'une ligne → la fin de la ligne survit seule et casse la config
+        # (ex. old finit par « -- hl.work » → il reste « space_rule({…}) » hors commentaire)
+        j = text.index(old) + len(old)
+        line_end = text.find("\n", j)
+        rest = text[j:line_end if line_end >= 0 else len(text)]
+        repaired = ""
+        if "\n" in old.strip("\n") and not old.endswith("\n") and re.search(r"[A-Za-z]", rest):
+            fragment = old[old.rfind("\n") + 1:]
+            if fragment.strip() and not new.rstrip("\n").endswith(fragment.strip()):
+                # Demi-ligne finale absente de new = artefact de génération : on la retire de old,
+                # la ligne d'origine reste intacte (manie observée de qwen : old finit par « -- hl.work »)
+                old = old[:old.rfind("\n") + 1]
+                new = new if new.endswith("\n") else new + "\n"
+                if text.count(old) == 1:
+                    repaired = " — old se terminait au milieu d'une ligne : la demi-ligne a été ignorée, ligne d'origine conservée"
+        if "\n" in old.strip("\n") and not old.endswith("\n") and re.search(r"[A-Za-z]", rest) and not repaired:
+            line_no = text.count("\n", 0, j) + 1
+            return (f"ERREUR : ton texte `old` s'arrête au milieu de la ligne {line_no} :\n"
+                    f"  {text.splitlines()[line_no - 1].strip()}\n"
+                    f"Le reste (« {rest.strip()[:60]} ») resterait seul et casserait la config. Copie des lignes "
+                    f"ENTIÈRES dans old (et reprends-les en entier dans new).")
         p.write_text(text.replace(old, new, 1))
         if (refused := self._guard(path, text)):
             return refused
-        return f"OK : {path} modifié ({old.count(chr(10)) + 1} ligne(s) → {new.count(chr(10)) + 1})"
+        return f"OK : {path} modifié ({old.count(chr(10)) + 1} ligne(s) → {new.count(chr(10)) + 1}){repaired}"
 
     def _guard(self, path: str, previous: str | None) -> str | None:
         """Annule une modification qui casse une config Hyprland qui était valide avant."""

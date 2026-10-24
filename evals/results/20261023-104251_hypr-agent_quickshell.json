@@ -1,0 +1,1299 @@
+{
+ "date": "20261023-104251",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 31,
+  "valid": 0.967741935483871,
+  "first_try": 0.6451612903225806,
+  "conform": 0.8709677419354839,
+  "checks": 0.9703703703703703,
+  "avg_seconds": 72.59354838709677,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "quickshell"
+ },
+ "filter": {
+  "pattern": null,
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "wb-bottom",
+   "tags": [
+    "waybar",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 86.3,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar position = 'bottom'",
+     "ok": true,
+     "got": "bottom"
+    },
+    {
+     "label": "waybar modules-left ∋ 'hyprland/workspaces'",
+     "ok": true,
+     "got": "[\"hyprland/workspaces\"]"
+    },
+    {
+     "label": "waybar modules-center ∋ 'clock'",
+     "ok": true,
+     "got": "[\"clock\"]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'battery'",
+     "ok": true,
+     "got": "[\"battery\", \"tray\"]"
+    },
+    {
+     "label": "css ~ /background(-color)?\\s*:\\s*(rgba\\(|alpha\\/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-bottom"
+  },
+  {
+   "id": "wb-audio-net",
+   "tags": [
+    "waybar",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 112.1,
+   "model_calls": 14,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-left ∋ 'clock'",
+     "ok": true,
+     "got": "[\"hyprland/workspaces\", \"clock\"]"
+    },
+    {
+     "label": "waybar modules-right ~ /(pulseaudio|wireplumber)/",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\"]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'network'",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\"]"
+    },
+    {
+     "label": "waybar clock.format ~ /\\{:/",
+     "ok": true,
+     "got": "{:L%X}"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-audio-net"
+  },
+  {
+   "id": "wb-pills",
+   "tags": [
+    "waybar",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": false,
+   "passed": 3,
+   "total": 4,
+   "seconds": 99.4,
+   "model_calls": 12,
+   "fixes": 1,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-left ∋ 'hyprland/workspaces'",
+     "ok": true,
+     "got": "[\"hyprland/workspaces\"]"
+    },
+    {
+     "label": "css ~ /#workspaces\\s+button[^{]*\\{[^}]*border-r/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "css ~ /button\\.active[^{]*\\{[^}]*(#[a-fA-F0-9]{/",
+     "ok": false,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-pills"
+  },
+  {
+   "id": "wb-floating",
+   "tags": [
+    "waybar",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 113.8,
+   "model_calls": 11,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar margin-top ~ /^\\d+$/",
+     "ok": true,
+     "got": "8"
+    },
+    {
+     "label": "waybar margin-left ~ /^\\d+$/",
+     "ok": true,
+     "got": "8"
+    },
+    {
+     "label": "css ~ /window#waybar[^{]*\\{[^}]*border-radius/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-floating"
+  },
+  {
+   "id": "wb-power",
+   "tags": [
+    "waybar",
+    "new",
+    "custom"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 130.0,
+   "model_calls": 14,
+   "fixes": 1,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-right ~ /custom//",
+     "ok": true,
+     "got": "[\"hyprland/window\", \"hyprland/submap\", \"custom/power\"]"
+    },
+    {
+     "label": "waybar custom/*.on-click ~ /wlogout/",
+     "ok": true,
+     "got": "[\"wlogout\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-power"
+  },
+  {
+   "id": "wb-date-format",
+   "tags": [
+    "waybar",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 39.6,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-center ∋ 'clock'",
+     "ok": true,
+     "got": "[\"clock\"]"
+    },
+    {
+     "label": "waybar clock.format ~ /\\{:.*%d/%m.*%H:%M/",
+     "ok": true,
+     "got": "{:%d/%m %H:%M}"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-date-format"
+  },
+  {
+   "id": "wb-cpu-mem",
+   "tags": [
+    "waybar",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 65.9,
+   "model_calls": 8,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-right ∋ 'cpu'",
+     "ok": true,
+     "got": "[\"cpu\", \"memory\", \"tray\", \"clock\"]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'memory'",
+     "ok": true,
+     "got": "[\"cpu\", \"memory\", \"tray\", \"clock\"]"
+    },
+    {
+     "label": "waybar cpu.interval = 5",
+     "ok": true,
+     "got": "5"
+    },
+    {
+     "label": "waybar memory.interval = 5",
+     "ok": true,
+     "got": "5"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-cpu-mem"
+  },
+  {
+   "id": "wb-colors",
+   "tags": [
+    "waybar",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 108.3,
+   "model_calls": 13,
+   "fixes": 1,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "css ~ /(?i)background(-color)?\\s*:\\s*#1e1e2e/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "css ~ /(?i)color\\s*:\\s*#cdd6f4/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "css ~ /JetBrainsMono/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "css ~ /font-size\\s*:\\s*12px/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/wb-colors"
+  },
+  {
+   "id": "hy-basics",
+   "tags": [
+    "hypr",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 43.4,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'fr'",
+     "ok": true,
+     "got": "fr"
+    },
+    {
+     "label": "hypr config.general.gaps_in = 8",
+     "ok": true,
+     "got": "8"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 16",
+     "ok": true,
+     "got": "16"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-basics"
+  },
+  {
+   "id": "hy-binds",
+   "tags": [
+    "hypr",
+    "new",
+    "binds"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 33.1,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "bind SUPER + Return ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"] {\\\"locked\\\": true}\"]"
+    },
+    {
+     "label": "bind SUPER + D ~ /rofi.*drun/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"rofi -show drun\\\"] {\\\"locked\\\": true}\"]"
+    },
+    {
+     "label": "bind SUPER + Q ~ /^window\\.(close|kill)/",
+     "ok": true,
+     "got": "[\"window.close [] {\\\"locked\\\": true}\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-binds"
+  },
+  {
+   "id": "hy-workspaces",
+   "tags": [
+    "hypr",
+    "new",
+    "binds"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 21.7,
+   "model_calls": 4,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "bind SUPER + 1 ~ /^focus .*\"workspace\": \"?1\\b/",
+     "ok": true,
+     "got": "[\"focus [{\\\"workspace\\\": 1}]\"]"
+    },
+    {
+     "label": "bind SUPER + 5 ~ /^focus .*\"workspace\": \"?5\\b/",
+     "ok": true,
+     "got": "[\"focus [{\\\"workspace\\\": 5}]\"]"
+    },
+    {
+     "label": "bind SUPER + SHIFT + 1 ~ /^window\\.move .*\"workspace\": \"/",
+     "ok": true,
+     "got": "[\"window.move [{\\\"workspace\\\": 1}]\"]"
+    },
+    {
+     "label": "bind SUPER + SHIFT + 5 ~ /^window\\.move .*\"workspace\": \"/",
+     "ok": true,
+     "got": "[\"window.move [{\\\"workspace\\\": 5}]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-workspaces"
+  },
+  {
+   "id": "hy-rules",
+   "tags": [
+    "hypr",
+    "new",
+    "rules"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 32.2,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "window_rule pavucontrol ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"float\": true, \"name\": \"float-pavu\", \"match\": {\"class\": \"^(pavucontrol)$\"}}]"
+    },
+    {
+     "label": "window_rule firefox ~ /\"workspace\":\\s*\"?2/",
+     "ok": true,
+     "got": "[{\"workspace\": 2, \"name\": \"firefox-ws2\", \"match\": {\"class\": \"^(firefox)$\"}}]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-rules"
+  },
+  {
+   "id": "hy-border",
+   "tags": [
+    "hypr",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": false,
+   "passed": 4,
+   "total": 5,
+   "seconds": 22.5,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.general.border_size = 3",
+     "ok": true,
+     "got": "3"
+    },
+    {
+     "label": "hypr config.general.col.active_border.colors teinte [255, 300]",
+     "ok": false,
+     "got": "204° 180°"
+    },
+    {
+     "label": "hypr config.general.col.active_border.colors teinte [165, 200]",
+     "ok": true,
+     "got": "204° 180°"
+    },
+    {
+     "label": "hypr config.decoration.rounding = 12",
+     "ok": true,
+     "got": "12"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-border"
+  },
+  {
+   "id": "hy-no-anim",
+   "tags": [
+    "hypr",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": false,
+   "passed": 1,
+   "total": 2,
+   "seconds": 39.3,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.animations.enabled = False",
+     "ok": false,
+     "got": "absent"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-no-anim"
+  },
+  {
+   "id": "hy-autostart",
+   "tags": [
+    "hypr",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 29.6,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "exec waybar",
+     "ok": true,
+     "got": "[\"waybar\", \"nm-applet --indicator\", \"hyprpaper\"]"
+    },
+    {
+     "label": "exec hyprpaper",
+     "ok": true,
+     "got": "[\"waybar\", \"nm-applet --indicator\", \"hyprpaper\"]"
+    },
+    {
+     "label": "exec nm-applet",
+     "ok": true,
+     "got": "[\"waybar\", \"nm-applet --indicator\", \"hyprpaper\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-autostart"
+  },
+  {
+   "id": "hy-blur-waybar",
+   "tags": [
+    "hypr",
+    "new",
+    "rules"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 2,
+   "total": 2,
+   "seconds": 19.9,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "layer_rule waybar ~ /\"blur\":\\s*true/",
+     "ok": true,
+     "got": "[{\"blur\": true, \"match\": {\"namespace\": \"waybar\"}}]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-blur-waybar"
+  },
+  {
+   "id": "hy-media-keys",
+   "tags": [
+    "hypr",
+    "new",
+    "binds"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 68.4,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "bind XF86AudioRaiseVolume ~ /wpctl.*5%\\+/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+\\\"] {\\\"locked\\\": …"
+    },
+    {
+     "label": "bind XF86AudioLowerVolume ~ /wpctl.*5%-/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-\\\"] {\\\"locked\\\": true,…"
+    },
+    {
+     "label": "bind XF86AudioMute ~ /wpctl.*mute/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\\\"] {\\\"locked\\\": true…"
+    },
+    {
+     "label": "bind XF86AudioMute ~ /\"locked\":\\s*true/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\\\"] {\\\"locked\\\": true…"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-media-keys"
+  },
+  {
+   "id": "hy-touchpad",
+   "tags": [
+    "hypr",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 18.0,
+   "model_calls": 4,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.input.touchpad.natural_scroll = True",
+     "ok": true,
+     "got": "true"
+    },
+    {
+     "label": "hypr config.input.sensitivity = 0.3",
+     "ok": true,
+     "got": "0.3"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/hy-touchpad"
+  },
+  {
+   "id": "mod-gaps",
+   "tags": [
+    "hypr",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 36.5,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.general.gaps_in = 2",
+     "ok": true,
+     "got": "2"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 4",
+     "ok": true,
+     "got": "4"
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'us'",
+     "ok": true,
+     "got": "us"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    },
+    {
+     "label": "bind SUPER + 5 ~ /workspace/",
+     "ok": true,
+     "got": "[\"focus [{\\\"workspace\\\": 5}]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/mod-gaps"
+  },
+  {
+   "id": "mod-layout",
+   "tags": [
+    "hypr",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 144.1,
+   "model_calls": 12,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.general.layout = 'master'",
+     "ok": true,
+     "got": "master"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/mod-layout"
+  },
+  {
+   "id": "mod-rule",
+   "tags": [
+    "hypr",
+    "modify",
+    "rules"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": false,
+   "passed": 3,
+   "total": 4,
+   "seconds": 181.4,
+   "model_calls": 13,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "window_rule Calculator ~ /\"float\":\\s*true/",
+     "ok": false,
+     "got": "absent"
+    },
+    {
+     "label": "window_rule hyprland-run ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"name\": \"move-hyprland-run\", \"move\": \"20 monitor_h-120\", \"float\": true, \"ma…"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/mod-rule"
+  },
+  {
+   "id": "mod-wb-add",
+   "tags": [
+    "waybar",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 28.8,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-right ∋ 'battery'",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\", \"battery\"]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'pulseaudio'",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\", \"battery\"]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'network'",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\", \"battery\"]"
+    },
+    {
+     "label": "waybar modules-center ∋ 'clock'",
+     "ok": true,
+     "got": "[\"clock\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/mod-wb-add"
+  },
+  {
+   "id": "mod-wb-move",
+   "tags": [
+    "waybar",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 46.1,
+   "model_calls": 9,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar modules-left ∋ 'clock'",
+     "ok": true,
+     "got": "[\"hyprland/workspaces\", \"clock\"]"
+    },
+    {
+     "label": "waybar modules-left ∋ 'hyprland/workspaces'",
+     "ok": true,
+     "got": "[\"hyprland/workspaces\", \"clock\"]"
+    },
+    {
+     "label": "waybar modules-center ∌ 'clock'",
+     "ok": true,
+     "got": "[]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'network'",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/mod-wb-move"
+  },
+  {
+   "id": "mod-wb-bottom",
+   "tags": [
+    "waybar",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 44.6,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar position = 'bottom'",
+     "ok": true,
+     "got": "bottom"
+    },
+    {
+     "label": "waybar height = 36",
+     "ok": true,
+     "got": "36"
+    },
+    {
+     "label": "waybar modules-right ∋ 'pulseaudio'",
+     "ok": true,
+     "got": "[\"pulseaudio\", \"network\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/mod-wb-bottom"
+  },
+  {
+   "id": "qs-clock",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 7,
+   "total": 7,
+   "seconds": 45.8,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "fichier quickshell",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /PanelWindow/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /top:\\s*true/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /Quickshell\\.screens/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(SystemClock|new Date)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(hh|HH):mm/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/qs-clock"
+  },
+  {
+   "id": "qs-workspaces",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 50.5,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /bottom:\\s*true/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /Hyprland\\.workspaces/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(\\.activate\\(\\)|dispatch)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(focused|active)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml contient une couleur de teinte [255, 300]",
+     "ok": true,
+     "got": "267° 226°"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/qs-workspaces"
+  },
+  {
+   "id": "qs-battery",
+   "tags": [
+    "quickshell",
+    "new",
+    "services"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 90.5,
+   "model_calls": 10,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /import Quickshell\\.Services\\.UPower/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /UPower\\.displayDevice/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /percentage/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /right:\\s*true/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/qs-battery"
+  },
+  {
+   "id": "qs-volume",
+   "tags": [
+    "quickshell",
+    "new",
+    "services"
+   ],
+   "valid": false,
+   "first_try": false,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 352.8,
+   "model_calls": 25,
+   "fixes": 2,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /import Quickshell\\.Services\\.Pipewire/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /defaultAudioSink/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /PwObjectTracker\\s*\\{[^}]*objects\\s*:\\s*\\/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /muted/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(onClicked|TapHandler)/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/qs-volume"
+  },
+  {
+   "id": "qs-launcher",
+   "tags": [
+    "quickshell",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 38.0,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(Process|execDetached)/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /rofi/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /drun/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(onClicked|TapHandler)/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/qs-launcher"
+  },
+  {
+   "id": "qs-floating",
+   "tags": [
+    "quickshell",
+    "new",
+    "style"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 101.6,
+   "model_calls": 11,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['quickshell/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /margins/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /margins[^}]*(top|left|right)\\s*:\\s*10/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /radius:\\s*12/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "qml ~ /(?i)#1e1e2e/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/qs-floating"
+  },
+  {
+   "id": "q-follow-mouse",
+   "tags": [
+    "question"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 2,
+   "total": 2,
+   "seconds": 6.2,
+   "model_calls": 1,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous aucun",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "réponse ~ /follow_mouse/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261023-104251/q-follow-mouse"
+  }
+ ]
+}

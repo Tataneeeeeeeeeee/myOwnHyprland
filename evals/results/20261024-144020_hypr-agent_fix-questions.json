@@ -1,0 +1,139 @@
+{
+ "date": "20261024-144020",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 3,
+  "valid": 1.0,
+  "first_try": 1.0,
+  "conform": 0.6666666666666666,
+  "checks": 0.9166666666666666,
+  "avg_seconds": 90.19999999999999,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "fix-questions"
+ },
+ "filter": {
+  "pattern": "^(mod-rule|mod-gaps|q-follow-mouse)$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "mod-gaps",
+   "tags": [
+    "hypr",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 6,
+   "total": 6,
+   "seconds": 37.8,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.general.gaps_in = 2",
+     "ok": true,
+     "got": "2"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 4",
+     "ok": true,
+     "got": "4"
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'us'",
+     "ok": true,
+     "got": "us"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    },
+    {
+     "label": "bind SUPER + 5 ~ /workspace/",
+     "ok": true,
+     "got": "[\"focus [{\\\"workspace\\\": 5}]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261024-144020/mod-gaps"
+  },
+  {
+   "id": "mod-rule",
+   "tags": [
+    "hypr",
+    "modify",
+    "rules"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": false,
+   "passed": 3,
+   "total": 4,
+   "seconds": 226.1,
+   "model_calls": 15,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "window_rule Calculator ~ /\"float\":\\s*true/",
+     "ok": false,
+     "got": "absent"
+    },
+    {
+     "label": "window_rule hyprland-run ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"float\": true, \"match\": {\"class\": \"hyprland-run\"}, \"move\": \"20 monitor_h-12…"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261024-144020/mod-rule"
+  },
+  {
+   "id": "q-follow-mouse",
+   "tags": [
+    "question"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 2,
+   "total": 2,
+   "seconds": 6.7,
+   "model_calls": 1,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous aucun",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "réponse ~ /follow_mouse/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261024-144020/q-follow-mouse"
+  }
+ ]
+}

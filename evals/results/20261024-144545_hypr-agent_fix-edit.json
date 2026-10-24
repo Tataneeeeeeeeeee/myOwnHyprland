@@ -1,0 +1,102 @@
+{
+ "date": "20261024-144545",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 2,
+  "valid": 1.0,
+  "first_try": 1.0,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 116.44999999999999,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 2,
+  "label": "fix-edit"
+ },
+ "filter": {
+  "pattern": "^mod-rule$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "mod-rule",
+   "tags": [
+    "hypr",
+    "modify",
+    "rules"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 53.3,
+   "model_calls": 8,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "window_rule Calculator ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"match\": {\"class\": \"^org\\\\.gnome\\\\.Calculator$\"}, \"float\": true}]"
+    },
+    {
+     "label": "window_rule hyprland-run ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"move\": \"20 monitor_h-120\", \"name\": \"move-hyprland-run\", \"match\": {\"class\":…"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261024-144545/r1/mod-rule"
+  },
+  {
+   "id": "mod-rule",
+   "tags": [
+    "hypr",
+    "modify",
+    "rules"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 179.6,
+   "model_calls": 14,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "window_rule Calculator ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"float\": true, \"match\": {\"class\": \"^org\\\\.gnome\\\\.Calculator$\"}}, {\"float\":…"
+    },
+    {
+     "label": "window_rule hyprland-run ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"name\": \"move-hyprland-run\", \"float\": true, \"move\": \"20 monitor_h-120\", \"ma…"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261024-144545/r2/mod-rule"
+  }
+ ]
+}

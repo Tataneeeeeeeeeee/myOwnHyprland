@@ -91,7 +91,8 @@ class Session:
                                self.messages[first:], time.time() - start)
             return Event("done", result=self.last)
 
-        fix_rounds, reviewed, summary = 0, False, ""
+        before = self._snapshot()
+        fix_rounds, reviewed, nudged, summary = 0, False, False, ""
         for _ in range(MAX_STEPS):
             yield from self._chat()
             msg = self.messages[-1]
@@ -112,8 +113,19 @@ class Session:
 
             # Le modèle pense avoir fini : on vérifie nous-mêmes
             summary = msg["content"]
-            if not self.workspace.files():
-                # Simple question / discussion : pas de fichier attendu
+            if self._snapshot() == before:
+                attempted = any(c["function"]["name"] in ("write_file", "edit_file")
+                                for m in self.messages[first:] for c in m.get("tool_calls", []))
+                if attempted and not nudged:
+                    # Toutes ses modifications ont été refusées ou annulées, mais il croit avoir réussi
+                    nudged = True
+                    self.messages.append({"role": "user", "content":
+                                          "Attention : aucun fichier n'a été modifié pendant ce tour (tes modifications "
+                                          "ont été refusées ou annulées). La demande n'est donc PAS réalisée. Relis le "
+                                          "passage avec read_file et refais une modification qui passe, ou explique "
+                                          "honnêtement pourquoi tu n'y arrives pas."})
+                    continue
+                # Question, description, explication : rien n'a changé → la réponse est la réponse
                 yield finish(True, [], summary)
                 return
             errors = self.workspace.validate_all()
@@ -145,6 +157,10 @@ class Session:
 
         errors = self.workspace.validate_all()
         yield finish(not errors, errors, summary)
+
+    def _snapshot(self) -> dict[str, int]:
+        root = self.workspace.root
+        return {p.relative_to(root).as_posix(): hash(p.read_bytes()) for p in root.rglob("*") if p.is_file()}
 
     def cancel_pending(self):
         """Après un Ctrl+C : retire un appel d'outil resté sans réponse pour garder un historique cohérent."""
