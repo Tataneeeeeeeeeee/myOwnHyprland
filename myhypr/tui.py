@@ -141,6 +141,7 @@ class Renderer:
         self.buf = ""
         self.before: str | None = None
         self.live = Live(Ticker(self), console=console, refresh_per_second=12, transient=True)
+        self.last_kind: str | None = None
 
     def __enter__(self):
         self.live.start()
@@ -149,10 +150,13 @@ class Renderer:
     def __exit__(self, *exc):
         self.live.stop()
 
-    def print(self, *items):
+    def print(self, *items, kind: str = "tool"):
+        """Ligne vide entre deux groupes de nature différente (narration, outils, statut, réponse) : plus aéré."""
+        if self.last_kind is not None and kind != self.last_kind:
+            self.live.console.print()
         self.live.console.print(*items)
+        self.last_kind = kind
 
-    # ---- texte du modèle
     def flush(self, final: bool):
         text, self.buf = self.buf.strip(), ""
         if not text:
@@ -162,13 +166,13 @@ class Renderer:
             body.add_column(width=2)
             body.add_column(ratio=1)
             body.add_row(Text("◆", style=f"bold {C['mauve']}"), Markdown(text, code_theme=CODE_THEME))
-            self.print(Text(), Padding(body, (0, 0, 0, 1)))
+            self.print(Padding(body, (0, 0, 0, 1)), kind="answer")
         else:
             # Narration intermédiaire : repliée et discrète
             plain = re.sub(r"\*\*|__|`|^#+\s*|^\s*[-*]\s+", "", text, flags=re.M)
             lines = [ln for ln in plain.splitlines() if ln.strip()]
             shown = "\n".join(lines[:2]) + (f"  (+{len(lines) - 2} lignes)" if len(lines) > 2 else "")
-            self.print(Padding(Text(shown, style=f"italic {C['overlay1']}"), (0, 0, 0, 4)))
+            self.print(Padding(Text(shown, style=f"italic {C['overlay1']}"), (0, 0, 0, 4)), kind="narration")
 
     def on_text(self, delta: str):
         self.buf += delta
@@ -247,12 +251,19 @@ class Renderer:
             return
         self.flush(final=False)
         if name == "review":
-            self.print(row("◇", C["lavender"], Text("relecture de la demande point par point", style=C["lavender"])))
+            self.print(row("◇", C["lavender"], Text("relecture de la demande point par point", style=C["lavender"])),
+                       kind="status")
             self.phase = "Relecture…"
         elif name == "fix":
             self.print(row("↻", C["peach"], Text(f"correction {args.get('round')}/{args.get('max')}",
-                                                  style=C["peach"])))
+                                                  style=C["peach"])), kind="status")
             self.phase = "Correction…"
+        elif name == "compact":
+            self.print(row("◇", C["overlay1"], Text("contexte presque plein : anciens résultats d'outils retirés",
+                                                    style=C["overlay1"])), kind="status")
+        elif name == "truncated":
+            self.print(row("!", C["peach"], Text("réponse coupée : limite de contexte atteinte — /new pour repartir "
+                                                 "d'une conversation vide", style=C["peach"])), kind="status")
 
 
 # --------------------------------------------------------------------------- application
@@ -392,14 +403,15 @@ class App:
         console.print()
 
     def footer(self, result, secs: float):
-        files = self.ws.files()
-        if not files:
-            return
+        changed = getattr(result, "changed", [])
+        if result.ok and not changed:
+            return  # question, description… : rien n'a été modifié, rien à valider
         console.print()
         if result.ok:
+            n = len(changed)
             head = Text.assemble((" ✓ ", f"bold {C['base']} on {C['green']}"),
                                  ("  config valide", f"bold {C['green']}"),
-                                 (f"  ·  {len(files)} fichier{'s' * (len(files) > 1)}  ·  {elapsed(secs)}",
+                                 (f"  ·  {n} fichier{'s' * (n > 1)} modifié{'s' * (n > 1)}  ·  {elapsed(secs)}",
                                   C["overlay0"]))
             console.print(head)
             hint = Text("   ")

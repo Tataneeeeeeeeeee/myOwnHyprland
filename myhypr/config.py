@@ -20,3 +20,5 @@ EMBED_MODEL = os.environ.get("MYHYPR_EMBED", "nomic-embed-text")
 MAX_STEPS = 25          # appels au modèle max par demande
 MAX_FIX_ROUNDS = 4      # relances automatiques si la validation échoue
 TOOL_OUTPUT_LIMIT = 6000
+NUM_CTX = 32768         # doit correspondre à PARAMETER num_ctx du Modelfile
+SYSTEM_TOKENS = 1700    # taille approximative du prompt système

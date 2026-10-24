@@ -13,7 +13,7 @@ from pathlib import Path
 import ollama
 
 from . import rag
-from .config import CHAT_MODEL, MAX_FIX_ROUNDS, MAX_STEPS, SESSIONS_DIR, TOOL_OUTPUT_LIMIT
+from .config import CHAT_MODEL, MAX_FIX_ROUNDS, MAX_STEPS, NUM_CTX, SESSIONS_DIR, SYSTEM_TOKENS, TOOL_OUTPUT_LIMIT
 from .tools import Workspace
 
 
@@ -26,6 +26,7 @@ class Result:
     summary: str
     messages: list[dict] = field(default_factory=list)
     duration: float = 0.0
+    changed: list[str] = field(default_factory=list)   # fichiers modifiés pendant ce tour
 
 
 @dataclass
@@ -59,7 +60,9 @@ class Session:
 
     def _chat(self) -> Iterator[Event]:
         """Un appel au modèle en streaming ; ajoute le message assistant à l'historique."""
-        content, thinking, calls = "", "", []
+        content, thinking, calls, done_reason = "", "", [], ""
+        if self._compact():
+            yield Event("status", "contexte compacté", name="compact")
         yield Event("status", name="model")
         stream = ollama.chat(model=self.model, messages=self.messages,
                              tools=list(self.workspace.tools().values()), think=self.think, stream=True)
@@ -75,23 +78,52 @@ class Session:
                 calls += m.tool_calls
             if chunk.done:
                 self.tokens = (chunk.prompt_eval_count or 0) + (chunk.eval_count or 0)
+                done_reason = chunk.done_reason or ""
         entry = {"role": "assistant", "content": content}
         if calls:
             entry["tool_calls"] = [{"function": {"name": c.function.name, "arguments": dict(c.function.arguments)}}
                                    for c in calls]
         self.messages.append(entry)
+        if done_reason == "length":
+            yield Event("status", "réponse coupée : limite de contexte atteinte", name="truncated")
+
+    def _estimate(self) -> int:
+        chars = sum(len(m.get("content", "")) + len(json.dumps(m.get("tool_calls", ""))) for m in self.messages)
+        return SYSTEM_TOKENS + chars // 3
+
+    def _compact(self) -> bool:
+        """Au-delà de 75 % du contexte, Ollama tronquerait l'entrée EN SILENCE (début de conversation perdu).
+        On remplace d'abord les vieux résultats d'outils et extraits de doc par une mention courte,
+        en gardant intacts les 8 derniers messages."""
+        if self._estimate() < 0.75 * NUM_CTX:
+            return False
+        changed = False
+        for m in self.messages[:-8]:
+            if self._estimate() < 0.6 * NUM_CTX:
+                break
+            content = m.get("content", "")
+            if m["role"] == "tool" and m.get("tool_name") in ("read_file", "search_docs", "list_files") \
+                    and len(content) > 300:
+                m["content"] = f"[résultat de {m['tool_name']} retiré pour libérer le contexte — relance l'outil si besoin]"
+                changed = True
+            elif m["role"] == "user" and content.startswith("DEMANDE :") and "Extraits de documentation" in content:
+                m["content"] = content.split("Extraits de documentation", 1)[0] + "[extraits de doc retirés]"
+                changed = True
+        return changed
 
     def turn(self, request: str) -> Iterator[Event]:
         start, first = time.time(), len(self.messages)
         tools = self.workspace.tools()
         self.messages.append(self._user_message(request))
+        before = self._snapshot()
 
         def finish(ok: bool, errors: list[str], summary: str) -> Event:
+            now = self._snapshot()
+            changed = sorted(f for f in now if before.get(f) != now[f])
             self.last = Result(request, self.workspace.root, ok, errors, summary,
-                               self.messages[first:], time.time() - start)
+                               self.messages[first:], time.time() - start, changed)
             return Event("done", result=self.last)
 
-        before = self._snapshot()
         fix_rounds, reviewed, nudged, summary = 0, False, False, ""
         for _ in range(MAX_STEPS):
             yield from self._chat()

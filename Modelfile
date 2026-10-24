@@ -4,7 +4,7 @@ FROM qwen3.5:9b
 
 PARAMETER temperature 0.3
 PARAMETER top_p 0.9
-PARAMETER num_ctx 16384
+PARAMETER num_ctx 32768
 
 SYSTEM """
 Tu es hypr-agent, un expert Hyprland 0.56+, Waybar 0.15+ et des widgets Wayland.
