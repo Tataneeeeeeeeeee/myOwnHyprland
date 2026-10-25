@@ -194,10 +194,20 @@ class Workspace:
             return f"ERREUR : {path}/shell.qml n'existe pas (une config Quickshell = un dossier avec shell.qml)"
         return verify_quickshell_dir(p)
 
+    def system_info(self) -> str:
+        """Détails de la machine : écrans (nom, modes disponibles, échelle), clavier/souris/touchpad, GPU,
+        logiciels installés, version de Hyprland et format de config en place.
+
+        Returns:
+            Les informations détectées en JSON
+        """
+        from .system import detect
+        return json.dumps(detect(), ensure_ascii=False, indent=1)
+
     def tools(self) -> dict:
         return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
                                          self.search_docs, self.verify_hyprland, self.verify_waybar,
-                                         self.verify_quickshell)}
+                                         self.verify_quickshell, self.system_info)}
 
     def validate_all(self) -> list[str]:
         """Validation automatique de tout ce qui a été produit. Renvoie les erreurs."""

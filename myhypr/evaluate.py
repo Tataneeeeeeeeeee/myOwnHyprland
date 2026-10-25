@@ -336,6 +336,7 @@ def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_M
          repeat: int = 1, live: bool = True, label: str = ""):
     if not live:
         os.environ["MYHYPR_NO_LIVE"] = "1"
+    os.environ.setdefault("MYHYPR_NO_SYSTEM", "1")  # banc reproductible d'une machine à l'autre
     cases = load_cases(pattern, tag)
     if not cases:
         console.print("[err]Aucun cas ne correspond.[/]")

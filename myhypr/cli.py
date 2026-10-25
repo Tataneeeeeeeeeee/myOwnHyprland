@@ -83,6 +83,11 @@ def cmd_eval(args):
     evaluate.main(args.filter, args.tag, args.model, args.think, args.repeat, not args.no_live, args.label)
 
 
+def cmd_system(_args):
+    from .system import detect, summary
+    print(summary(detect()))
+
+
 def cmd_dataset(_args):
     print(dataset.stats())
 
@@ -132,6 +137,9 @@ def main():
     s.add_argument("--label", default="", help="étiquette du run, ex. 'avant-exemples'")
     s.add_argument("--rescore", metavar="RESULTS.json", help="recalcule les vérifications d'un run existant")
     s.set_defaults(func=cmd_eval)
+
+    s = sub.add_parser("system", help="ce que l'agent détecte de la machine")
+    s.set_defaults(func=cmd_system)
 
     s = sub.add_parser("dataset", help="statistiques du dataset de fine-tuning")
     s.set_defaults(func=cmd_dataset)

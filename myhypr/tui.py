@@ -24,6 +24,7 @@ from rich.text import Text
 
 from . import dataset, ops, rag
 from .agent import Session
+from .system import detect
 from .config import CHAT_MODEL, DATA, INDEX_DIR, SESSIONS_DIR, WORKSPACES
 from .theme import C, CODE_THEME, LOGO, PT_STYLE, RICH_THEME, gradient
 from .tools import Workspace
@@ -37,6 +38,7 @@ COMMANDS = {
         "/from": "partir de ta config actuelle  ·  /from hypr waybar",
         "/think": "raisonnement du modèle on/off (plus lent)",
         "/model": "afficher ou changer de modèle",
+        "/system": "ce que l'agent sait de ta machine (écrans, clavier, GPU, logiciels)",
     },
     "Fichiers": {
         "/files": "fichiers produits",
@@ -196,6 +198,7 @@ class Renderer:
             "verify_hyprland": "Validation Hyprland…",
             "verify_waybar": "Validation Waybar (test live 3 s)…",
             "verify_quickshell": "Validation Quickshell (qmllint + test live 4 s)…",
+            "system_info": "Détection du système…",
         }.get(name, f"{name}…")
         self.args = args
 
@@ -332,6 +335,15 @@ class App:
         info.add_row("doc", f"{n_docs} passages indexés" if n_docs else Text("index absent · myhypr index",
                                                                                style=C["peach"]))
         info.add_row("dataset", f"{n_data} / 300 exemples")
+        try:
+            sysinfo = detect()
+            screens = ", ".join(f"{m['nom']} {m['mode'].split('@')[0]}@{float(m['mode'].split('@')[1]):.0f}"
+                                for m in sysinfo["ecrans"])
+            gpu = "+".join(c["vendor"] for c in sysinfo["gpu"]["cartes"])
+            info.add_row("machine", f"Hyprland {sysinfo['hyprland']['version']} · {screens} · "
+                                    f"clavier {sysinfo['entrees']['disposition']} · {gpu}")
+        except Exception:
+            pass
 
         console.print(Panel(Group(head, Text(), info), border_style=C["surface1"], padding=(1, 2),
                             width=min(self.width(), 78)))
@@ -498,6 +510,8 @@ class App:
                 self.think = self.session.think = not self.think
                 self.note(f"raisonnement {'activé — plus lent, parfois meilleur' if self.think else 'désactivé'}",
                           C["mauve"], "◆")
+            case "/system":
+                self.system()
             case "/model":
                 if args:
                     self.model = self.session.model = args[0]
@@ -507,6 +521,30 @@ class App:
             case _:
                 self.note(f"commande inconnue : {cmd}  (/help)", C["red"], "✗")
         return True
+
+    def system(self):
+        info = detect()
+        t = Table.grid(padding=(0, 2))
+        t.add_column(style=C["overlay0"], width=14)
+        t.add_column(style=C["subtext"])
+        h = info["hyprland"]
+        t.add_row("Hyprland", f"{h['version']} · config {h['format_config']}")
+        for m in info["ecrans"]:
+            t.add_row("écran", f"{m['nom']} · {m['mode']} Hz · échelle {m['echelle']} · position {m['position']}"
+                               f" · VRR {'oui' if m['vrr'] else 'non'}")
+        e = info["entrees"]
+        t.add_row("clavier", f"{e['disposition']}{(' / ' + e['variante']) if e['variante'] else ''} ({e['clavier_principal']})")
+        t.add_row("souris", ", ".join(e["souris"]) or "—")
+        t.add_row("touchpad", ", ".join(e["touchpad"]) or "—")
+        g = info["gpu"]
+        for c in g["cartes"]:
+            t.add_row("GPU", c["name"])
+        if g["pilote_nvidia"]:
+            t.add_row("", Text(f"pilote NVIDIA {g['pilote_nvidia']} : variables d'environnement NVIDIA nécessaires",
+                               style=C["peach"]))
+        for cat, bins in info["logiciels"].items():
+            t.add_row(cat if len(cat) <= 14 else cat[:13] + "…", ", ".join(bins))
+        console.print(Padding(t, (0, 0, 0, 2)))
 
     def help(self):
         t = Table.grid(padding=(0, 2))

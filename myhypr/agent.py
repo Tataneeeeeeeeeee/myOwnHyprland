@@ -5,6 +5,7 @@ appels d'outils, résultats) que la CLI ou l'UI affichent comme elles veulent.
 """
 
 import json
+import os
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass, field
@@ -12,7 +13,7 @@ from pathlib import Path
 
 import ollama
 
-from . import rag
+from . import rag, system
 from .config import CHAT_MODEL, MAX_FIX_ROUNDS, MAX_STEPS, NUM_CTX, SESSIONS_DIR, SYSTEM_TOKENS, TOOL_OUTPUT_LIMIT
 from .tools import Workspace
 
@@ -53,8 +54,14 @@ class Session:
             context = rag.search_mixed(request, docs=3, examples=2)
         except RuntimeError as e:
             context = f"(doc indisponible : {e})"
+        machine = ""
+        if not self.messages and not os.environ.get("MYHYPR_NO_SYSTEM"):
+            try:
+                machine = f"Système détecté (détails : outil system_info) :\n{system.summary()}\n\n"
+            except Exception:  # détection best-effort : jamais bloquante
+                machine = ""
         return {"role": "user", "content": (
-            f"DEMANDE : {request}\n\n"
+            f"DEMANDE : {request}\n\n{machine}"
             f"Fichiers présents dans le dossier de travail :\n{self.workspace.list_files()}\n\n"
             f"Extraits de documentation pertinents :\n{context}")}
 
