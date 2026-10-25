@@ -44,7 +44,9 @@ def restore(name: str) -> list[str]:
         raise FileNotFoundError(f"Sauvegarde introuvable : {backup}")
     restored = []
     for top in sorted(p.name for p in backup.iterdir()):
-        dst = CONFIG_HOME / top
+        # ~/.config/hypr est souvent un lien vers un dépôt de dotfiles (ml4w, stow…) : on garde le lien
+        # et on remplace le contenu du VRAI dossier (rmtree refuse un lien symbolique)
+        dst = (CONFIG_HOME / top).resolve()
         if dst.exists():
             shutil.rmtree(dst)
         shutil.copytree(backup / top, dst, symlinks=True)
