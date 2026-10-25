@@ -98,6 +98,19 @@ formats de date dans un label hyprlock (→ `$TIME`). La détection du système 
 La validation ne porte que sur les fichiers **modifiés pendant la demande** : un vieux fichier inutilisé du
 dossier de travail ne bloque pas une autre demande.
 
+## Thème tiré du fond d'écran (matugen)
+
+- `/palette` (ou l'outil `wallpaper_palette`) : palette Material 3 du fond affiché (détecté via awww / swww /
+  hyprpaper) ou d'une image, calculée par `matugen --dry-run` — rien n'est écrit ni relancé.
+- **Couleurs fixes** : l'agent reprend ces couleurs exactes (bordure primary → tertiary, fond surface, texte
+  on_surface…).
+- **Couleurs qui suivent le fond** : l'agent ajoute un template dans `matugen/` (`[templates.x]` +
+  `{{colors.<rôle>.default.hex}}`). `verify_matugen` rend les templates dans un **bac à sable** (`--prefix`,
+  hooks retirés : aucun fichier réel modifié, kitty pas relancé), vérifie qu'aucun `{{…}}` ne reste, valide le
+  Lua généré avec Hyprland et le CSS généré (`@define-color …;`).
+- La détection liste les fichiers **générés** par ta config matugen : l'agent modifie le template, jamais le
+  fichier généré (sinon matugen l'écraserait au prochain changement de fond).
+
 ## Quickshell (widgets QML)
 
 - Une config = un dossier `quickshell/<nom>/shell.qml` dans le dossier de travail ; après `/apply`, lance-la avec

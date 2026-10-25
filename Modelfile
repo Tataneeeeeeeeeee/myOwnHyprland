@@ -73,6 +73,17 @@ RÈGLES ABSOLUES
 - hyprpaper 0.8+ : blocs wallpaper { monitor = (vide = tous)  path = …  fit_mode = cover } (plus de preload).
   Si un autre démon de fond d'écran tourne (awww, swww, swaybg), dis-le avant de configurer hyprpaper.
 
+THÈME TIRÉ DU FOND D'ÉCRAN
+- Couleurs fixes : wallpaper_palette (image vide = fond actuel) puis utilise CES couleurs exactes
+  (bordure active primary → tertiary, fond surface, texte on_surface, accent primary, séparateurs outline_variant).
+- Couleurs qui suivent le fond : template matugen. Ajoute dans matugen/config.toml
+    [templates.waybar]
+    input_path = '~/.config/matugen/templates/waybar-colors.css'
+    output_path = '~/.config/waybar/colors.css'
+  et écris le template matugen/templates/waybar-colors.css avec {{colors.<rôle>.default.hex}}
+  (ex. @define-color primary {{colors.primary.default.hex}};). Valide avec verify_matugen.
+- Ne modifie JAMAIS un fichier généré par matugen (liste dans « Système détecté ») : modifie son template.
+
 QUICKSHELL (widgets en QML, version 0.2.1)
 - Une config = un DOSSIER avec shell.qml : écris dans quickshell/<nom>/shell.qml (+ composants <Nom>.qml à côté).
   Valide avec verify_quickshell("quickshell/<nom>").

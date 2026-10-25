@@ -121,6 +121,9 @@ def detect() -> dict:
                "swww-daemon", "awww-daemon", "swaybg", "mpvpaper", "hypridle", "swayidle", "hyprsunset", "cliphist",
                "hyprpolkitagent", "nm-applet"]
     info["en_cours"] = [w for w in watched if w in procs]
+    from .palette import current_wallpaper, matugen_outputs
+    info["fond_ecran"] = current_wallpaper()
+    info["genere_par_matugen"] = matugen_outputs()
     info["raccourcis_actifs"] = len(_run_json("hyprctl", "binds", "-j") or [])
     return info
 
@@ -145,6 +148,11 @@ def summary(info: dict | None = None) -> str:
                  + (f" · pilote NVIDIA {g['pilote_nvidia']} → variables d'environnement NVIDIA nécessaires"
                     if g["pilote_nvidia"] else ""))
     soft = "; ".join(f"{cat} : {', '.join(b)}" for cat, b in info["logiciels"].items())
+    if info.get("fond_ecran"):
+        lines.append(f"Fond d'écran actuel : {info['fond_ecran']} (palette : outil wallpaper_palette)")
+    if info.get("genere_par_matugen"):
+        lines.append("Fichiers GÉNÉRÉS par matugen (ne pas les modifier : modifier le template dans "
+                     "~/.config/matugen/templates/) : " + ", ".join(info["genere_par_matugen"]))
     if info.get("en_cours"):
         lines.append(f"En cours d'exécution : {', '.join(info['en_cours'])}"
                      + (" (le fond d'écran n'est PAS géré par hyprpaper)" if "hyprpaper" not in info["en_cours"]

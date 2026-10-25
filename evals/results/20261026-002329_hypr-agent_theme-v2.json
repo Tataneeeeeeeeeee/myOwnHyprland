@@ -1,0 +1,100 @@
+{
+ "date": "20261026-002329",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 2,
+  "valid": 1.0,
+  "first_try": 0.0,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 168.85,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 2,
+  "label": "theme-v2"
+ },
+ "filter": {
+  "pattern": "^theme-matugen$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "theme-matugen",
+   "tags": [
+    "theme",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 254.9,
+   "model_calls": 18,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['matugen/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/config.toml ~ /output_path\\s*=\\s*[\\x27\"][^\\x2/ ~ /output_path\\s*=\\s*[\\x27\"][^\\x2/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/config.toml ~ /\\[templates\\.hyprland\\]/ ~ /\\[templates\\.hyprland\\]/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/templates/**/* ~ /@define-color\\s+\\S+\\s+\\{\\{\\s*c/ ~ /@define-color\\s+\\S+\\s+\\{\\{\\s*c/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-002329/r1/theme-matugen"
+  },
+  {
+   "id": "theme-matugen",
+   "tags": [
+    "theme",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 82.8,
+   "model_calls": 9,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['matugen/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/config.toml ~ /output_path\\s*=\\s*[\\x27\"][^\\x2/ ~ /output_path\\s*=\\s*[\\x27\"][^\\x2/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/config.toml ~ /\\[templates\\.hyprland\\]/ ~ /\\[templates\\.hyprland\\]/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/templates/**/* ~ /@define-color\\s+\\S+\\s+\\{\\{\\s*c/ ~ /@define-color\\s+\\S+\\s+\\{\\{\\s*c/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-002329/r2/theme-matugen"
+  }
+ ]
+}

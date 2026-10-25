@@ -201,6 +201,9 @@ def apply_live(ws: Workspace, keep: Callable[[], bool], wait: float = 1.5) -> Li
     for f, hint in hints.items():
         if f in files:
             report.add("info", hint)
+    if any(f.startswith("matugen/") for f in files):
+        report.add("info", "matugen : régénère les couleurs avec  matugen image <ton fond> --prefer saturation  "
+                           "(lance aussi les hooks de ta config, ex. rechargement de kitty)")
 
     for name in sorted({f.split("/")[1] for f in files if f.startswith("quickshell/") and f.count("/") >= 2}):
         report.add("info", f"Quickshell : qs -p ~/.config/quickshell/{name}")

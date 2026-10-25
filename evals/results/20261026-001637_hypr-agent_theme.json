@@ -1,0 +1,95 @@
+{
+ "date": "20261026-001637",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 2,
+  "valid": 1.0,
+  "first_try": 0.5,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 185.2,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "theme"
+ },
+ "filter": {
+  "pattern": "^theme-",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "theme-static",
+   "tags": [
+    "theme",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 301.5,
+   "model_calls": 22,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/', 'waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr/hyprland.lua utilise ≥ 1 couleur(s) de la palette",
+     "ok": true,
+     "got": "1c2024 92cdf6 cdc0e9"
+    },
+    {
+     "label": "waybar/style.css, waybar/config.jsonc utilise ≥ 2 couleur(s) de la palette",
+     "ok": true,
+     "got": "00344c 1c2024 1e1635 92cdf6 cdc0e9 dfe3e7"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-001637/theme-static"
+  },
+  {
+   "id": "theme-matugen",
+   "tags": [
+    "theme",
+    "modify"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 4,
+   "total": 4,
+   "seconds": 68.9,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['matugen/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/config.toml ~ /output_path\\s*=\\s*[\\x27\"][^\\x2/ ~ /output_path\\s*=\\s*[\\x27\"][^\\x2/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/config.toml ~ /\\[templates\\.hyprland\\]/ ~ /\\[templates\\.hyprland\\]/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "matugen/templates/**/* ~ /@define-color\\s+\\S+\\s+\\{\\{\\s*c/ ~ /@define-color\\s+\\S+\\s+\\{\\{\\s*c/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-001637/theme-matugen"
+  }
+ ]
+}

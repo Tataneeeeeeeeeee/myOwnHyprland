@@ -22,6 +22,8 @@
 #   { conf = "hypr/hypridle.conf", key = "listener:timeout", has = 300 }   valeur dans un .conf hyprlang
 #   { conf = "…", key = "general:lock_cmd", match = 'hyprlock' }    (match = '^$' : la clé ne doit pas exister)
 #   { conf = "…", key = "listener:on-timeout", where = "timeout=300", match = '…' }   dans le bloc où timeout = 300
+#   { palette = "img.png", files = ["…"], min = 2 }   au moins N couleurs de la palette matugen de l'image
+#   { file_match = "chemin", match = '…' } / { glob_match = "motif/**/*", match = '…' }
 #   { exec = "waybar" }                        lancé au démarrage (hl.exec_cmd / hl.on)
 #   { answer = "follow_mouse" }                regex sur la réponse texte finale
 
@@ -372,6 +374,30 @@ checks = [
   { conf = "hypr/hyprpaper.conf", key = "wallpaper:path", match = 'wall0\.png' },
   { conf = "hypr/hyprpaper.conf", key = "splash", has = "false" },
   { conf = "hypr/hyprpaper.conf", key = "preload", match = '^$' },
+]
+
+# ------------------------------------------------------------- Thème tiré du fond d'écran
+
+[[case]]
+id = "theme-static"
+tags = ["theme", "new"]
+request = "Crée hypr/hyprland.lua et une waybar dont les couleurs sont tirées du fond d'écran /usr/share/hypr/wall0.png : bordure active, fond et texte de la barre, workspace actif."
+checks = [
+  { only = ["hypr/", "waybar/"] },
+  { palette = "/usr/share/hypr/wall0.png", files = ["hypr/hyprland.lua"], min = 1 },
+  { palette = "/usr/share/hypr/wall0.png", files = ["waybar/style.css", "waybar/config.jsonc"], min = 2 },
+]
+
+[[case]]
+id = "theme-matugen"
+tags = ["theme", "modify"]
+seed = "matugen"
+request = "Ajoute un template matugen pour que les couleurs de ma Waybar suivent le fond d'écran : il doit générer ~/.config/waybar/colors.css avec des @define-color."
+checks = [
+  { only = ["matugen/"] },
+  { file_match = "matugen/config.toml", match = 'output_path\s*=\s*[\x27"][^\x27"]*waybar/colors\.css' },
+  { file_match = "matugen/config.toml", match = '\[templates\.hyprland\]' },
+  { glob_match = "matugen/templates/**/*", match = '@define-color\s+\S+\s+\{\{\s*colors\.[^}]+\}\}\s*;' },
 ]
 
 # ------------------------------------------------------------------- Quickshell (QML)

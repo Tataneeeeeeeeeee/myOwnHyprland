@@ -43,6 +43,7 @@ COMMANDS = {
         "/model": "afficher ou changer de modèle",
         "/system": "ce que l'agent sait de ta machine (écrans, clavier, GPU, logiciels)",
         "/binds": "conflits de raccourcis (session en cours + dossier de travail)",
+        "/palette": "couleurs du fond d'écran (matugen)  ·  /palette ~/image.jpg",
     },
     "Fichiers": {
         "/files": "fichiers produits",
@@ -206,6 +207,8 @@ class Renderer:
             "check_binds": "Analyse des raccourcis…",
             "migrate_hyprlang": "Conversion hyprlang → Lua…",
             "verify_hyprtools": "Validation hyprlock / hypridle / hyprpaper…",
+            "wallpaper_palette": "Calcul de la palette du fond d'écran…",
+            "verify_matugen": "Rendu des templates matugen (bac à sable)…",
         }.get(name, f"{name}…")
         self.args = args
 
@@ -237,10 +240,10 @@ class Renderer:
             body = Text.assemble(("doc ", C["teal"]), (f"« {args.get('query', '')} »", C["subtext"]))
             self.print(row("⌕", C["teal"], body, Text(" · ".join(pages)[:48], style=C["overlay0"])))
         elif name.startswith("verify"):
-            what = {"verify_hyprland": "Hyprland", "verify_waybar": "Waybar",
+            what = {"verify_hyprland": "Hyprland", "verify_waybar": "Waybar", "verify_matugen": "matugen",
                     "verify_hyprtools": (path or "outil Hypr").split("/")[-1]}.get(name, "Quickshell")
             lines = [LOG_PREFIX.sub("", ln) for ln in out.splitlines() if ln.strip()]
-            if lines and re.match(r"(config|waybar|quickshell|hypr\w+) ok", lines[0]):
+            if lines and re.match(r"(config|waybar|quickshell|hypr\w+|matugen) ok", lines[0]):
                 self.print(row("✓", f"bold {C['green']}", Text(f"{what} valide", style=C["green"])))
             else:
                 errors = [ln for ln in lines if not ln.startswith("Indice")]
@@ -534,6 +537,8 @@ class App:
                     console.print()
                     self.ask("Migre ma config hypr/hyprland.conf vers Lua avec migrate_hyprlang, puis corrige les "
                              "erreurs de validation et les TODO restants.")
+            case "/palette":
+                self.palette(args[0] if args else "")
             case "/binds":
                 self.binds_report()
             case "/system":
@@ -547,6 +552,25 @@ class App:
             case _:
                 self.note(f"commande inconnue : {cmd}  (/help)", C["red"], "✗")
         return True
+
+    def palette(self, image: str):
+        from .palette import MAIN_ROLES, current_wallpaper, palette
+        image = image or current_wallpaper() or ""
+        if not image:
+            self.note("fond d'écran actuel introuvable : /palette <chemin de l'image>", C["red"], "✗")
+            return
+        try:
+            colors = palette(image)
+        except (OSError, RuntimeError) as e:
+            self.note(str(e), C["red"], "✗")
+            return
+        self.note(f"palette de {short(image)}", C["mauve"], "◆")
+        t = Table.grid(padding=(0, 2))
+        for role in MAIN_ROLES:
+            if role in colors:
+                t.add_row(Text("      ", style=f"on {colors[role]}"), Text(role, style=C["subtext"]),
+                          Text(colors[role], style=C["overlay1"]))
+        console.print(Padding(t, (0, 0, 0, 4)))
 
     def binds_report(self):
         sources = [("session en cours", binds.from_session())]

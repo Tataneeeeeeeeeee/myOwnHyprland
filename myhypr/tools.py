@@ -235,6 +235,45 @@ class Workspace:
         p = self.path(path)
         return verify(p) if p.exists() else f"ERREUR : {path} n'existe pas"
 
+    def wallpaper_palette(self, image: str = "", mode: str = "dark", scheme: str = "scheme-tonal-spot",
+                          full: bool = False) -> str:
+        """Couleurs (Material 3) tirées d'un fond d'écran par matugen, sans rien modifier sur le système.
+
+        Args:
+            image: Chemin de l'image (vide = fond d'écran actuellement affiché)
+            mode: "dark" ou "light"
+            scheme: scheme-tonal-spot (défaut), scheme-vibrant, scheme-expressive, scheme-content, scheme-monochrome…
+            full: true pour les 50 rôles au lieu des principaux
+
+        Returns:
+            Les couleurs par rôle (primary, surface, on_surface, outline…) en hexadécimal
+        """
+        from .palette import current_wallpaper, describe, palette
+        image = image or current_wallpaper() or ""
+        if not image:
+            return "ERREUR : fond d'écran actuel introuvable, donne le chemin de l'image"
+        try:
+            return describe(image, palette(image, mode, scheme), full)
+        except (OSError, RuntimeError) as e:
+            return f"ERREUR : {e}"
+
+    def verify_matugen(self, path: str = "matugen/config.toml", image: str = "") -> str:
+        """Valide une config matugen et ses templates en les rendant dans un bac à sable (aucun fichier réel
+        modifié, aucun hook lancé). Les templates du dossier de travail sont utilisés en priorité.
+
+        Args:
+            path: Config matugen, par défaut "matugen/config.toml"
+            image: Image de test (vide = fond actuel)
+
+        Returns:
+            "matugen ok" ou les erreurs de template
+        """
+        from .palette import current_wallpaper, verify_matugen
+        p = self.path(path)
+        if not p.exists():
+            return f"ERREUR : {path} n'existe pas"
+        return verify_matugen(p, image or current_wallpaper() or "/usr/share/hypr/wall0.png", self.root)
+
     def check_binds(self, keys: str = "", path: str = "hypr/hyprland.lua") -> str:
         """Raccourcis d'une config Hyprland. Avec keys : dit si cette combinaison est libre ou déjà utilisée
         (par quelle action, à quelle ligne). Sans keys : liste les conflits (même combinaison, actions différentes).
@@ -266,7 +305,8 @@ class Workspace:
         return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
                                          self.search_docs, self.verify_hyprland, self.verify_waybar,
                                          self.verify_quickshell, self.system_info, self.check_binds,
-                                         self.migrate_hyprlang, self.verify_hyprtools)}
+                                         self.migrate_hyprlang, self.verify_hyprtools,
+                                         self.wallpaper_palette, self.verify_matugen)}
 
     def validate_all(self, changed: set[str] | None = None) -> list[str]:
         """Validation automatique. `changed` (fichiers modifiés pendant le tour) limite la validation à ce que
@@ -295,6 +335,11 @@ class Workspace:
             out = verify_quickshell_dir(shell.parent)
             if not out.startswith("quickshell ok"):
                 errors.append(f"{shell.parent.relative_to(self.root)} :\n{out}")
+        matugen_cfg = self.root / "matugen" / "config.toml"
+        if matugen_cfg.exists() and touched("matugen/"):
+            out = self.verify_matugen()
+            if not out.startswith("matugen ok"):
+                errors.append(f"matugen/config.toml :\n{out}")
         from .ecosystem import verify as verify_tool
         for name in ("hyprlock.conf", "hypridle.conf", "hyprpaper.conf"):
             conf = self.root / "hypr" / name

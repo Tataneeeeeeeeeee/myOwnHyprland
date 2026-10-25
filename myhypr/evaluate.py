@@ -186,6 +186,17 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
             else:
                 # « match = '^$' » sur une clé absente = la clé ne doit pas exister
                 ok = any(re.search(check["match"], v) for v in values) if values else check["match"] == "^$"
+        elif "palette" in check:
+            from .palette import hexes, palette
+            wanted = hexes(palette(check["palette"]))
+            text = "\n".join((ws / f).read_text(errors="ignore").lower() for f in check["files"] if (ws / f).exists())
+            found = sorted({h for h in wanted if h in text})
+            label = f"{', '.join(check['files'])} utilise ≥ {check.get('min', 1)} couleur(s) de la palette"
+            ok, got = len(found) >= check.get("min", 1), " ".join(found)[:80]
+        elif "file_match" in check or "glob_match" in check:
+            files = [ws / check["file_match"]] if "file_match" in check else sorted(ws.glob(check["glob_match"]))
+            label = f"{check.get('file_match') or check['glob_match']} ~ /{check['match'][:30]}/"
+            ok = any(f.is_file() and re.search(check["match"], f.read_text(errors="ignore")) for f in files)
         elif "no_conflicts" in check:
             from .binds import conflicts, describe, from_config
             found = conflicts(from_config(ws / "hypr" / "hyprland.lua"))
@@ -268,7 +279,7 @@ def run_case(case: dict, model: str, think: bool, out_dir: Path) -> CaseRun:
             elif ev.kind == "status" and ev.name == "fix":
                 fixes += 1
             elif ev.kind == "tool_result" and ev.name.startswith("verify") \
-                    and not re.match(r"(config|waybar|quickshell|hypr\w+) ok", ev.text):
+                    and not re.match(r"(config|waybar|quickshell|hypr\w+|matugen) ok", ev.text):
                 verify_failed = True
     except Exception as e:
         error = f"{type(e).__name__}: {e}"
@@ -361,6 +372,7 @@ def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_M
     if not live:
         os.environ["MYHYPR_NO_LIVE"] = "1"
     os.environ.setdefault("MYHYPR_NO_SYSTEM", "1")  # banc reproductible d'une machine à l'autre
+    os.environ.setdefault("MYHYPR_WALLPAPER", "/usr/share/hypr/wall0.png")
     cases = load_cases(pattern, tag)
     if not cases:
         console.print("[err]Aucun cas ne correspond.[/]")
