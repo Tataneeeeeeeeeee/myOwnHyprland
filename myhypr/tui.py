@@ -23,7 +23,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 from rich.text import Text
 
-from . import dataset, ops, rag
+from . import binds, dataset, ops, rag
 from .agent import Session
 from .system import detect
 from .config import CHAT_MODEL, DATA, INDEX_DIR, SESSIONS_DIR, WORKSPACES
@@ -41,6 +41,7 @@ COMMANDS = {
         "/think": "raisonnement du modèle on/off (plus lent)",
         "/model": "afficher ou changer de modèle",
         "/system": "ce que l'agent sait de ta machine (écrans, clavier, GPU, logiciels)",
+        "/binds": "conflits de raccourcis (session en cours + dossier de travail)",
     },
     "Fichiers": {
         "/files": "fichiers produits",
@@ -201,6 +202,7 @@ class Renderer:
             "verify_waybar": "Validation Waybar (test live 3 s)…",
             "verify_quickshell": "Validation Quickshell (qmllint + test live 4 s)…",
             "system_info": "Détection du système…",
+            "check_binds": "Analyse des raccourcis…",
         }.get(name, f"{name}…")
         self.args = args
 
@@ -262,6 +264,12 @@ class Renderer:
         elif name == "fix":
             self.print(row("↻", C["peach"], Text(f"correction {args.get('round')}/{args.get('max')}",
                                                   style=C["peach"])), kind="status")
+            self.phase = "Correction…"
+        elif name == "conflict":
+            self.print(row("!", C["peach"], Text("conflit de raccourcis créé → correction", style=C["peach"])),
+                       kind="status")
+            for line in args.get("lines", [])[:4]:
+                self.print(Padding(Text(f"│ {line}", style=C["peach"]), (0, 0, 0, 4)), kind="status")
             self.phase = "Correction…"
         elif name == "compact":
             self.print(row("◇", C["overlay1"], Text("contexte presque plein : anciens résultats d'outils retirés",
@@ -512,6 +520,8 @@ class App:
                 self.think = self.session.think = not self.think
                 self.note(f"raisonnement {'activé — plus lent, parfois meilleur' if self.think else 'désactivé'}",
                           C["mauve"], "◆")
+            case "/binds":
+                self.binds_report()
             case "/system":
                 self.system()
             case "/model":
@@ -523,6 +533,21 @@ class App:
             case _:
                 self.note(f"commande inconnue : {cmd}  (/help)", C["red"], "✗")
         return True
+
+    def binds_report(self):
+        sources = [("session en cours", binds.from_session())]
+        entry = self.ws.root / "hypr" / "hyprland.lua"
+        if entry.exists():
+            sources.append(("dossier de travail", binds.from_config(entry)))
+        for label, found in sources:
+            conf, dup = binds.conflicts(found), binds.duplicates(found)
+            color = C["red"] if conf else C["green"]
+            self.note(f"{label} : {len(found)} raccourcis · {len(conf)} conflit(s) · {len(dup)} doublon(s)",
+                      color, "✗" if conf else "✓")
+            for line in binds.describe(conf):
+                console.print(Padding(Text(f"│ {line}", style=C["red"]), (0, 0, 0, 4)))
+            for line in binds.describe(dup):
+                console.print(Padding(Text(f"│ {line} (même action, inoffensif)", style=C["overlay1"]), (0, 0, 0, 4)))
 
     def system(self):
         info = detect()

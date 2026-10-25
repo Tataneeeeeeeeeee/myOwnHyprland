@@ -170,6 +170,14 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
             found = re.search(pattern, css, re.S) is not None
             ok = found if "css" in check else not found
             label = f"css {'~' if 'css' in check else '!~'} /{pattern[:40]}/"
+        elif "no_conflicts" in check:
+            from .binds import conflicts, describe, from_config
+            found = conflicts(from_config(ws / "hypr" / "hyprland.lua"))
+            label, ok, got = "aucun conflit de raccourcis", not found, "; ".join(describe(found))[:120]
+        elif "bind_any" in check:
+            hy = hy if hy is not None else hypr_conf(ws) or {}
+            label = f"un raccourci lance /{check['bind_any']}/"
+            ok = any(re.search(check["bind_any"], bind_repr(b)) for b in hy.get("binds", []))
         elif any(k in check for k in ("hypr", "bind", "window_rule", "layer_rule", "exec")):
             hy = hy if hy is not None else hypr_conf(ws) or {}
             if "hypr" in check:

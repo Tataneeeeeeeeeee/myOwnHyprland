@@ -194,6 +194,23 @@ class Workspace:
             return f"ERREUR : {path}/shell.qml n'existe pas (une config Quickshell = un dossier avec shell.qml)"
         return verify_quickshell_dir(p)
 
+    def check_binds(self, keys: str = "", path: str = "hypr/hyprland.lua") -> str:
+        """Raccourcis d'une config Hyprland. Avec keys : dit si cette combinaison est libre ou déjà utilisée
+        (par quelle action, à quelle ligne). Sans keys : liste les conflits (même combinaison, actions différentes).
+
+        Args:
+            keys: Combinaison à vérifier, ex. "SUPER + E" (laisser vide pour lister tous les conflits)
+            path: Fichier d'entrée de la config, par défaut "hypr/hyprland.lua"
+
+        Returns:
+            Combinaison libre / déjà utilisée, ou liste des conflits avec fichier:ligne
+        """
+        from .binds import lookup, report
+        p = self.path(path)
+        if not p.exists():
+            return f"ERREUR : {path} n'existe pas"
+        return lookup(p, keys) if keys.strip() else report(p)
+
     def system_info(self) -> str:
         """Détails de la machine : écrans (nom, modes disponibles, échelle), clavier/souris/touchpad, GPU,
         logiciels installés, version de Hyprland et format de config en place.
@@ -207,7 +224,7 @@ class Workspace:
     def tools(self) -> dict:
         return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
                                          self.search_docs, self.verify_hyprland, self.verify_waybar,
-                                         self.verify_quickshell, self.system_info)}
+                                         self.verify_quickshell, self.system_info, self.check_binds)}
 
     def validate_all(self) -> list[str]:
         """Validation automatique de tout ce qui a été produit. Renvoie les erreurs."""

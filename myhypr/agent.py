@@ -13,7 +13,7 @@ from pathlib import Path
 
 import ollama
 
-from . import rag, system
+from . import binds, rag, system
 from .config import CHAT_MODEL, MAX_FIX_ROUNDS, MAX_STEPS, NUM_CTX, SESSIONS_DIR, SYSTEM_TOKENS, TOOL_OUTPUT_LIMIT
 from .tools import Workspace
 
@@ -123,6 +123,10 @@ class Session:
         tools = self.workspace.tools()
         self.messages.append(self._user_message(request))
         before = self._snapshot()
+        conflicts_before = self._conflict_keys()
+        entry = self.workspace.root / "hypr" / "hyprland.lua"
+        binds_before = {(b.key, b.action) for b in binds.from_config(entry)} if entry.exists() else set()
+        conflict_reported = False
 
         def finish(ok: bool, errors: list[str], summary: str) -> Event:
             now = self._snapshot()
@@ -168,6 +172,15 @@ class Session:
                 yield finish(True, [], summary)
                 return
             errors = self.workspace.validate_all()
+            if not errors and not conflict_reported:
+                new = {k: v for k, v in self._conflicts().items() if k not in conflicts_before}
+                if new:
+                    # Valide pour Hyprland, mais une des deux actions ne se déclenchera jamais
+                    conflict_reported = True
+                    yield Event("status", "nouveau conflit de raccourcis", name="conflict",
+                                args={"lines": binds.describe(new)})
+                    self.messages.append({"role": "user", "content": self._conflict_message(new, binds_before)})
+                    continue
             if not errors:
                 if reviewed:
                     break
@@ -196,6 +209,32 @@ class Session:
 
         errors = self.workspace.validate_all()
         yield finish(not errors, errors, summary)
+
+    @staticmethod
+    def _conflict_message(new: dict, binds_before: set) -> str:
+        """Désigne précisément l'ancien et le nouveau raccourci, avec la ligne exacte à neutraliser."""
+        parts = ["Ta modification crée un conflit de raccourcis : une même combinaison déclenche deux actions "
+                 "différentes, une seule fonctionnera."]
+        for (_, combo, _), group in new.items():
+            old = [b for b in group if (b.key, b.action) in binds_before]
+            fresh = [b for b in group if (b.key, b.action) not in binds_before]
+            parts.append(f"\n{combo} :")
+            for b in old:
+                parts.append(f"  ANCIEN  {b.action} @ {b.where} : {b.text}")
+            for b in fresh:
+                parts.append(f"  NOUVEAU {b.action} @ {b.where} : {b.text}")
+        parts.append("\nSi la demande nomme explicitement cette combinaison, le nouveau raccourci gagne : commente "
+                     "l'ANCIEN avec edit_file (old = sa ligne exacte ci-dessus, new = « -- » + la même ligne) et dis "
+                     "à l'utilisateur quelle action n'a plus de raccourci. Sinon, choisis pour le NOUVEAU une "
+                     "combinaison libre (check_binds avec keys). N'ajoute pas de nouveau hl.bind en double.")
+        return "\n".join(parts)
+
+    def _conflicts(self) -> dict:
+        entry = self.workspace.root / "hypr" / "hyprland.lua"
+        return binds.conflicts(binds.from_config(entry)) if entry.exists() else {}
+
+    def _conflict_keys(self) -> set:
+        return set(self._conflicts())
 
     def _snapshot(self) -> dict[str, int]:
         root = self.workspace.root

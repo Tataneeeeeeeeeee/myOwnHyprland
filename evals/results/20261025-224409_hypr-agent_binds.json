@@ -1,0 +1,62 @@
+{
+ "date": "20261025-224409",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 1,
+  "valid": 1.0,
+  "first_try": 1.0,
+  "conform": 0.0,
+  "checks": 0.75,
+  "avg_seconds": 296.8,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "binds"
+ },
+ "filter": {
+  "pattern": "^mod-bind-conflict$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "mod-bind-conflict",
+   "tags": [
+    "hypr",
+    "modify",
+    "binds"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": false,
+   "passed": 3,
+   "total": 4,
+   "seconds": 296.8,
+   "model_calls": 22,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "un raccourci lance /firefox/",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "aucun conflit de raccourcis",
+     "ok": false,
+     "got": "SUPER + E est utilisé 4 fois : exec_cmd(firefox) @ hyprland.lua:172 ; exec_cmd(firefox) @ hyprland.lua:177 ; exec_cmd(fi"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261025-224409/mod-bind-conflict"
+  }
+ ]
+}

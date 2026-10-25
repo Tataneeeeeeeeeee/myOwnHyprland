@@ -11,6 +11,8 @@ local rec = {
     events = {}, other = {}, errors = {},
 }
 
+local current_submap = ""
+
 local function merge(dst, src)
     for k, v in pairs(src) do
         if type(v) == "table" and type(dst[k]) == "table" and #v == 0 then
@@ -38,8 +40,30 @@ local function push(list) return function(spec) list[#list + 1] = spec; return h
 hl = setmetatable({
     config = function(t) merge(rec.config, t) end,
     bind = function(keys, action, opts)
-        rec.binds[#rec.binds + 1] = { keys = keys, action = action, opts = opts }
+        -- fichier:ligne de l'appel, pour pointer précisément un conflit de raccourcis
+        local info = debug.getinfo(2, "Sl")
+        local src = info and info.source and info.source:gsub("^@", "") or "?"
+        local prefix = dir .. "/"
+        if src:sub(1, #prefix) == prefix then src = src:sub(#prefix + 1) end
+        rec.binds[#rec.binds + 1] = { keys = keys, action = action, opts = opts, submap = current_submap,
+                                      src = src, line = info and info.currentline or 0 }
         return handle()
+    end,
+    unbind = function(keys)
+        for i = #rec.binds, 1, -1 do
+            local b = rec.binds[i]
+            if b.keys == keys and b.submap == current_submap then table.remove(rec.binds, i) end
+        end
+    end,
+    define_submap = function(name, reset_or_fn, fn)
+        local f = type(reset_or_fn) == "function" and reset_or_fn or fn
+        local previous = current_submap
+        current_submap = name
+        if type(f) == "function" then
+            local ok, err = pcall(f)
+            if not ok then rec.errors[#rec.errors + 1] = tostring(err) end
+        end
+        current_submap = previous
     end,
     window_rule = push(rec.window_rules),
     layer_rule = push(rec.layer_rules),

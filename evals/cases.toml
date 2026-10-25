@@ -17,6 +17,8 @@
 #   { hypr = "...colors", hue = [255, 300] }   au moins une couleur dans cette plage de teinte (violet)
 #   { qml = 'regex' } / { qml_not = 'regex' }  sur tous les .qml produits sous quickshell/
 #   { qml_hue = [255, 300] }                   au moins une couleur de cette teinte dans le QML
+#   { bind_any = 'firefox' }                  au moins un raccourci dont l'action matche
+#   { no_conflicts = true }                    aucune combinaison avec deux actions différentes
 #   { exec = "waybar" }                        lancé au démarrage (hl.exec_cmd / hl.on)
 #   { answer = "follow_mouse" }                regex sur la réponse texte finale
 
@@ -297,6 +299,18 @@ checks = [
   { waybar = "position", eq = "bottom" },
   { waybar = "height", eq = 36 },
   { waybar = "modules-right", has = "pulseaudio" },
+]
+
+[[case]]
+id = "mod-bind-conflict"
+tags = ["hypr", "modify", "binds"]
+seed = "basic"
+request = "Ajoute un raccourci SUPER+E qui lance firefox."
+checks = [
+  { only = ["hypr/"] },
+  { bind_any = 'firefox' },
+  { no_conflicts = true },
+  { bind = "SUPER + Q", match = "kitty" },
 ]
 
 # ------------------------------------------------------------------- Quickshell (QML)
