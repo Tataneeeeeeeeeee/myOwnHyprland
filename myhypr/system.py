@@ -113,6 +113,14 @@ def detect() -> dict:
         if hits:
             found[cat] = hits
     info["logiciels"] = found
+    try:
+        procs = subprocess.run(["ps", "-eo", "comm="], capture_output=True, text=True, timeout=5).stdout.split()
+    except (OSError, subprocess.TimeoutExpired):
+        procs = []
+    watched = ["waybar", "quickshell", "qs", "eww", "ags", "hyprpanel", "swaync", "mako", "dunst", "hyprpaper",
+               "swww-daemon", "awww-daemon", "swaybg", "mpvpaper", "hypridle", "swayidle", "hyprsunset", "cliphist",
+               "hyprpolkitagent", "nm-applet"]
+    info["en_cours"] = [w for w in watched if w in procs]
     info["raccourcis_actifs"] = len(_run_json("hyprctl", "binds", "-j") or [])
     return info
 
@@ -137,6 +145,11 @@ def summary(info: dict | None = None) -> str:
                  + (f" · pilote NVIDIA {g['pilote_nvidia']} → variables d'environnement NVIDIA nécessaires"
                     if g["pilote_nvidia"] else ""))
     soft = "; ".join(f"{cat} : {', '.join(b)}" for cat, b in info["logiciels"].items())
+    if info.get("en_cours"):
+        lines.append(f"En cours d'exécution : {', '.join(info['en_cours'])}"
+                     + (" (le fond d'écran n'est PAS géré par hyprpaper)" if "hyprpaper" not in info["en_cours"]
+                        and any(d in info["en_cours"] for d in ("awww-daemon", "swww-daemon", "swaybg", "mpvpaper"))
+                        else ""))
     lines.append(f"Installés : {soft}")
     lines.append("Utilise ces noms d'écran et ces logiciels réels plutôt que des valeurs génériques, "
                  "sauf si la demande dit autre chose.")

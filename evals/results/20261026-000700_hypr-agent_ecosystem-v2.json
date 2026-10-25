@@ -1,0 +1,169 @@
+{
+ "date": "20261026-000700",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 3,
+  "valid": 1.0,
+  "first_try": 0.6666666666666666,
+  "conform": 0.3333333333333333,
+  "checks": 0.8888888888888888,
+  "avg_seconds": 79.8,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "ecosystem-v2"
+ },
+ "filter": {
+  "pattern": "^eco-",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "eco-idle",
+   "tags": [
+    "ecosystem",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 8,
+   "total": 8,
+   "seconds": 33.9,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "fichier hypr/hypridle.conf",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypridle.conf listener:timeout ∋ 300",
+     "ok": true,
+     "got": "600, 300"
+    },
+    {
+     "label": "hypridle.conf listener:timeout ∋ 600",
+     "ok": true,
+     "got": "600, 300"
+    },
+    {
+     "label": "hypridle.conf listener:on-timeout [timeout=300] ~ /(loginctl lock-session|hyprloc/",
+     "ok": true,
+     "got": "loginctl lock-session"
+    },
+    {
+     "label": "hypridle.conf listener:on-timeout [timeout=600] ~ /hl\\.dsp\\.dpms/",
+     "ok": true,
+     "got": "hyprctl dispatch 'hl.dsp.dpms({ action = \"disable\" })'"
+    },
+    {
+     "label": "hypridle.conf listener:on-resume [timeout=600] ~ /hl\\.dsp\\.dpms/",
+     "ok": true,
+     "got": "hyprctl dispatch 'hl.dsp.dpms({ action = \"enable\" })'"
+    },
+    {
+     "label": "hypridle.conf general:before_sleep_cmd ~ /(loginctl lock-session|hyprloc/",
+     "ok": true,
+     "got": "loginctl lock-session"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-000700/eco-idle"
+  },
+  {
+   "id": "eco-lock",
+   "tags": [
+    "ecosystem",
+    "new"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": false,
+   "passed": 5,
+   "total": 6,
+   "seconds": 187.5,
+   "model_calls": 15,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "fichier hypr/hyprlock.conf",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hyprlock.conf background:path ∋ 'screenshot'",
+     "ok": true,
+     "got": "screenshot"
+    },
+    {
+     "label": "hyprlock.conf background:blur_passes ~ /^[1-9]/",
+     "ok": true,
+     "got": "3"
+    },
+    {
+     "label": "hyprlock.conf label:text ~ /(\\$TIME|date)/",
+     "ok": true,
+     "got": "$TIME, \"\""
+    },
+    {
+     "label": "hyprlock.conf input-field:rounding ~ /^(-1|[1-9]\\d*)$/",
+     "ok": false,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-000700/eco-lock"
+  },
+  {
+   "id": "eco-paper",
+   "tags": [
+    "ecosystem",
+    "new"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": false,
+   "passed": 3,
+   "total": 4,
+   "seconds": 18.0,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hyprpaper.conf wallpaper:path ~ /wall0\\.png/",
+     "ok": true,
+     "got": "/usr/share/hypr/wall0.png"
+    },
+    {
+     "label": "hyprpaper.conf splash ∋ 'false'",
+     "ok": false,
+     "got": ""
+    },
+    {
+     "label": "hyprpaper.conf preload ~ /^$/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-000700/eco-paper"
+  }
+ ]
+}

@@ -205,6 +205,7 @@ class Renderer:
             "system_info": "Détection du système…",
             "check_binds": "Analyse des raccourcis…",
             "migrate_hyprlang": "Conversion hyprlang → Lua…",
+            "verify_hyprtools": "Validation hyprlock / hypridle / hyprpaper…",
         }.get(name, f"{name}…")
         self.args = args
 
@@ -236,9 +237,10 @@ class Renderer:
             body = Text.assemble(("doc ", C["teal"]), (f"« {args.get('query', '')} »", C["subtext"]))
             self.print(row("⌕", C["teal"], body, Text(" · ".join(pages)[:48], style=C["overlay0"])))
         elif name.startswith("verify"):
-            what = {"verify_hyprland": "Hyprland", "verify_waybar": "Waybar"}.get(name, "Quickshell")
+            what = {"verify_hyprland": "Hyprland", "verify_waybar": "Waybar",
+                    "verify_hyprtools": (path or "outil Hypr").split("/")[-1]}.get(name, "Quickshell")
             lines = [LOG_PREFIX.sub("", ln) for ln in out.splitlines() if ln.strip()]
-            if lines and lines[0].startswith(("config ok", "waybar ok", "quickshell ok")):
+            if lines and re.match(r"(config|waybar|quickshell|hypr\w+) ok", lines[0]):
                 self.print(row("✓", f"bold {C['green']}", Text(f"{what} valide", style=C["green"])))
             else:
                 errors = [ln for ln in lines if not ln.startswith("Indice")]

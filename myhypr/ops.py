@@ -193,6 +193,15 @@ def apply_live(ws: Workspace, keep: Callable[[], bool], wait: float = 1.5) -> Li
         else:
             report.add("info", "aucune Waybar en cours : lance-la avec  waybar &")
 
+    hints = {"hypr/hypridle.conf": "hypridle : relance-le pour prendre la config  →  pkill hypridle; hypridle & disown",
+             "hypr/hyprpaper.conf": "hyprpaper : relance-le  →  pkill hyprpaper; hyprpaper & disown "
+                                    "(arrête d'abord awww/swww s'ils gèrent déjà le fond)",
+             "hypr/hyprlock.conf": "hyprlock : sera utilisé au prochain verrouillage ; pour tester  →  hyprlock "
+                                   "(déverrouille avec ton mot de passe)"}
+    for f, hint in hints.items():
+        if f in files:
+            report.add("info", hint)
+
     for name in sorted({f.split("/")[1] for f in files if f.startswith("quickshell/") and f.count("/") >= 2}):
         report.add("info", f"Quickshell : qs -p ~/.config/quickshell/{name}")
 

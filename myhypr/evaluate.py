@@ -170,6 +170,22 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
             found = re.search(pattern, css, re.S) is not None
             ok = found if "css" in check else not found
             label = f"css {'~' if 'css' in check else '!~'} /{pattern[:40]}/"
+        elif "conf" in check:
+            from .ecosystem import parse
+            conf = ws / check["conf"]
+            entries = parse(conf, []) if conf.exists() else []
+            if "where" in check:  # « timeout=300 » : seulement les blocs qui contiennent cette valeur
+                wk, _, wv = check["where"].partition("=")
+                blocks = {e.block for e in entries if e.key == wk and e.value == wv}
+                entries = [e for e in entries if e.block in blocks]
+            values = [e.value for e in entries if f"{e.category}:{e.key}".lstrip(":") == check["key"]]
+            label = f"{check['conf'].split('/')[-1]} {check['key']}" + (f" [{check['where']}]" if "where" in check else "")
+            got = ", ".join(values)[:80]
+            if "has" in check:
+                ok = str(check["has"]) in values
+            else:
+                # « match = '^$' » sur une clé absente = la clé ne doit pas exister
+                ok = any(re.search(check["match"], v) for v in values) if values else check["match"] == "^$"
         elif "no_conflicts" in check:
             from .binds import conflicts, describe, from_config
             found = conflicts(from_config(ws / "hypr" / "hyprland.lua"))
@@ -252,7 +268,7 @@ def run_case(case: dict, model: str, think: bool, out_dir: Path) -> CaseRun:
             elif ev.kind == "status" and ev.name == "fix":
                 fixes += 1
             elif ev.kind == "tool_result" and ev.name.startswith("verify") \
-                    and not ev.text.startswith(("config ok", "waybar ok", "quickshell ok")):
+                    and not re.match(r"(config|waybar|quickshell|hypr\w+) ok", ev.text):
                 verify_failed = True
     except Exception as e:
         error = f"{type(e).__name__}: {e}"

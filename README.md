@@ -85,6 +85,19 @@ Testé sur de vraies configs : JaKooLit/Hyprland-Dots (46 fichiers, 502 lignes, 
 (309 lignes, 0 TODO), linuxmobile/hyprland-dots (216 lignes, 2 TODO). Les erreurs restantes viennent d'options
 supprimées depuis (`pseudotile`, `drop_shadow`…), que l'agent corrige avec la liste des clés valides.
 
+## Écosystème Hypr : hyprlock, hypridle, hyprpaper
+
+Ils restent en hyprlang (`hypr/hyprlock.conf`, `hypridle.conf`, `hyprpaper.conf`). Aucun n'a d'option de
+vérification et les lancer agirait sur la session (verrouillage, veille, fond) : `verify_hyprtools` les valide
+**sans les exécuter** — options et types d'après les tableaux du wiki (schéma construit automatiquement, avec
+suggestion en cas de faute), fichiers d'images, binaires des commandes, `hyprctl dispatch` à l'ancienne
+(→ conversion `hl.dsp.*` proposée), `listener` sans `timeout`, ancienne syntaxe de hyprpaper (`preload`),
+formats de date dans un label hyprlock (→ `$TIME`). La détection du système indique ce qui tourne déjà
+(ex. `awww-daemon` : le fond d'écran n'est pas géré par hyprpaper).
+
+La validation ne porte que sur les fichiers **modifiés pendant la demande** : un vieux fichier inutilisé du
+dossier de travail ne bloque pas une autre demande.
+
 ## Quickshell (widgets QML)
 
 - Une config = un dossier `quickshell/<nom>/shell.qml` dans le dossier de travail ; après `/apply`, lance-la avec

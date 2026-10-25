@@ -171,7 +171,8 @@ class Session:
                 # Question, description, explication : rien n'a changé → la réponse est la réponse
                 yield finish(True, [], summary)
                 return
-            errors = self.workspace.validate_all()
+            changed_now = self._changed(before)
+            errors = self.workspace.validate_all(changed_now)
             if not errors and not conflict_reported:
                 new = {k: v for k, v in self._conflicts().items() if k not in conflicts_before}
                 if new:
@@ -209,11 +210,11 @@ class Session:
                                   "puis réécris les fichiers concernés :\n\n" + "\n\n".join(errors)})
         else:
             # Limite d'étapes : on juge l'état final, pas le chemin (une config valide reste valide)
-            errors = self.workspace.validate_all()
+            errors = self.workspace.validate_all(self._changed(before))
             yield finish(not errors, errors, summary or "(limite d'étapes atteinte)")
             return
 
-        errors = self.workspace.validate_all()
+        errors = self.workspace.validate_all(self._changed(before))
         yield finish(not errors, errors, summary)
 
     @staticmethod
@@ -241,6 +242,10 @@ class Session:
 
     def _conflict_keys(self) -> set:
         return set(self._conflicts())
+
+    def _changed(self, before: dict[str, int]) -> set[str]:
+        now = self._snapshot()
+        return {f for f in now if before.get(f) != now[f]}
 
     def _snapshot(self) -> dict[str, int]:
         root = self.workspace.root

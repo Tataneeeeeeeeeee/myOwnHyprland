@@ -221,6 +221,20 @@ class Workspace:
                 "des règles). Dès que la validation passe et qu'il ne reste plus de TODO, arrête-toi et résume. "
                 "Les .conf peuvent rester : Hyprland charge hyprland.lua en priorité.")
 
+    def verify_hyprtools(self, path: str = "hypr/hypridle.conf") -> str:
+        """Valide une config hyprlock, hypridle ou hyprpaper (format hyprlang .conf) SANS lancer l'outil : options
+        connues (d'après le wiki), types, fichiers d'images, commandes (hyprctl dispatch au format Lua).
+
+        Args:
+            path: "hypr/hyprlock.conf", "hypr/hypridle.conf" ou "hypr/hyprpaper.conf"
+
+        Returns:
+            "<outil> ok" ou la liste des erreurs
+        """
+        from .ecosystem import verify
+        p = self.path(path)
+        return verify(p) if p.exists() else f"ERREUR : {path} n'existe pas"
+
     def check_binds(self, keys: str = "", path: str = "hypr/hyprland.lua") -> str:
         """Raccourcis d'une config Hyprland. Avec keys : dit si cette combinaison est libre ou déjà utilisée
         (par quelle action, à quelle ligne). Sans keys : liste les conflits (même combinaison, actions différentes).
@@ -252,26 +266,42 @@ class Workspace:
         return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
                                          self.search_docs, self.verify_hyprland, self.verify_waybar,
                                          self.verify_quickshell, self.system_info, self.check_binds,
-                                         self.migrate_hyprlang)}
+                                         self.migrate_hyprlang, self.verify_hyprtools)}
 
-    def validate_all(self) -> list[str]:
-        """Validation automatique de tout ce qui a été produit. Renvoie les erreurs."""
+    def validate_all(self, changed: set[str] | None = None) -> list[str]:
+        """Validation automatique. `changed` (fichiers modifiés pendant le tour) limite la validation à ce que
+        l'agent a touché : un vieux fichier inutilisé du dossier de travail ne bloque pas une autre demande."""
+        def touched(prefix: str) -> bool:
+            return changed is None or any(f.startswith(prefix) for f in changed)
+
         errors = []
         hypr_entry = self.root / "hypr" / "hyprland.lua"
-        luas = [hypr_entry] if hypr_entry.exists() else sorted(self.root.glob("hypr/**/*.lua"))
-        for lua in luas:
-            out = verify_hyprland_file(lua)
-            if out != "config ok":
-                errors.append(f"{lua.relative_to(self.root)} :\n{out}")
-        for cfg in sorted(self.root.glob("waybar/config*.json*")):
-            css = cfg.parent / "style.css"
-            out = verify_waybar_files(cfg, css if css.exists() else None)
-            if out != "waybar ok":
-                errors.append(f"{cfg.relative_to(self.root)} :\n{out}")
+        if changed is None or any(f.startswith("hypr/") and f.endswith(".lua") for f in changed):
+            luas = [hypr_entry] if hypr_entry.exists() else sorted(self.root.glob("hypr/**/*.lua"))
+            for lua in luas:
+                out = verify_hyprland_file(lua)
+                if out != "config ok":
+                    errors.append(f"{lua.relative_to(self.root)} :\n{out}")
+        if touched("waybar/"):
+            for cfg in sorted(self.root.glob("waybar/config*.json*")):
+                css = cfg.parent / "style.css"
+                out = verify_waybar_files(cfg, css if css.exists() else None)
+                if out != "waybar ok":
+                    errors.append(f"{cfg.relative_to(self.root)} :\n{out}")
         for shell in sorted(self.root.glob("quickshell/**/shell.qml")):
+            rel = shell.parent.relative_to(self.root).as_posix() + "/"
+            if not touched(rel):
+                continue
             out = verify_quickshell_dir(shell.parent)
             if not out.startswith("quickshell ok"):
                 errors.append(f"{shell.parent.relative_to(self.root)} :\n{out}")
+        from .ecosystem import verify as verify_tool
+        for name in ("hyprlock.conf", "hypridle.conf", "hyprpaper.conf"):
+            conf = self.root / "hypr" / name
+            if conf.exists() and (changed is None or f"hypr/{name}" in changed):
+                out = verify_tool(conf)
+                if not re.match(r"hypr\w+ ok", out):
+                    errors.append(f"hypr/{name} :\n{out}")
         return errors
 
 

@@ -19,6 +19,9 @@
 #   { qml_hue = [255, 300] }                   au moins une couleur de cette teinte dans le QML
 #   { bind_any = 'firefox' }                  au moins un raccourci dont l'action matche
 #   { no_conflicts = true }                    aucune combinaison avec deux actions différentes
+#   { conf = "hypr/hypridle.conf", key = "listener:timeout", has = 300 }   valeur dans un .conf hyprlang
+#   { conf = "…", key = "general:lock_cmd", match = 'hyprlock' }    (match = '^$' : la clé ne doit pas exister)
+#   { conf = "…", key = "listener:on-timeout", where = "timeout=300", match = '…' }   dans le bloc où timeout = 300
 #   { exec = "waybar" }                        lancé au démarrage (hl.exec_cmd / hl.on)
 #   { answer = "follow_mouse" }                regex sur la réponse texte finale
 
@@ -328,6 +331,47 @@ checks = [
   { bind = "SUPER + mouse:272", match = '^window\.drag' },
   { window_rule = "pavucontrol", match = '"float":\s*true' },
   { exec = "nm-applet" },
+]
+
+# ------------------------------------------------------------- Écosystème Hypr (hyprlang)
+
+[[case]]
+id = "eco-idle"
+tags = ["ecosystem", "new"]
+request = "Crée hypr/hypridle.conf : verrouille l'écran avec hyprlock après 5 minutes d'inactivité, éteins l'écran après 10 minutes (et rallume-le au retour), verrouille aussi avant la mise en veille."
+checks = [
+  { only = ["hypr/"] },
+  { file = "hypr/hypridle.conf" },
+  { conf = "hypr/hypridle.conf", key = "listener:timeout", has = 300 },
+  { conf = "hypr/hypridle.conf", key = "listener:timeout", has = 600 },
+  { conf = "hypr/hypridle.conf", key = "listener:on-timeout", where = "timeout=300", match = '(loginctl lock-session|hyprlock)' },
+  { conf = "hypr/hypridle.conf", key = "listener:on-timeout", where = "timeout=600", match = 'hl\.dsp\.dpms' },
+  { conf = "hypr/hypridle.conf", key = "listener:on-resume", where = "timeout=600", match = 'hl\.dsp\.dpms' },
+  { conf = "hypr/hypridle.conf", key = "general:before_sleep_cmd", match = '(loginctl lock-session|hyprlock)' },
+]
+
+[[case]]
+id = "eco-lock"
+tags = ["ecosystem", "new"]
+request = "Crée hypr/hyprlock.conf : fond flouté à partir d'une capture d'écran, l'heure en grand au centre, et un champ de mot de passe arrondi en dessous."
+checks = [
+  { only = ["hypr/"] },
+  { file = "hypr/hyprlock.conf" },
+  { conf = "hypr/hyprlock.conf", key = "background:path", has = "screenshot" },
+  { conf = "hypr/hyprlock.conf", key = "background:blur_passes", match = '^[1-9]' },
+  { conf = "hypr/hyprlock.conf", key = "label:text", match = '(\$TIME|date)' },
+  { conf = "hypr/hyprlock.conf", key = "input-field:rounding", match = '^(-1|[1-9]\d*)$' },
+]
+
+[[case]]
+id = "eco-paper"
+tags = ["ecosystem", "new"]
+request = "Crée hypr/hyprpaper.conf : le fond /usr/share/hypr/wall0.png sur tous les écrans, sans le splash."
+checks = [
+  { only = ["hypr/"] },
+  { conf = "hypr/hyprpaper.conf", key = "wallpaper:path", match = 'wall0\.png' },
+  { conf = "hypr/hyprpaper.conf", key = "splash", has = "false" },
+  { conf = "hypr/hyprpaper.conf", key = "preload", match = '^$' },
 ]
 
 # ------------------------------------------------------------------- Quickshell (QML)

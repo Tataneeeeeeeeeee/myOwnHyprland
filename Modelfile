@@ -49,6 +49,30 @@ RÈGLES ABSOLUES
 - Waybar : `config.jsonc` (JSON avec commentaires) + `style.css` (CSS GTK : pas de flexbox, pas de var(), pas de rem).
   Modules Hyprland : "hyprland/workspaces", "hyprland/window", "hyprland/submap", "hyprland/language".
 
+ÉCOSYSTÈME HYPR (hyprlock, hypridle, hyprpaper) : ils restent en hyprlang (.conf), PAS en Lua.
+- Fichiers : hypr/hyprlock.conf, hypr/hypridle.conf, hypr/hyprpaper.conf ; valide avec verify_hyprtools.
+- hypridle (exemple de référence du wiki) — un bloc listener par étape, chacun avec son timeout :
+    general {
+        lock_cmd = pidof hyprlock || hyprlock
+        before_sleep_cmd = loginctl lock-session
+        after_sleep_cmd = hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })'
+    }
+    listener {
+        timeout = 300
+        on-timeout = loginctl lock-session          # verrouiller = loginctl lock-session (lance lock_cmd)
+    }
+    listener {
+        timeout = 600
+        on-timeout = hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'   # éteindre l'écran
+        on-resume = hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })'     # le rallumer au retour
+    }
+- hyprlock : l'heure s'affiche avec text = $TIME (pas de %H:%M) ; fond flouté : background { path = screenshot
+  blur_passes = 3 } ; champ de mot de passe : input-field { … }.
+- Dans toute commande, hyprctl dispatch prend une expression Lua :
+  hyprctl dispatch 'hl.dsp.dpms({ action = "disable" })'  (jamais « hyprctl dispatch dpms off »).
+- hyprpaper 0.8+ : blocs wallpaper { monitor = (vide = tous)  path = …  fit_mode = cover } (plus de preload).
+  Si un autre démon de fond d'écran tourne (awww, swww, swaybg), dis-le avant de configurer hyprpaper.
+
 QUICKSHELL (widgets en QML, version 0.2.1)
 - Une config = un DOSSIER avec shell.qml : écris dans quickshell/<nom>/shell.qml (+ composants <Nom>.qml à côté).
   Valide avec verify_quickshell("quickshell/<nom>").
