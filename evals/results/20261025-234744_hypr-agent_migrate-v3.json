@@ -1,0 +1,150 @@
+{
+ "date": "20261025-234744",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 2,
+  "valid": 1.0,
+  "first_try": 0.5,
+  "conform": 1.0,
+  "checks": 1.0,
+  "avg_seconds": 46.65,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 2,
+  "label": "migrate-v3"
+ },
+ "filter": {
+  "pattern": "^mig-conf$",
+  "tag": null
+ },
+ "runs": [
+  {
+   "id": "mig-conf",
+   "tags": [
+    "hypr",
+    "migrate"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 9,
+   "total": 9,
+   "seconds": 31.4,
+   "model_calls": 7,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "fichier hypr/hyprland.lua",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'fr'",
+     "ok": true,
+     "got": "fr"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 20",
+     "ok": true,
+     "got": "20"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    },
+    {
+     "label": "bind SUPER + SHIFT + 2 ~ /^window\\.move .*\"workspace\": 2/",
+     "ok": true,
+     "got": "[\"window.move [{\\\"follow\\\": false, \\\"workspace\\\": 2}]\"]"
+    },
+    {
+     "label": "bind SUPER + mouse:272 ~ /^window\\.drag/",
+     "ok": true,
+     "got": "[\"window.drag [] {\\\"mouse\\\": true}\"]"
+    },
+    {
+     "label": "window_rule pavucontrol ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"float\": true, \"match\": {\"class\": \"^(pavucontrol)$\"}}, {\"size\": \"800 600\", …"
+    },
+    {
+     "label": "exec nm-applet",
+     "ok": true,
+     "got": "[\"waybar & hyprpaper\", \"nm-applet --indicator\", \"/usr/lib/hyprpolkitagent/hyp…"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261025-234744/r1/mig-conf"
+  },
+  {
+   "id": "mig-conf",
+   "tags": [
+    "hypr",
+    "migrate"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 9,
+   "total": 9,
+   "seconds": 61.9,
+   "model_calls": 13,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "fichier hypr/hyprland.lua",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'fr'",
+     "ok": true,
+     "got": "fr"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 20",
+     "ok": true,
+     "got": "20"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    },
+    {
+     "label": "bind SUPER + SHIFT + 2 ~ /^window\\.move .*\"workspace\": 2/",
+     "ok": true,
+     "got": "[\"window.move [{\\\"follow\\\": false, \\\"workspace\\\": 2}]\"]"
+    },
+    {
+     "label": "bind SUPER + mouse:272 ~ /^window\\.drag/",
+     "ok": true,
+     "got": "[\"window.drag [] {\\\"mouse\\\": true}\"]"
+    },
+    {
+     "label": "window_rule pavucontrol ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"float\": true, \"match\": {\"class\": \"^(pavucontrol)$\"}}, {\"size\": \"800 600\", …"
+    },
+    {
+     "label": "exec nm-applet",
+     "ok": true,
+     "got": "[\"waybar & hyprpaper\", \"nm-applet --indicator\", \"/usr/lib/hyprpolkitagent/hyp…"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261025-234744/r2/mig-conf"
+  }
+ ]
+}

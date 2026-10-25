@@ -123,7 +123,9 @@ def summary(info: dict | None = None) -> str:
     h, e, g = info["hyprland"], info["entrees"], info["gpu"]
     lines = [f"Hyprland {h['version']} · config actuelle : {h['format_config']}"
              + (" (hyprland.conf aussi présent, ignoré car hyprland.lua est prioritaire)"
-                if h["hyprland.conf_aussi_present"] else "")]
+                if h["hyprland.conf_aussi_present"] else "")
+             + (" → ancien format : propose la migration vers Lua (outil migrate_hyprlang)"
+                if h["format_config"].startswith("hyprlang") else "")]
     for m in info["ecrans"]:
         lines.append(f"Écran {m['nom']} ({m['description']}) : {m['mode']} Hz, position {m['position']}, "
                      f"échelle {m['echelle']}, rotation {m['rotation']}, VRR {'oui' if m['vrr'] else 'non'}")

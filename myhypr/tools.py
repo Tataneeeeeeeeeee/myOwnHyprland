@@ -194,6 +194,33 @@ class Workspace:
             return f"ERREUR : {path}/shell.qml n'existe pas (une config Quickshell = un dossier avec shell.qml)"
         return verify_quickshell_dir(p)
 
+    def migrate_hyprlang(self, path: str = "hypr/hyprland.conf") -> str:
+        """Convertit une config Hyprland hyprlang (.conf, ancien format) en Lua : écrit hyprland.lua et un .lua par
+        fichier sourcé, à côté des .conf (Hyprland charge le .lua en priorité). Renvoie les lignes laissées en
+        « -- TODO migration » et le résultat de la validation, à corriger ensuite avec edit_file.
+
+        Args:
+            path: Fichier hyprland.conf à migrer, par défaut "hypr/hyprland.conf"
+
+        Returns:
+            Résumé de la migration, TODO restants et erreurs de validation
+        """
+        from .migrate import migrate
+        conf = self.path(path)
+        if not conf.exists():
+            return f"ERREUR : {path} n'existe pas"
+        result = migrate(conf)
+        for rel, text in result.files.items():
+            dst = conf.parent / rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_text(text)
+        verdict = verify_hyprland_file(conf.with_suffix(".lua"))
+        return (result.summary() + "\n\nValidation : " + verdict + "\n\nÀ faire : corrige les erreurs de validation "
+                "(clés renommées ou supprimées : search_docs) et chaque « -- TODO migration » avec edit_file. "
+                "Le reste est déjà converti et correct : NE LE RETOUCHE PAS (pas de write_file, pas de reformulation "
+                "des règles). Dès que la validation passe et qu'il ne reste plus de TODO, arrête-toi et résume. "
+                "Les .conf peuvent rester : Hyprland charge hyprland.lua en priorité.")
+
     def check_binds(self, keys: str = "", path: str = "hypr/hyprland.lua") -> str:
         """Raccourcis d'une config Hyprland. Avec keys : dit si cette combinaison est libre ou déjà utilisée
         (par quelle action, à quelle ligne). Sans keys : liste les conflits (même combinaison, actions différentes).
@@ -224,7 +251,8 @@ class Workspace:
     def tools(self) -> dict:
         return {f.__name__: f for f in (self.write_file, self.edit_file, self.read_file, self.list_files,
                                          self.search_docs, self.verify_hyprland, self.verify_waybar,
-                                         self.verify_quickshell, self.system_info, self.check_binds)}
+                                         self.verify_quickshell, self.system_info, self.check_binds,
+                                         self.migrate_hyprlang)}
 
     def validate_all(self) -> list[str]:
         """Validation automatique de tout ce qui a été produit. Renvoie les erreurs."""

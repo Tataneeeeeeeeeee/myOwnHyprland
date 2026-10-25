@@ -66,6 +66,25 @@ tant que tu ne lances pas `/apply`, qui fait une **application à chaud sécuris
    nouvelle config casse le clavier ou l'affichage).
 `/restore <date>` reste disponible ensuite.
 
+## Migration hyprland.conf → Lua
+
+Depuis la 0.55, Hyprland se configure en Lua (hyprlock, hypridle, hyprpaper restent en hyprlang).
+`myhypr/migrate.py` convertit de façon **déterministe** tout ce qui a une correspondance sûre : sections,
+`$variables` (y compris `$bg-dir` → `bg_dir`, variables partagées entre fichiers), `bind*` et leurs drapeaux
+(`bindel` → `{ repeating, locked }`, `bindd` → description, `bindm`), ~40 dispatchers (`killactive`,
+`movetoworkspacesilent` → `follow = false`, `hyprctl dispatch X` dans un exec…), sous-modes, `monitor`, `exec-once`,
+`env`, les deux syntaxes de `windowrule`, `layerrule`, `workspace`, `bezier`/`animation`, `gestures` → `hl.gesture`,
+`device`, `source` (un module Lua par fichier). Le reste devient `-- TODO migration` avec la ligne d'origine.
+
+```bash
+uv run myhypr migrate ~/.config/hypr/hyprland.conf   # sans IA → workspaces/<date>/hypr
+uv run myhypr   puis   /migrate                       # avec l'agent : conversion + correction + validation
+```
+
+Testé sur de vraies configs : JaKooLit/Hyprland-Dots (46 fichiers, 502 lignes, 9 TODO), prasanthrangan/hyprdots
+(309 lignes, 0 TODO), linuxmobile/hyprland-dots (216 lignes, 2 TODO). Les erreurs restantes viennent d'options
+supprimées depuis (`pseudotile`, `drop_shadow`…), que l'agent corrige avec la liste des clés valides.
+
 ## Quickshell (widgets QML)
 
 - Une config = un dossier `quickshell/<nom>/shell.qml` dans le dossier de travail ; après `/apply`, lance-la avec

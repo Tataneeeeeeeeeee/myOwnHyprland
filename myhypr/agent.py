@@ -182,7 +182,11 @@ class Session:
                     self.messages.append({"role": "user", "content": self._conflict_message(new, binds_before)})
                     continue
             if not errors:
-                if reviewed:
+                migrated = any(c["function"]["name"] == "migrate_hyprlang"
+                               for m in self.messages[first:] for c in m.get("tool_calls", []))
+                if reviewed or migrated:
+                    # Migration : conversion déterministe + validation suffisent ; une relecture pousse le modèle
+                    # à reformuler du code correct (observé : 8 modifications inutiles, toutes annulées)
                     break
                 # Valide ≠ conforme : une passe de relecture contre la demande (oublis fréquents sur un 9B)
                 reviewed = True
@@ -204,7 +208,9 @@ class Session:
                                   "La validation automatique a échoué. Corrige ces erreurs (search_docs si besoin) "
                                   "puis réécris les fichiers concernés :\n\n" + "\n\n".join(errors)})
         else:
-            yield finish(False, self.workspace.validate_all() or ["nombre maximum d'étapes atteint"], summary)
+            # Limite d'étapes : on juge l'état final, pas le chemin (une config valide reste valide)
+            errors = self.workspace.validate_all()
+            yield finish(not errors, errors, summary or "(limite d'étapes atteinte)")
             return
 
         errors = self.workspace.validate_all()

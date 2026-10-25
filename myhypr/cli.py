@@ -83,6 +83,20 @@ def cmd_eval(args):
     evaluate.main(args.filter, args.tag, args.model, args.think, args.repeat, not args.no_live, args.label)
 
 
+def cmd_migrate(args):
+    from .migrate import migrate
+    from .tools import verify_hyprland_file
+    conf = Path(args.conf).expanduser()
+    result = migrate(conf)
+    out = Path(args.out).expanduser() if args.out else WORKSPACES / time.strftime("%Y%m%d-%H%M%S") / "hypr"
+    for rel, text in result.files.items():
+        (out / rel).parent.mkdir(parents=True, exist_ok=True)
+        (out / rel).write_text(text)
+    print(result.summary())
+    print(f"\nÉcrit dans {out}\nValidation : {verify_hyprland_file(out / conf.with_suffix('.lua').name)}")
+    print("Pour terminer avec l'agent : uv run myhypr  puis  /migrate")
+
+
 def cmd_system(_args):
     from .system import detect, summary
     print(summary(detect()))
@@ -137,6 +151,11 @@ def main():
     s.add_argument("--label", default="", help="étiquette du run, ex. 'avant-exemples'")
     s.add_argument("--rescore", metavar="RESULTS.json", help="recalcule les vérifications d'un run existant")
     s.set_defaults(func=cmd_eval)
+
+    s = sub.add_parser("migrate", help="convertit un hyprland.conf (hyprlang) en Lua, sans IA, dans un dossier de travail")
+    s.add_argument("conf", nargs="?", default="~/.config/hypr/hyprland.conf")
+    s.add_argument("--out", help="dossier de sortie (défaut : workspaces/<date>/hypr)")
+    s.set_defaults(func=cmd_migrate)
 
     s = sub.add_parser("system", help="ce que l'agent détecte de la machine")
     s.set_defaults(func=cmd_system)

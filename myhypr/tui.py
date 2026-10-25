@@ -38,6 +38,7 @@ COMMANDS = {
     "Conversation": {
         "/new": "nouvelle conversation et nouveau dossier de travail",
         "/from": "partir de ta config actuelle  ·  /from hypr waybar",
+        "/migrate": "migrer une config hyprland.conf (hyprlang) vers Lua avec l'agent",
         "/think": "raisonnement du modèle on/off (plus lent)",
         "/model": "afficher ou changer de modèle",
         "/system": "ce que l'agent sait de ta machine (écrans, clavier, GPU, logiciels)",
@@ -203,6 +204,7 @@ class Renderer:
             "verify_quickshell": "Validation Quickshell (qmllint + test live 4 s)…",
             "system_info": "Détection du système…",
             "check_binds": "Analyse des raccourcis…",
+            "migrate_hyprlang": "Conversion hyprlang → Lua…",
         }.get(name, f"{name}…")
         self.args = args
 
@@ -520,6 +522,16 @@ class App:
                 self.think = self.session.think = not self.think
                 self.note(f"raisonnement {'activé — plus lent, parfois meilleur' if self.think else 'désactivé'}",
                           C["mauve"], "◆")
+            case "/migrate":
+                if not (self.ws.root / "hypr" / "hyprland.conf").exists():
+                    ops.seed(self.ws, ["hypr"])
+                if not (self.ws.root / "hypr" / "hyprland.conf").exists():
+                    self.note("aucun hyprland.conf trouvé (ni dans le dossier de travail, ni dans ~/.config/hypr)",
+                              C["red"], "✗")
+                else:
+                    console.print()
+                    self.ask("Migre ma config hypr/hyprland.conf vers Lua avec migrate_hyprlang, puis corrige les "
+                             "erreurs de validation et les TODO restants.")
             case "/binds":
                 self.binds_report()
             case "/system":

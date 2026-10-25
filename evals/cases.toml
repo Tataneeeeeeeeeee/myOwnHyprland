@@ -313,6 +313,23 @@ checks = [
   { bind = "SUPER + Q", match = "kitty" },
 ]
 
+[[case]]
+id = "mig-conf"
+tags = ["hypr", "migrate"]
+seed = "conf"
+request = "Migre ma config hypr/hyprland.conf vers Lua."
+checks = [
+  { only = ["hypr/"] },
+  { file = "hypr/hyprland.lua" },
+  { hypr = "config.input.kb_layout", eq = "fr" },
+  { hypr = "config.general.gaps_out", eq = 20 },
+  { bind = "SUPER + Q", match = "kitty" },
+  { bind = "SUPER + SHIFT + 2", match = '^window\.move .*"workspace": 2' },
+  { bind = "SUPER + mouse:272", match = '^window\.drag' },
+  { window_rule = "pavucontrol", match = '"float":\s*true' },
+  { exec = "nm-applet" },
+]
+
 # ------------------------------------------------------------------- Quickshell (QML)
 
 [[case]]
