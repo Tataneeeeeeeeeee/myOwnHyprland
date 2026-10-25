@@ -57,7 +57,14 @@ uv run myhypr dataset                      # avancement du dataset de fine-tunin
 ```
 
 L'agent travaille **toujours** dans `workspaces/<date>/` (miroir de `~/.config`). Rien ne touche ta config
-tant que tu ne lances pas `apply`. Note : `verify_waybar` affiche une waybar de test pendant 3 s.
+tant que tu ne lances pas `/apply`, qui fait une **application à chaud sécurisée** :
+1. diff + confirmation, puis sauvegarde dans `data/backups/<date>/` (y compris la liste des dossiers créés) ;
+2. copie dans `~/.config` (les liens symboliques vers un dépôt de dotfiles sont respectés) ;
+3. `hyprctl reload` puis `hyprctl configerrors` : toute **nouvelle** erreur → restauration automatique ;
+4. Waybar rechargée par `SIGUSR2` si elle utilise `~/.config/waybar` (sinon tu es prévenu), et restauration si elle s'arrête ;
+5. « Garder ? » : sans « o » dans les 20 s, tout est restauré (comme les réglages d'écran — utile si la
+   nouvelle config casse le clavier ou l'affichage).
+`/restore <date>` reste disponible ensuite.
 
 ## Quickshell (widgets QML)
 

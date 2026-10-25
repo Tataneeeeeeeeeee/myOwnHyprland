@@ -1,5 +1,6 @@
 """Interface conversationnelle : `uv run myhypr`."""
 
+import asyncio
 import difflib
 import json
 import re
@@ -31,6 +32,7 @@ from .tools import Workspace
 
 console = Console(theme=RICH_THEME, highlight=False)
 HOME = str(Path.home())
+KEEP_SECONDS = 20
 
 COMMANDS = {
     "Conversation": {
@@ -599,15 +601,31 @@ class App:
             if not self.confirm("Appliquer quand même ?"):
                 return
         self.command("/diff")
-        if self.confirm(f"Copier {len(files)} fichier{'s' * (len(files) > 1)} dans ~/.config ?"):
-            backup = ops.apply(self.ws)
-            self.note(f"appliqué · sauvegarde {backup.name}  (/restore {backup.name} pour revenir)", C["green"], "✓")
-            if any(f.startswith("hypr/") for f in files):
-                self.note("Hyprland recharge sa config tout seul ; sinon : hyprctl reload")
-            if any(f.startswith("waybar/") for f in files):
-                self.note("Waybar : pkill waybar; waybar & disown")
-            for name in sorted({f.split("/")[1] for f in files if f.startswith("quickshell/") and f.count("/") >= 2}):
-                self.note(f"Quickshell : qs -p ~/.config/quickshell/{name}")
+        if not self.confirm(f"Appliquer {len(files)} fichier{'s' * (len(files) > 1)} et recharger à chaud ?"):
+            return
+        styles = {"ok": ("✓", C["green"]), "info": ("·", C["overlay1"]), "warn": ("!", C["peach"]),
+                  "err": ("✗", C["red"])}
+        report = ops.apply_live(self.ws, keep=lambda: self.keep_changes(KEEP_SECONDS))
+        for level, msg in report.steps:
+            icon, color = styles[level]
+            self.note(msg, color, icon)
+        if not report.rolled_back:
+            self.note(f"pour revenir en arrière plus tard : /restore {report.backup.name}")
+
+    def keep_changes(self, seconds: int) -> bool:
+        """Comme les réglages d'écran : sans « o » dans le délai, on restaure (config qui casse le clavier…)."""
+        self.note(f"regarde le résultat : garde les changements avec « o » — restauration automatique dans {seconds} s",
+                  C["yellow"], "?")
+
+        async def ask() -> str:
+            return await PromptSession(style=PT_STYLE).prompt_async(
+                [("class:prompt", "? "), ("", "Garder ? "), ("class:placeholder", "[o/N] ")])
+        try:
+            answer = asyncio.run(asyncio.wait_for(ask(), timeout=seconds))
+        except (asyncio.TimeoutError, KeyboardInterrupt, EOFError):
+            console.print()
+            return False
+        return answer.strip().lower() in ("o", "oui", "y", "yes")
 
     # ---- boucle
     def run(self):
