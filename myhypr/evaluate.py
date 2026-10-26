@@ -399,9 +399,10 @@ def _inhibit_sleep(why: str):
     if not shutil.which("systemd-inhibit"):
         return None
     try:
+        # « tail --pid » s'arrête dès que le banc meurt, même tué (kill, Ctrl+C, plantage) : le verrou ne survit jamais
         return subprocess.Popen(["systemd-inhibit", "--what=idle:sleep", "--who=myOwnHyprland", f"--why={why}",
-                                 "--mode=block", "sleep", "infinity"], stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL)
+                                 "--mode=block", "tail", f"--pid={os.getpid()}", "-f", "/dev/null"],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except OSError:
         return None
 
