@@ -11,5 +11,5 @@ sync_repo https://github.com/hyprwm/hyprland-wiki hyprland-wiki
 sync_repo https://github.com/Alexays/Waybar.wiki.git waybar-wiki
 
 cd ../..
-uv run python scripts/fetch_quickshell_docs.py   # doc Quickshell de la version installée
+if command -v qs >/dev/null 2>&1; then uv run python scripts/fetch_quickshell_docs.py; else echo "· Quickshell absent : doc Quickshell ignorée"; fi
 echo "Pense à relancer : uv run myhypr index"

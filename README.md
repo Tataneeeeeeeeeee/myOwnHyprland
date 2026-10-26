@@ -15,13 +15,25 @@ demande ─► RAG (wiki Hyprland + wiki Waybar + stubs hl.*) ─► qwen3.5 + o
 
 ## Installation
 
+**Prérequis** : Hyprland 0.55+ (config Lua), [Ollama](https://ollama.com) (avec ~8 Go de VRAM idéalement),
+[uv](https://docs.astral.sh/uv), git, lua. Optionnels : waybar, quickshell (+ qt6-declarative pour qmllint),
+matugen, gh (connecté, pour récupérer des exemples sur GitHub).
+
 ```bash
-ollama pull qwen3.5:9b && ollama pull nomic-embed-text
-ollama create hypr-agent -f Modelfile      # étape 1 : prompt système spécialisé
-./scripts/fetch_docs.sh                     # clone/maj des wikis dans docs/raw
-uv sync
-uv run myhypr index                         # étape 2 : indexation RAG (~1 min)
+git clone <ce dépôt> ~/myOwnHyprland && cd ~/myOwnHyprland
+./install.sh           # modèles, doc de TES versions, exemples, index, lanceur « myhypr » + entrée de menu
+./install.sh --bind    # idem + raccourci Hyprland (première combinaison libre de ta session, avec confirmation)
 ```
+
+Le script est **relançable sans risque** : il ne refait que ce qui manque. `./install.sh --update` met à jour la
+doc (wiki Hyprland, wiki Waybar, doc Quickshell de la version installée) et les exemples, puis réindexe.
+
+Le raccourci est écrit dans `~/.config/hypr/myhypr.lua` (fenêtre flottante centrée) et branché par une seule
+ligne `require("myhypr")`, ajoutée dans `custom.lua` si ta config le charge, sinon dans `hyprland.lua` ;
+sauvegarde `.bak-myhypr` et validation `--verify-config` avant de garder la modification.
+
+`myhypr doctor` vérifie tout : dépendances, modèles, contexte du modèle, doc qui correspond aux versions
+installées, index à jour, lanceur, raccourci.
 
 ## Utilisation
 

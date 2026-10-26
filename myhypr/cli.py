@@ -108,6 +108,35 @@ def cmd_candidates(_args):
     print("Pour les examiner : uv run myhypr  puis  /candidates")
 
 
+def cmd_setup(args):
+    from . import setup
+
+    def confirm(question: str) -> bool:
+        if args.yes:
+            return True
+        try:
+            return input(f"{question} [o/N] ").strip().lower() in ("o", "oui", "y", "yes")
+        except EOFError:
+            return False
+    print("✓", setup.install_launcher())
+    if args.bind:
+        print("·", setup.install_bind(confirm))
+    else:
+        print("· raccourci Hyprland non installé (myhypr setup --bind pour l'ajouter)")
+
+
+def cmd_doctor(_args):
+    from . import setup
+    icons = {"ok": "✓", "warn": "!", "err": "✗"}
+    report = setup.doctor()
+    for level, item, detail in report:
+        print(f"  {icons[level]} {item:<24} {detail}")
+    errs = sum(1 for lvl, _, _ in report if lvl == "err")
+    warns = sum(1 for lvl, _, _ in report if lvl == "warn")
+    print(f"\n{errs} erreur(s), {warns} avertissement(s)")
+    sys.exit(1 if errs else 0)
+
+
 def cmd_dataset(_args):
     print(dataset.stats())
 
@@ -168,6 +197,14 @@ def main():
 
     s = sub.add_parser("candidates", help="candidats du banc pour le dataset (revue : /candidates dans l'UI)")
     s.set_defaults(func=cmd_candidates)
+
+    s = sub.add_parser("setup", help="lanceur, entrée de menu et (option) raccourci Hyprland")
+    s.add_argument("--bind", action="store_true", help="ajoute un raccourci (première combinaison libre)")
+    s.add_argument("-y", "--yes", action="store_true", help="sans confirmation")
+    s.set_defaults(func=cmd_setup)
+
+    s = sub.add_parser("doctor", help="vérifie l'installation (dépendances, modèles, docs, index)")
+    s.set_defaults(func=cmd_doctor)
 
     s = sub.add_parser("dataset", help="statistiques du dataset de fine-tuning")
     s.set_defaults(func=cmd_dataset)
