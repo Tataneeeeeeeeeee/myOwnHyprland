@@ -102,6 +102,12 @@ def cmd_system(_args):
     print(summary(detect()))
 
 
+def cmd_candidates(_args):
+    from . import candidates
+    print(candidates.stats())
+    print("Pour les examiner : uv run myhypr  puis  /candidates")
+
+
 def cmd_dataset(_args):
     print(dataset.stats())
 
@@ -159,6 +165,9 @@ def main():
 
     s = sub.add_parser("system", help="ce que l'agent détecte de la machine")
     s.set_defaults(func=cmd_system)
+
+    s = sub.add_parser("candidates", help="candidats du banc pour le dataset (revue : /candidates dans l'UI)")
+    s.set_defaults(func=cmd_candidates)
 
     s = sub.add_parser("dataset", help="statistiques du dataset de fine-tuning")
     s.set_defaults(func=cmd_dataset)

@@ -56,7 +56,8 @@ COMMANDS = {
     },
     "Entraînement": {
         "/keep": "garder le dernier résultat pour le fine-tuning",
-        "/dataset": "avancement du dataset",
+        "/dataset": "avancement du dataset  ·  /dataset list  ·  /dataset remove N",
+        "/candidates": "revue des candidats du banc pour le dataset (o garder · n rejeter · v voir · q arrêter)",
         "/search": "tester la recherche dans la doc",
     },
     "": {
@@ -516,7 +517,18 @@ class App:
                     dataset.add(last)
                     self.note(f"ajouté au dataset — {dataset.stats()}", C["green"], "✓")
             case "/dataset":
+                if args[:1] == ["list"]:
+                    for i, r in enumerate(dataset.rows(), 1):
+                        src = r["meta"].get("source", "ui")
+                        console.print(Text.assemble((f"  {i:>3}  ", C["mauve"]), (r.get("request") or
+                                                    r["messages"][0]["content"])[:80], (f"  {src}", C["overlay0"])))
+                elif args[:1] == ["remove"] and len(args) == 2 and args[1].isdigit():
+                    if self.confirm(f"Retirer l'exemple {args[1]} du dataset ?"):
+                        r = dataset.remove(int(args[1]))
+                        self.note(f"retiré : {(r.get('request') or r['messages'][0]['content'])[:80]}", C["green"], "✓")
                 self.note(dataset.stats())
+            case "/candidates":
+                self.review_candidates()
             case "/search":
                 t = Table.grid(padding=(0, 2))
                 for h in rag.search(" ".join(args), k=6):
@@ -571,6 +583,74 @@ class App:
                 t.add_row(Text("      ", style=f"on {colors[role]}"), Text(role, style=C["subtext"]),
                           Text(colors[role], style=C["overlay1"]))
         console.print(Padding(t, (0, 0, 0, 4)))
+
+    def review_candidates(self):
+        from . import candidates
+        pend = candidates.pending()
+        if not pend:
+            self.note("aucun candidat à examiner — " + candidates.stats())
+            return
+        self.note(f"{len(pend)} candidat(s) · garde seulement ce que tu voudrais que l'agent refasse à l'identique",
+                  C["mauve"], "◆")
+        kept = rejected = 0
+        for i, c in enumerate(pend, 1):
+            console.print()
+            head = Text.assemble((f" {i}/{len(pend)} ", f"bold {C['base']} on {C['mauve']}"),
+                                 (f"  {c.case}", f"bold {C['text']}"),
+                                 (f"  ·  {'1er coup' if c.first_try else 'après corrections'}  ·  "
+                                  f"{c.model_calls} appels  ·  run {c.source.split('/')[0]}", C["overlay0"]))
+            console.print(head)
+            console.print(Padding(Text(c.request, style=f"italic {C['text']}"), (0, 0, 0, 3)))
+            full = False
+            while True:
+                self._show_candidate(c, full)
+                try:
+                    ans = PromptSession(style=PT_STYLE).prompt(
+                        [("class:prompt", "? "), ("", "garder "), ("class:tb.key", "o"), ("", " · rejeter "),
+                         ("class:tb.key", "n"), ("", " · voir tout "), ("class:tb.key", "v"), ("", " · passer "),
+                         ("class:tb.key", "s"), ("", " · arrêter "), ("class:tb.key", "q"), ("", " : ")]).strip().lower()
+                except (KeyboardInterrupt, EOFError):
+                    ans = "q"
+                if ans == "v":
+                    full = True
+                    continue
+                break
+            if ans in ("o", "oui", "y"):
+                candidates.decide(c, True)
+                kept += 1
+                self.note("ajouté au dataset", C["green"], "✓")
+            elif ans in ("n", "non"):
+                candidates.decide(c, False)
+                rejected += 1
+                self.note("rejeté", C["red"], "✗")
+            elif ans == "q":
+                break
+        console.print()
+        self.note(f"revue : {kept} gardé(s), {rejected} rejeté(s) · {dataset.stats()}", C["mauve"], "◆")
+
+    def _show_candidate(self, c, full: bool):
+        limit = None if full else 40
+        for path, content in c.files.items():
+            if path in c.original:  # modification d'une config existante → diff
+                diff = "".join(difflib.unified_diff(c.original[path].splitlines(keepends=True),
+                                                    content.splitlines(keepends=True), f"avant/{path}", f"après/{path}"))
+                body = Syntax("\n".join(diff.splitlines()[:limit]) if limit else diff, "diff", theme=CODE_THEME,
+                              word_wrap=True, background_color="default")
+            else:
+                lines = content.splitlines()
+                shown = "\n".join(lines[:limit]) if limit else content
+                lexer = {".jsonc": "json", ".lua": "lua", ".css": "css", ".qml": "qml", ".conf": "ini",
+                         ".toml": "toml"}.get(Path(path).suffix, "text")
+                body = Syntax(shown, lexer, theme=CODE_THEME, line_numbers=True, word_wrap=True,
+                              background_color="default")
+                if limit and len(lines) > limit:
+                    body = Group(body, Text(f"   … {len(lines) - limit} lignes de plus (v pour tout voir)",
+                                            style=C["overlay0"]))
+            console.print(Panel(body, title=Text(f" {path} ", style=C["blue"]), title_align="left",
+                                border_style=C["surface1"]))
+        if c.answer:
+            answer = c.answer if full else "\n".join(c.answer.splitlines()[:8])
+            console.print(Padding(Markdown(answer, code_theme=CODE_THEME), (0, 0, 0, 3)))
 
     def binds_report(self):
         sources = [("session en cours", binds.from_session())]

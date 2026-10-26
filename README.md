@@ -173,6 +173,15 @@ sont pas versionnés ; `docs/examples/SOURCES.md` liste les origines. Tes propre
 À chaque demande, l'agent reçoit 3 passages de doc + 2 exemples réels. `MYHYPR_NO_EXAMPLES=1` désactive les
 exemples (pour mesurer leur apport avec le banc).
 
+### Candidats issus du banc
+`uv run myhypr candidates` puis, dans l'interface, `/candidates` : les sorties **conformes** de tous les runs du
+banc, **re-notées avec les vérifications actuelles** (les anciens scores ont pu être faussés par des vérifications
+corrigées depuis) et revalidées, dédoublonnées, au plus 3 par demande, les plus propres d'abord (1er coup, peu
+d'appels). Pour chacune : la demande, les fichiers (ou le diff pour une modification), la réponse ; `o` garder,
+`n` rejeter, `v` tout voir, `s` passer, `q` arrêter. Les décisions sont mémorisées (`data/candidates.json`).
+Chaque exemple gardé contient la **trajectoire complète** (appels d'outils) en plus de « demande → fichiers ».
+`/dataset list` et `/dataset remove N` pour faire le ménage.
+
 ### Étape 5 — fine-tuning (plus tard)
 - Outil : [Unsloth](https://github.com/unslothai/unsloth), QLoRA 4 bits sur le modèle de base Qwen3.5-9B (HF).
 - VRAM : ta RTX 5070 Laptop a 8 Go → juste pour un 9B ; si ça ne passe pas, Colab/Kaggle (T4 16 Go gratuit).
