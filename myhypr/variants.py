@@ -14,9 +14,9 @@ import re
 import tomllib
 from pathlib import Path
 
-import ollama
 
 from .config import ROOT
+from .llm import client
 
 DIR = ROOT / "evals" / "variants"
 TEMPLATES = DIR / "templates.toml"
@@ -100,7 +100,7 @@ def paraphrases(case: dict, n: int) -> list[str]:
               "Styles, un par reformulation, dans cet ordre :\n" + "\n".join(f"- {s}" for s in styles) +
               "\n\nRéponds uniquement par un tableau JSON de chaînes.")
     try:
-        r = ollama.chat(model=PARAPHRASE_MODEL, messages=[{"role": "user", "content": prompt}], think=False,
+        r = client.chat(model=PARAPHRASE_MODEL, messages=[{"role": "user", "content": prompt}], think=False,
                         options={"temperature": 0.8}, format="json")
         data = json.loads(r.message.content)
     except Exception:

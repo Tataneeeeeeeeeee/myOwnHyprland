@@ -279,6 +279,10 @@ class Renderer:
             for line in args.get("lines", [])[:4]:
                 self.print(Padding(Text(f"│ {line}", style=C["peach"]), (0, 0, 0, 4)), kind="status")
             self.phase = "Correction…"
+        elif name == "retry":
+            self.print(row("↻", C["peach"], Text("le modèle ne répondait plus → nouvelle tentative", style=C["peach"])),
+                       kind="status")
+            self.buf = ""
         elif name == "compact":
             self.print(row("◇", C["overlay1"], Text("contexte presque plein : anciens résultats d'outils retirés",
                                                     style=C["overlay1"])), kind="status")

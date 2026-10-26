@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 import numpy as np
-import ollama
+from .llm import client
 
 from .config import DOCS_RAW, EMBED_MODEL, INDEX_DIR
 
@@ -110,7 +110,7 @@ def _embed(texts: list[str], prefix: str) -> np.ndarray:
     vecs = []
     for i in range(0, len(texts), 64):
         batch = [prefix + t for t in texts[i:i + 64]]
-        vecs += ollama.embed(model=EMBED_MODEL, input=batch, truncate=True).embeddings
+        vecs += client.embed(model=EMBED_MODEL, input=batch, truncate=True).embeddings
     arr = np.asarray(vecs, dtype=np.float32)
     return arr / np.linalg.norm(arr, axis=1, keepdims=True)
 

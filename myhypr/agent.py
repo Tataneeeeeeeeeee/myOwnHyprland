@@ -11,10 +11,11 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import ollama
 
 from . import binds, rag, system
-from .config import CHAT_MODEL, MAX_FIX_ROUNDS, MAX_STEPS, NUM_CTX, SESSIONS_DIR, SYSTEM_TOKENS, TOOL_OUTPUT_LIMIT
+from .llm import TRANSIENT, client
+from .config import (CHAT_MODEL, MAX_FIX_ROUNDS, MAX_STEPS, NUM_CTX, OLLAMA_RETRIES, SESSIONS_DIR,
+                     SYSTEM_TOKENS, TOOL_OUTPUT_LIMIT)
 from .tools import Workspace
 
 
@@ -67,25 +68,34 @@ class Session:
 
     def _chat(self) -> Iterator[Event]:
         """Un appel au modèle en streaming ; ajoute le message assistant à l'historique."""
-        content, thinking, calls, done_reason = "", "", [], ""
         if self._compact():
             yield Event("status", "contexte compacté", name="compact")
-        yield Event("status", name="model")
-        stream = ollama.chat(model=self.model, messages=self.messages,
-                             tools=list(self.workspace.tools().values()), think=self.think, stream=True)
-        for chunk in stream:
-            m = chunk.message
-            if m.thinking:
-                thinking += m.thinking
-                yield Event("thinking", m.thinking)
-            if m.content:
-                content += m.content
-                yield Event("text", m.content)
-            if m.tool_calls:
-                calls += m.tool_calls
-            if chunk.done:
-                self.tokens = (chunk.prompt_eval_count or 0) + (chunk.eval_count or 0)
-                done_reason = chunk.done_reason or ""
+        for attempt in range(OLLAMA_RETRIES + 1):
+            yield Event("status", name="model")
+            content, thinking, calls, done_reason = "", "", [], ""
+            try:
+                stream = client.chat(model=self.model, messages=self.messages,
+                                     tools=list(self.workspace.tools().values()), think=self.think, stream=True)
+                for chunk in stream:
+                    m = chunk.message
+                    if m.thinking:
+                        thinking += m.thinking
+                        yield Event("thinking", m.thinking)
+                    if m.content:
+                        content += m.content
+                        yield Event("text", m.content)
+                    if m.tool_calls:
+                        calls += m.tool_calls
+                    if chunk.done:
+                        self.tokens = (chunk.prompt_eval_count or 0) + (chunk.eval_count or 0)
+                        done_reason = chunk.done_reason or ""
+                break
+            except TRANSIENT as e:
+                if attempt == OLLAMA_RETRIES:
+                    raise RuntimeError(f"le modèle ne répond plus ({type(e).__name__}) après "
+                                       f"{OLLAMA_RETRIES + 1} tentatives") from e
+                yield Event("status", f"le modèle ne répondait plus ({type(e).__name__}) → nouvelle tentative",
+                            name="retry", args={"attempt": attempt + 1})
         entry = {"role": "assistant", "content": content}
         if calls:
             entry["tool_calls"] = [{"function": {"name": c.function.name, "arguments": dict(c.function.arguments)}}

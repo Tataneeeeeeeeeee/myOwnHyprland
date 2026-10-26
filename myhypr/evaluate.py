@@ -386,6 +386,27 @@ def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_M
     if not cases:
         console.print("[err]Aucun cas ne correspond.[/]")
         return
+    inhibitor = _inhibit_sleep(f"banc myOwnHyprland ({len(cases) * repeat} cas)")
+    try:
+        _run_all(cases, model, think, repeat, pattern, tag, label, source, live)
+    finally:
+        if inhibitor:
+            inhibitor.terminate()
+
+
+def _inhibit_sleep(why: str):
+    """Bloque la veille automatique pendant le run (un run de plusieurs heures coupé par hypridle reste bloqué)."""
+    if not shutil.which("systemd-inhibit"):
+        return None
+    try:
+        return subprocess.Popen(["systemd-inhibit", "--what=idle:sleep", "--who=myOwnHyprland", f"--why={why}",
+                                 "--mode=block", "sleep", "infinity"], stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL)
+    except OSError:
+        return None
+
+
+def _run_all(cases, model, think, repeat, pattern, tag, label, source, live):
     stamp = time.strftime("%Y%m%d-%H%M%S")
     out_dir = EVALS / "runs" / stamp
     console.print(Text.assemble(("◆ ", C["mauve"]), (f"{len(cases)} cas × {repeat}", "bold"),
