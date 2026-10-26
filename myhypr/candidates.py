@@ -49,7 +49,7 @@ def _save_state(state: dict):
 def harvest() -> list[Candidate]:
     """Tous les candidats valables (avant filtrage par décision et plafond par demande)."""
     from .tools import verify_hyprland_file
-    cases = {c["id"]: c for c in load_cases(None, None)}
+    cases = {c["id"]: c for c in load_cases(None, None, "all")}
     found: dict[str, Candidate] = {}
     for result in sorted(RESULTS.glob("*.json")):
         if "rescored" in result.name:

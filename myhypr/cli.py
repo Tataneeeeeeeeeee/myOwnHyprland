@@ -80,7 +80,8 @@ def cmd_eval(args):
     from . import evaluate
     if args.rescore:
         return evaluate.rescore(args.rescore)
-    evaluate.main(args.filter, args.tag, args.model, args.think, args.repeat, not args.no_live, args.label)
+    evaluate.main(args.filter, args.tag, args.model, args.think, args.repeat, not args.no_live, args.label,
+                  "variants" if args.variants else "bench")
 
 
 def cmd_migrate(args):
@@ -137,6 +138,21 @@ def cmd_doctor(_args):
     sys.exit(1 if errs else 0)
 
 
+def cmd_variants(args):
+    from . import variants
+    if args.action == "generate":
+        variants.generate(args.paraphrases)
+    else:
+        cases = variants.load()
+        kinds = {"template": 0, "paraphrase": 0}
+        for c in cases:
+            kinds["template" if "template" in c["tags"] else "paraphrase"] += 1
+        print(f"{len(cases)} variantes ({kinds['template']} paramétrées, {kinds['paraphrase']} reformulations)")
+        for c in cases[:args.show]:
+            print(f"  {c['id']:<26} {c['request'][:90]}")
+        print("Jouer : uv run myhypr eval --variants   (puis /candidates pour les revoir)")
+
+
 def cmd_dataset(_args):
     print(dataset.stats())
 
@@ -185,6 +201,9 @@ def main():
     s.add_argument("--no-live", action="store_true", help="ne pas lancer waybar pour valider (plus rapide)")
     s.add_argument("--label", default="", help="étiquette du run, ex. 'avant-exemples'")
     s.add_argument("--rescore", metavar="RESULTS.json", help="recalcule les vérifications d'un run existant")
+    s.add_argument("--variants", action="store_true",
+                   help="joue les variantes (evals/variants/generated.json) au lieu du banc : de nouveaux candidats "
+                        "pour le dataset, sans toucher à la référence")
     s.set_defaults(func=cmd_eval)
 
     s = sub.add_parser("migrate", help="convertit un hyprland.conf (hyprlang) en Lua, sans IA, dans un dossier de travail")
@@ -205,6 +224,12 @@ def main():
 
     s = sub.add_parser("doctor", help="vérifie l'installation (dépendances, modèles, docs, index)")
     s.set_defaults(func=cmd_doctor)
+
+    s = sub.add_parser("variants", help="variantes des demandes du banc pour diversifier le dataset")
+    s.add_argument("action", nargs="?", choices=["generate", "list"], default="list")
+    s.add_argument("--paraphrases", type=int, default=2, help="reformulations par demande du banc (max 4)")
+    s.add_argument("--show", type=int, default=15)
+    s.set_defaults(func=cmd_variants)
 
     s = sub.add_parser("dataset", help="statistiques du dataset de fine-tuning")
     s.set_defaults(func=cmd_dataset)

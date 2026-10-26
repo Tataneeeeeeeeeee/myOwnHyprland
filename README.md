@@ -194,6 +194,18 @@ d'appels). Pour chacune : la demande, les fichiers (ou le diff pour une modifica
 Chaque exemple gardé contient la **trajectoire complète** (appels d'outils) en plus de « demande → fichiers ».
 `/dataset list` et `/dataset remove N` pour faire le ménage.
 
+### Variantes : plus de diversité pour le dataset
+```bash
+uv run myhypr variants generate --paraphrases 3   # → evals/variants/generated.json
+uv run myhypr eval --variants                      # les joue (≈ 2 h 30) ; jamais comptées comme référence
+uv run myhypr   puis   /candidates                 # les sorties conformes arrivent dans la revue
+```
+- **Modèles paramétrés** (`evals/variants/templates.toml`) : la même demande avec d'autres valeurs (gaps, clavier,
+  touche → application, règles, décor, position de barre, délais de veille, modifications…), vérifications ajustées.
+- **Reformulations** par le modèle de base (familier, poli, anglais, style SMS). Filtre strict : rejet si un chiffre,
+  un chemin (casse exacte), une couleur, une combinaison de touches ou un terme vérifié disparaît, ou si la phrase
+  est tournée comme si c'était l'agent qui parlait.
+
 ### Étape 5 — fine-tuning (plus tard)
 - Outil : [Unsloth](https://github.com/unslothai/unsloth), QLoRA 4 bits sur le modèle de base Qwen3.5-9B (HF).
 - VRAM : ta RTX 5070 Laptop a 8 Go → juste pour un 9B ; si ça ne passe pas, Colab/Kaggle (T4 16 Go gratuit).

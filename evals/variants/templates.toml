@@ -1,0 +1,134 @@
+# Modèles paramétrés : chaque [[template]] × chaque ligne de `values` = une nouvelle demande pour le dataset.
+# Dans request et checks, {nom} est remplacé par la valeur ; une valeur exactement "{nom}" garde son type (nombre…).
+# Mêmes vérifications que evals/cases.toml. Générer : uv run myhypr variants generate
+
+[[template]]
+id = "hy-gaps"
+tags = ["hypr", "new"]
+request = "Crée hypr/hyprland.lua avec des gaps intérieurs de {inner} et extérieurs de {outer}."
+values = [{ inner = 2, outer = 6 }, { inner = 10, outer = 30 }, { inner = 0, outer = 0 }]
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.general.gaps_in", eq = "{inner}" },
+  { hypr = "config.general.gaps_out", eq = "{outer}" },
+]
+
+[[template]]
+id = "hy-kb"
+tags = ["hypr", "new"]
+request = "Crée hypr/hyprland.lua avec un clavier {name}."
+values = [{ name = "allemand", layout = "de" }, { name = "espagnol", layout = "es" },
+          { name = "belge", layout = "be" }, { name = "américain (qwerty us)", layout = "us" }]
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.input.kb_layout", eq = "{layout}" },
+]
+
+[[template]]
+id = "hy-app-bind"
+tags = ["hypr", "new", "binds"]
+request = "Crée hypr/hyprland.lua où SUPER+{key} lance {app}."
+values = [{ key = "T", app = "kitty" }, { key = "B", app = "firefox" }, { key = "N", app = "nautilus" },
+          { key = "Return", app = "foot" }]
+checks = [
+  { only = ["hypr/"] },
+  { bind = "SUPER + {key}", match = "{app}" },
+]
+
+[[template]]
+id = "hy-rule-float"
+tags = ["hypr", "new", "rules"]
+request = "Crée hypr/hyprland.lua avec une règle pour que {app} s'ouvre toujours en flottant."
+values = [{ app = "nm-connection-editor" }, { app = "blueman-manager" }, { app = "org.gnome.Calculator" }]
+checks = [
+  { only = ["hypr/"] },
+  { window_rule = "{app}", match = '"float":\s*true' },
+]
+
+[[template]]
+id = "hy-rule-ws"
+tags = ["hypr", "new", "rules"]
+request = "Crée hypr/hyprland.lua avec une règle qui envoie toujours {app} sur le workspace {ws}."
+values = [{ app = "discord", ws = 3 }, { app = "spotify", ws = 9 }, { app = "thunderbird", ws = 4 }]
+checks = [
+  { only = ["hypr/"] },
+  { window_rule = "{app}", match = '"workspace":\s*"?{ws}' },
+]
+
+[[template]]
+id = "hy-decor"
+tags = ["hypr", "new", "style"]
+request = "Crée hypr/hyprland.lua avec des bordures de {border} pixels et des coins arrondis de {round}."
+values = [{ border = 1, round = 6 }, { border = 4, round = 0 }, { border = 2, round = 16 }]
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.general.border_size", eq = "{border}" },
+  { hypr = "config.decoration.rounding", eq = "{round}" },
+]
+
+[[template]]
+id = "wb-pos-module"
+tags = ["waybar", "new"]
+request = "Crée une waybar {pos_fr} avec les workspaces à gauche et {module_fr} à droite."
+values = [{ pos = "bottom", pos_fr = "en bas", module = "battery", module_fr = "la batterie" },
+          { pos = "top", pos_fr = "en haut", module = "cpu", module_fr = "l'utilisation du processeur" },
+          { pos = "bottom", pos_fr = "en bas", module = "network", module_fr = "le réseau" },
+          { pos = "top", pos_fr = "en haut", module = "memory", module_fr = "la mémoire" }]
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "position", eq = "{pos}" },
+  { waybar = "modules-left", has = "hyprland/workspaces" },
+  { waybar = "modules-right", has = "{module}" },
+]
+
+[[template]]
+id = "eco-idle-times"
+tags = ["ecosystem", "new"]
+request = "Crée hypr/hypridle.conf : verrouille avec hyprlock après {lock} minutes d'inactivité, éteins l'écran après {off} minutes et rallume-le au retour."
+values = [{ lock = 3, lock_s = "180", off = 8, off_s = "480" }, { lock = 10, lock_s = "600", off = 15, off_s = "900" }]
+checks = [
+  { only = ["hypr/"] },
+  { conf = "hypr/hypridle.conf", key = "listener:on-timeout", where = "timeout={lock_s}", match = '(loginctl lock-session|hyprlock)' },
+  { conf = "hypr/hypridle.conf", key = "listener:on-timeout", where = "timeout={off_s}", match = 'hl\.dsp\.dpms' },
+  { conf = "hypr/hypridle.conf", key = "listener:on-resume", where = "timeout={off_s}", match = 'hl\.dsp\.dpms' },
+]
+
+[[template]]
+id = "mod-gaps"
+tags = ["hypr", "modify"]
+seed = "basic"
+request = "Passe les gaps à {inner} à l'intérieur et {outer} à l'extérieur, sans rien changer d'autre."
+values = [{ inner = 8, outer = 12 }, { inner = 0, outer = 4 }]
+checks = [
+  { only = ["hypr/"] },
+  { hypr = "config.general.gaps_in", eq = "{inner}" },
+  { hypr = "config.general.gaps_out", eq = "{outer}" },
+  { bind = "SUPER + Q", match = "kitty" },
+  { hypr = "config.input.kb_layout", eq = "us" },
+]
+
+[[template]]
+id = "mod-wb-move"
+tags = ["waybar", "modify"]
+seed = "basic"
+request = "Déplace {module_fr} à gauche de ma waybar, après les workspaces."
+values = [{ module = "network", module_fr = "le réseau" }, { module = "pulseaudio", module_fr = "le volume" }]
+checks = [
+  { only = ["waybar/"] },
+  { waybar = "modules-left", has = "{module}" },
+  { waybar = "modules-left", has = "hyprland/workspaces" },
+  { waybar = "modules-right", lacks = "{module}" },
+  { waybar = "modules-center", has = "clock" },
+]
+
+[[template]]
+id = "qs-bar-pos"
+tags = ["quickshell", "new"]
+request = "Crée une barre Quickshell {pos_fr} qui affiche l'heure au format HH:mm."
+values = [{ pos = "bottom", pos_fr = "en bas de l'écran" }, { pos = "left", pos_fr = "verticale à gauche" }]
+checks = [
+  { only = ["quickshell/"] },
+  { qml = 'PanelWindow' },
+  { qml = '{pos}:\s*true' },
+  { qml = '(hh|HH):mm' },
+]

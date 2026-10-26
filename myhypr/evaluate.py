@@ -303,8 +303,14 @@ def run_case(case: dict, model: str, think: bool, out_dir: Path) -> CaseRun:
     )
 
 
-def load_cases(pattern: str | None, tag: str | None) -> list[dict]:
-    cases = tomllib.loads((EVALS / "cases.toml").read_text())["case"]
+def load_cases(pattern: str | None, tag: str | None, source: str = "bench") -> list[dict]:
+    """source : "bench" (evals/cases.toml), "variants" (evals/variants/generated.json) ou "all"."""
+    cases = []
+    if source in ("bench", "all"):
+        cases += tomllib.loads((EVALS / "cases.toml").read_text())["case"]
+    if source in ("variants", "all"):
+        from .variants import load
+        cases += load()
     if pattern:
         cases = [c for c in cases if re.search(pattern, c["id"])]
     if tag:
@@ -330,7 +336,8 @@ def previous_result(model: str) -> dict | None:
     """Dernier run complet (sans filtre) du même modèle, pour afficher les écarts."""
     for f in sorted(RESULTS.glob("*.json"), reverse=True):
         data = json.loads(f.read_text())
-        if data["model"] == model and not any(data.get("filter", {}).values()):
+        if data["model"] == model and not any(data.get("filter", {}).values()) \
+                and data.get("source", "bench") == "bench":
             return data
     return None
 
@@ -368,12 +375,14 @@ def print_report(runs: list[CaseRun], summary: dict, prev: dict | None):
 
 
 def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_MODEL, think: bool = False,
-         repeat: int = 1, live: bool = True, label: str = ""):
+         repeat: int = 1, live: bool = True, label: str = "", source: str = "bench"):
     if not live:
         os.environ["MYHYPR_NO_LIVE"] = "1"
     os.environ.setdefault("MYHYPR_NO_SYSTEM", "1")  # banc reproductible d'une machine à l'autre
     os.environ.setdefault("MYHYPR_WALLPAPER", "/usr/share/hypr/wall0.png")
-    cases = load_cases(pattern, tag)
+    cases = load_cases(pattern, tag, source)
+    if source != "bench":
+        label = f"variants{('-' + label) if label else ''}"
     if not cases:
         console.print("[err]Aucun cas ne correspond.[/]")
         return
@@ -398,7 +407,7 @@ def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_M
     out = RESULTS / f"{stamp}_{model.replace(':', '-')}{('_' + label) if label else ''}.json"
     prev = previous_result(model)
     out.write_text(json.dumps({"date": stamp, "model": model, "summary": summary,
-                               "filter": {"pattern": pattern, "tag": tag},
+                               "filter": {"pattern": pattern, "tag": tag}, "source": source,
                                "runs": [asdict(r) for r in runs]}, ensure_ascii=False, indent=1))
     console.print()
     print_report(runs, summary, prev if prev and not pattern and not tag else None)
@@ -410,7 +419,7 @@ def rescore(result_file: str):
     """Recalcule les vérifications d'un run existant (après correction du banc), sans relancer le modèle."""
     path = Path(result_file).resolve()
     data = json.loads(path.read_text())
-    cases = {c["id"]: c for c in load_cases(None, None)}
+    cases = {c["id"]: c for c in load_cases(None, None, "all")}
     runs = []
     for r in data["runs"]:
         case, ws = cases.get(r["id"]), Path(r["workspace"])

@@ -1,0 +1,3732 @@
+[
+ {
+  "id": "v-hy-gaps-1",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec des gaps intérieurs de 2 et extérieurs de 6.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 2
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 6
+   }
+  ],
+  "parent": "hy-gaps"
+ },
+ {
+  "id": "v-hy-gaps-2",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec des gaps intérieurs de 10 et extérieurs de 30.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 10
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 30
+   }
+  ],
+  "parent": "hy-gaps"
+ },
+ {
+  "id": "v-hy-gaps-3",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec des gaps intérieurs de 0 et extérieurs de 0.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 0
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 0
+   }
+  ],
+  "parent": "hy-gaps"
+ },
+ {
+  "id": "v-hy-kb-1",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec un clavier allemand.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "de"
+   }
+  ],
+  "parent": "hy-kb"
+ },
+ {
+  "id": "v-hy-kb-2",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec un clavier espagnol.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "es"
+   }
+  ],
+  "parent": "hy-kb"
+ },
+ {
+  "id": "v-hy-kb-3",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec un clavier belge.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "be"
+   }
+  ],
+  "parent": "hy-kb"
+ },
+ {
+  "id": "v-hy-kb-4",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec un clavier américain (qwerty us).",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "us"
+   }
+  ],
+  "parent": "hy-kb"
+ },
+ {
+  "id": "v-hy-app-bind-1",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua où SUPER+T lance kitty.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + T",
+    "match": "kitty"
+   }
+  ],
+  "parent": "hy-app-bind"
+ },
+ {
+  "id": "v-hy-app-bind-2",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua où SUPER+B lance firefox.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + B",
+    "match": "firefox"
+   }
+  ],
+  "parent": "hy-app-bind"
+ },
+ {
+  "id": "v-hy-app-bind-3",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua où SUPER+N lance nautilus.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + N",
+    "match": "nautilus"
+   }
+  ],
+  "parent": "hy-app-bind"
+ },
+ {
+  "id": "v-hy-app-bind-4",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua où SUPER+Return lance foot.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + Return",
+    "match": "foot"
+   }
+  ],
+  "parent": "hy-app-bind"
+ },
+ {
+  "id": "v-hy-rule-float-1",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec une règle pour que nm-connection-editor s'ouvre toujours en flottant.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "nm-connection-editor",
+    "match": "\"float\":\\s*true"
+   }
+  ],
+  "parent": "hy-rule-float"
+ },
+ {
+  "id": "v-hy-rule-float-2",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec une règle pour que blueman-manager s'ouvre toujours en flottant.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "blueman-manager",
+    "match": "\"float\":\\s*true"
+   }
+  ],
+  "parent": "hy-rule-float"
+ },
+ {
+  "id": "v-hy-rule-float-3",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec une règle pour que org.gnome.Calculator s'ouvre toujours en flottant.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "org.gnome.Calculator",
+    "match": "\"float\":\\s*true"
+   }
+  ],
+  "parent": "hy-rule-float"
+ },
+ {
+  "id": "v-hy-rule-ws-1",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec une règle qui envoie toujours discord sur le workspace 3.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "discord",
+    "match": "\"workspace\":\\s*\"?3"
+   }
+  ],
+  "parent": "hy-rule-ws"
+ },
+ {
+  "id": "v-hy-rule-ws-2",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec une règle qui envoie toujours spotify sur le workspace 9.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "spotify",
+    "match": "\"workspace\":\\s*\"?9"
+   }
+  ],
+  "parent": "hy-rule-ws"
+ },
+ {
+  "id": "v-hy-rule-ws-3",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec une règle qui envoie toujours thunderbird sur le workspace 4.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "thunderbird",
+    "match": "\"workspace\":\\s*\"?4"
+   }
+  ],
+  "parent": "hy-rule-ws"
+ },
+ {
+  "id": "v-hy-decor-1",
+  "tags": [
+   "hypr",
+   "new",
+   "style",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec des bordures de 1 pixels et des coins arrondis de 6.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.border_size",
+    "eq": 1
+   },
+   {
+    "hypr": "config.decoration.rounding",
+    "eq": 6
+   }
+  ],
+  "parent": "hy-decor"
+ },
+ {
+  "id": "v-hy-decor-2",
+  "tags": [
+   "hypr",
+   "new",
+   "style",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec des bordures de 4 pixels et des coins arrondis de 0.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.border_size",
+    "eq": 4
+   },
+   {
+    "hypr": "config.decoration.rounding",
+    "eq": 0
+   }
+  ],
+  "parent": "hy-decor"
+ },
+ {
+  "id": "v-hy-decor-3",
+  "tags": [
+   "hypr",
+   "new",
+   "style",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hyprland.lua avec des bordures de 2 pixels et des coins arrondis de 16.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.border_size",
+    "eq": 2
+   },
+   {
+    "hypr": "config.decoration.rounding",
+    "eq": 16
+   }
+  ],
+  "parent": "hy-decor"
+ },
+ {
+  "id": "v-wb-pos-module-1",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée une waybar en bas avec les workspaces à gauche et la batterie à droite.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "battery"
+   }
+  ],
+  "parent": "wb-pos-module"
+ },
+ {
+  "id": "v-wb-pos-module-2",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée une waybar en haut avec les workspaces à gauche et l'utilisation du processeur à droite.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "top"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "cpu"
+   }
+  ],
+  "parent": "wb-pos-module"
+ },
+ {
+  "id": "v-wb-pos-module-3",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée une waybar en bas avec les workspaces à gauche et le réseau à droite.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   }
+  ],
+  "parent": "wb-pos-module"
+ },
+ {
+  "id": "v-wb-pos-module-4",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée une waybar en haut avec les workspaces à gauche et la mémoire à droite.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "top"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "memory"
+   }
+  ],
+  "parent": "wb-pos-module"
+ },
+ {
+  "id": "v-eco-idle-times-1",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hypridle.conf : verrouille avec hyprlock après 3 minutes d'inactivité, éteins l'écran après 8 minutes et rallume-le au retour.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=180",
+    "match": "(loginctl lock-session|hyprlock)"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=480",
+    "match": "hl\\.dsp\\.dpms"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-resume",
+    "where": "timeout=480",
+    "match": "hl\\.dsp\\.dpms"
+   }
+  ],
+  "parent": "eco-idle-times"
+ },
+ {
+  "id": "v-eco-idle-times-2",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée hypr/hypridle.conf : verrouille avec hyprlock après 10 minutes d'inactivité, éteins l'écran après 15 minutes et rallume-le au retour.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=600",
+    "match": "(loginctl lock-session|hyprlock)"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=900",
+    "match": "hl\\.dsp\\.dpms"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-resume",
+    "where": "timeout=900",
+    "match": "hl\\.dsp\\.dpms"
+   }
+  ],
+  "parent": "eco-idle-times"
+ },
+ {
+  "id": "v-mod-gaps-1",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "template"
+  ],
+  "seed": "basic",
+  "request": "Passe les gaps à 8 à l'intérieur et 12 à l'extérieur, sans rien changer d'autre.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 8
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 12
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "us"
+   }
+  ],
+  "parent": "mod-gaps"
+ },
+ {
+  "id": "v-mod-gaps-2",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "template"
+  ],
+  "seed": "basic",
+  "request": "Passe les gaps à 0 à l'intérieur et 4 à l'extérieur, sans rien changer d'autre.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 0
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 4
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "us"
+   }
+  ],
+  "parent": "mod-gaps"
+ },
+ {
+  "id": "v-mod-wb-move-1",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "template"
+  ],
+  "seed": "basic",
+  "request": "Déplace le réseau à gauche de ma waybar, après les workspaces.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "network"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-right",
+    "lacks": "network"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   }
+  ],
+  "parent": "mod-wb-move"
+ },
+ {
+  "id": "v-mod-wb-move-2",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "template"
+  ],
+  "seed": "basic",
+  "request": "Déplace le volume à gauche de ma waybar, après les workspaces.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "pulseaudio"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-right",
+    "lacks": "pulseaudio"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   }
+  ],
+  "parent": "mod-wb-move"
+ },
+ {
+  "id": "v-qs-bar-pos-1",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée une barre Quickshell en bas de l'écran qui affiche l'heure au format HH:mm.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "PanelWindow"
+   },
+   {
+    "qml": "bottom:\\s*true"
+   },
+   {
+    "qml": "(hh|HH):mm"
+   }
+  ],
+  "parent": "qs-bar-pos"
+ },
+ {
+  "id": "v-qs-bar-pos-2",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "template"
+  ],
+  "request": "Crée une barre Quickshell verticale à gauche qui affiche l'heure au format HH:mm.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "PanelWindow"
+   },
+   {
+    "qml": "left:\\s*true"
+   },
+   {
+    "qml": "(hh|HH):mm"
+   }
+  ],
+  "parent": "qs-bar-pos"
+ },
+ {
+  "id": "v-wb-bottom-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Pourrais-tu créer une waybar positionnée en bas contenant les workspaces à gauche, l'horloge au centre et la batterie à droite, avec un fond semi-transparent ?",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "battery"
+   },
+   {
+    "css": "background(-color)?\\s*:\\s*(rgba\\(|alpha\\()"
+   }
+  ],
+  "parent": "wb-bottom"
+ },
+ {
+  "id": "v-wb-bottom-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a waybar at the bottom featuring workspaces on the left, clock in the center, battery on the right, with a semi-transparent background.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "battery"
+   },
+   {
+    "css": "background(-color)?\\s*:\\s*(rgba\\(|alpha\\()"
+   }
+  ],
+  "parent": "wb-bottom"
+ },
+ {
+  "id": "v-wb-audio-net-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Mettre une waybar avec l'horloge à gauche, le volume puis le réseau à droite.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "match": "(pulseaudio|wireplumber)"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   },
+   {
+    "waybar": "clock.format",
+    "match": "\\{:"
+   }
+  ],
+  "parent": "wb-audio-net"
+ },
+ {
+  "id": "v-wb-audio-net-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Set up a waybar with the clock on the left, and volume followed by network on the right.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "match": "(pulseaudio|wireplumber)"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   },
+   {
+    "waybar": "clock.format",
+    "match": "\\{:"
+   }
+  ],
+  "parent": "wb-audio-net"
+ },
+ {
+  "id": "v-wb-pills-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Waybar : workspaces en pastilles arrondies, actif en violet.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "css": "#workspaces\\s+button[^{]*\\{[^}]*border-radius"
+   },
+   {
+    "css": "button\\.active[^{]*\\{[^}]*(#[a-fA-F0-9]{6}|rgba?\\(|purple|violet)"
+   }
+  ],
+  "parent": "wb-pills"
+ },
+ {
+  "id": "v-wb-pills-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Bonjour, pourriez-vous configurer la waybar avec des icônes de workspaces sous forme de cercles et mettre l'espace de travail actif en couleur violette ?",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "css": "#workspaces\\s+button[^{]*\\{[^}]*border-radius"
+   },
+   {
+    "css": "button\\.active[^{]*\\{[^}]*(#[a-fA-F0-9]{6}|rgba?\\(|purple|violet)"
+   }
+  ],
+  "parent": "wb-pills"
+ },
+ {
+  "id": "v-wb-floating-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Waybar flottant avec une marge de 8px autour et des coins arrondis.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "margin-top",
+    "match": "^\\d+$"
+   },
+   {
+    "waybar": "margin-left",
+    "match": "^\\d+$"
+   },
+   {
+    "css": "window#waybar[^{]*\\{[^}]*border-radius"
+   }
+  ],
+  "parent": "wb-floating"
+ },
+ {
+  "id": "v-wb-floating-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "A floating waybar: detached from screen edges with an 8px margin and rounded corners.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "margin-top",
+    "match": "^\\d+$"
+   },
+   {
+    "waybar": "margin-left",
+    "match": "^\\d+$"
+   },
+   {
+    "css": "window#waybar[^{]*\\{[^}]*border-radius"
+   }
+  ],
+  "parent": "wb-floating"
+ },
+ {
+  "id": "v-wb-power-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "custom",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Ajoute à droite de la waybar un bouton power (module custom) qui lance wlogout au clic.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "match": "custom/"
+   },
+   {
+    "waybar_custom": "on-click",
+    "match": "wlogout"
+   }
+  ],
+  "parent": "wb-power"
+ },
+ {
+  "id": "v-wb-power-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "custom",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Mets juste à droite de la waybar un bouton power (module custom) qui lance wlogout quand on clique dessus.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "match": "custom/"
+   },
+   {
+    "waybar_custom": "on-click",
+    "match": "wlogout"
+   }
+  ],
+  "parent": "wb-power"
+ },
+ {
+  "id": "v-wb-power-p3",
+  "tags": [
+   "waybar",
+   "new",
+   "custom",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Pourriez-vous ajouter, à droite de la barre waybar, un bouton nommé power utilisant un module custom ; ce bouton doit lancer le programme wlogout dès qu'on y fait un clic.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "match": "custom/"
+   },
+   {
+    "waybar_custom": "on-click",
+    "match": "wlogout"
+   }
+  ],
+  "parent": "wb-power"
+ },
+ {
+  "id": "v-wb-date-format-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "A minimalist waybar with only the clock centered in the day/month hour:minute format, for example 22/10 14:05.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   },
+   {
+    "waybar": "clock.format",
+    "match": "\\{:.*%d/%m.*%H:%M"
+   }
+  ],
+  "parent": "wb-date-format"
+ },
+ {
+  "id": "v-wb-cpu-mem-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Waybar avec CPU et mémoire à droite, mis à jour toutes les 5 secondes.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "has": "cpu"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "memory"
+   },
+   {
+    "waybar": "cpu.interval",
+    "eq": 5
+   },
+   {
+    "waybar": "memory.interval",
+    "eq": 5
+   }
+  ],
+  "parent": "wb-cpu-mem"
+ },
+ {
+  "id": "v-wb-cpu-mem-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Merci de configurer une waybar affichant le CPU et la mémoire à droite, avec un rafraîchissement toutes les 5 secondes.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "has": "cpu"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "memory"
+   },
+   {
+    "waybar": "cpu.interval",
+    "eq": 5
+   },
+   {
+    "waybar": "memory.interval",
+    "eq": 5
+   }
+  ],
+  "parent": "wb-cpu-mem"
+ },
+ {
+  "id": "v-wb-cpu-mem-p3",
+  "tags": [
+   "waybar",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "A waybar with CPU and memory on the right, refreshed every 5 seconds.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "has": "cpu"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "memory"
+   },
+   {
+    "waybar": "cpu.interval",
+    "eq": 5
+   },
+   {
+    "waybar": "memory.interval",
+    "eq": 5
+   }
+  ],
+  "parent": "wb-cpu-mem"
+ },
+ {
+  "id": "v-wb-colors-p1",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Fais-moi une waybar avec le fond #1e1e2e, le texte #cdd6f4 et la police JetBrainsMono Nerd Font à 12px.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "css": "(?i)background(-color)?\\s*:\\s*#1e1e2e"
+   },
+   {
+    "css": "(?i)color\\s*:\\s*#cdd6f4"
+   },
+   {
+    "css": "JetBrainsMono"
+   },
+   {
+    "css": "font-size\\s*:\\s*12px"
+   }
+  ],
+  "parent": "wb-colors"
+ },
+ {
+  "id": "v-wb-colors-p2",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Configurez une waybar dont le fond est exactement #1e1e2e, le texte #cdd6f4, la police JetBrainsMono Nerd Font en taille 12px.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "css": "(?i)background(-color)?\\s*:\\s*#1e1e2e"
+   },
+   {
+    "css": "(?i)color\\s*:\\s*#cdd6f4"
+   },
+   {
+    "css": "JetBrainsMono"
+   },
+   {
+    "css": "font-size\\s*:\\s*12px"
+   }
+  ],
+  "parent": "wb-colors"
+ },
+ {
+  "id": "v-wb-colors-p3",
+  "tags": [
+   "waybar",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a waybar with background exactly #1e1e2e, text #cdd6f4, and font JetBrainsMono Nerd Font at 12px.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "css": "(?i)background(-color)?\\s*:\\s*#1e1e2e"
+   },
+   {
+    "css": "(?i)color\\s*:\\s*#cdd6f4"
+   },
+   {
+    "css": "JetBrainsMono"
+   },
+   {
+    "css": "font-size\\s*:\\s*12px"
+   }
+  ],
+  "parent": "wb-colors"
+ },
+ {
+  "id": "v-hy-basics-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua avec le clavier français, des gaps intérieurs à 8 et extérieurs à 16.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "fr"
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 8
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 16
+   }
+  ],
+  "parent": "hy-basics"
+ },
+ {
+  "id": "v-hy-basics-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hyprland.lua avec la configuration suivante : clavier français, gaps intérieurs de 8 unités et gaps extérieurs de 16 unités.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "fr"
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 8
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 16
+   }
+  ],
+  "parent": "hy-basics"
+ },
+ {
+  "id": "v-hy-basics-p3",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua with a French keyboard layout, inner gaps of 8 and outer gaps of 16.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "fr"
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 8
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 16
+   }
+  ],
+  "parent": "hy-basics"
+ },
+ {
+  "id": "v-hy-binds-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua : SUPER+Return pour lancer kitty, SUPER+D pour rofi -show drun, SUPER+Q pour fermer la fenêtre active.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + Return",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + D",
+    "match": "rofi.*drun"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "^window\\.(close|kill)"
+   }
+  ],
+  "parent": "hy-binds"
+ },
+ {
+  "id": "v-hy-binds-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée le fichier hypr/hyprland.lua avec ces bindings précis : SUPER+Return lance kitty, SUPER+D exécute rofi -show drun, et SUPER+Q ferme la fenêtre courante.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + Return",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + D",
+    "match": "rofi.*drun"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "^window\\.(close|kill)"
+   }
+  ],
+  "parent": "hy-binds"
+ },
+ {
+  "id": "v-hy-binds-p3",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua with: SUPER+Return launches kitty, SUPER+D runs rofi -show drun, and SUPER+Q closes the active window.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + Return",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + D",
+    "match": "rofi.*drun"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "^window\\.(close|kill)"
+   }
+  ],
+  "parent": "hy-binds"
+ },
+ {
+  "id": "v-hy-workspaces-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hyprland.lua avec la configuration suivante : utilisez la combinaison SUPER+1 jusqu'à SUPER+5 pour accéder aux workspaces numérotés de 1 à 5, et SUPER+SHIFT+1 jusqu'à SUPER+SHIFT+5 pour déplacer la fenêtre vers ces mêmes workspaces.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + 1",
+    "match": "^focus .*\"workspace\": \"?1\\b"
+   },
+   {
+    "bind": "SUPER + 5",
+    "match": "^focus .*\"workspace\": \"?5\\b"
+   },
+   {
+    "bind": "SUPER + SHIFT + 1",
+    "match": "^window\\.move .*\"workspace\": \"?1\\b"
+   },
+   {
+    "bind": "SUPER + SHIFT + 5",
+    "match": "^window\\.move .*\"workspace\": \"?5\\b"
+   }
+  ],
+  "parent": "hy-workspaces"
+ },
+ {
+  "id": "v-hy-workspaces-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua: SUPER+1 to 5 to switch to workspaces 1 to 5, SUPER+SHIFT+1 to 5 to move the window there.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "SUPER + 1",
+    "match": "^focus .*\"workspace\": \"?1\\b"
+   },
+   {
+    "bind": "SUPER + 5",
+    "match": "^focus .*\"workspace\": \"?5\\b"
+   },
+   {
+    "bind": "SUPER + SHIFT + 1",
+    "match": "^window\\.move .*\"workspace\": \"?1\\b"
+   },
+   {
+    "bind": "SUPER + SHIFT + 5",
+    "match": "^window\\.move .*\"workspace\": \"?5\\b"
+   }
+  ],
+  "parent": "hy-workspaces"
+ },
+ {
+  "id": "v-hy-rules-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create the file hypr/hyprland.lua with these rules: pavucontrol always floating, firefox always on workspace 2.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "pavucontrol",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "window_rule": "firefox",
+    "match": "\"workspace\":\\s*\"?2"
+   }
+  ],
+  "parent": "hy-rules"
+ },
+ {
+  "id": "v-hy-border-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua : bordures de 3 px, dégradé violet vers cyan sur la fenêtre active, coins arrondis à 12.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.border_size",
+    "eq": 3
+   },
+   {
+    "hypr": "config.general.col.active_border.colors",
+    "hue": [
+     255,
+     300
+    ]
+   },
+   {
+    "hypr": "config.general.col.active_border.colors",
+    "hue": [
+     165,
+     200
+    ]
+   },
+   {
+    "hypr": "config.decoration.rounding",
+    "eq": 12
+   }
+  ],
+  "parent": "hy-border"
+ },
+ {
+  "id": "v-hy-border-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Créez le fichier hypr/hyprland.lua avec les exigences suivantes : bordures d'une épaisseur de 3 pixels, un dégradé allant du violet au cyan appliqué uniquement sur la fenêtre active, et des coins arrondis mesurant 12.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.border_size",
+    "eq": 3
+   },
+   {
+    "hypr": "config.general.col.active_border.colors",
+    "hue": [
+     255,
+     300
+    ]
+   },
+   {
+    "hypr": "config.general.col.active_border.colors",
+    "hue": [
+     165,
+     200
+    ]
+   },
+   {
+    "hypr": "config.decoration.rounding",
+    "eq": 12
+   }
+  ],
+  "parent": "hy-border"
+ },
+ {
+  "id": "v-hy-border-p3",
+  "tags": [
+   "hypr",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua: 3px borders, gradient from purple to cyan on the active window, and rounded corners of 12.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.border_size",
+    "eq": 3
+   },
+   {
+    "hypr": "config.general.col.active_border.colors",
+    "hue": [
+     255,
+     300
+    ]
+   },
+   {
+    "hypr": "config.general.col.active_border.colors",
+    "hue": [
+     165,
+     200
+    ]
+   },
+   {
+    "hypr": "config.decoration.rounding",
+    "eq": 12
+   }
+  ],
+  "parent": "hy-border"
+ },
+ {
+  "id": "v-hy-no-anim-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua pour désactiver toutes les animations.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.animations.enabled",
+    "eq": false
+   }
+  ],
+  "parent": "hy-no-anim"
+ },
+ {
+  "id": "v-hy-no-anim-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hyprland.lua afin de désactiver complètement les animations.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.animations.enabled",
+    "eq": false
+   }
+  ],
+  "parent": "hy-no-anim"
+ },
+ {
+  "id": "v-hy-no-anim-p3",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua that completely disables animations.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.animations.enabled",
+    "eq": false
+   }
+  ],
+  "parent": "hy-no-anim"
+ },
+ {
+  "id": "v-hy-autostart-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua pour lancer au démarrage waybar, hyprpaper et nm-applet.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "exec": "waybar"
+   },
+   {
+    "exec": "hyprpaper"
+   },
+   {
+    "exec": "nm-applet"
+   }
+  ],
+  "parent": "hy-autostart"
+ },
+ {
+  "id": "v-hy-autostart-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Merci de configurer le fichier hypr/hyprland.lua afin d'initialiser au démarrage les modules suivants : waybar, hyprpaper et nm-applet.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "exec": "waybar"
+   },
+   {
+    "exec": "hyprpaper"
+   },
+   {
+    "exec": "nm-applet"
+   }
+  ],
+  "parent": "hy-autostart"
+ },
+ {
+  "id": "v-hy-autostart-p3",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua to launch waybar, hyprpaper, and nm-applet at startup.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "exec": "waybar"
+   },
+   {
+    "exec": "hyprpaper"
+   },
+   {
+    "exec": "nm-applet"
+   }
+  ],
+  "parent": "hy-autostart"
+ },
+ {
+  "id": "v-hy-blur-waybar-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hyprland.lua incluant une layer rule activant le blur derrière waybar, en respectant exactement les mêmes exigences : mêmes valeurs, mêmes touches, mêmes noms de fichiers, de programmes et de couleurs, rien en plus, rien en moins.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "layer_rule": "waybar",
+    "match": "\"blur\":\\s*true"
+   }
+  ],
+  "parent": "hy-blur-waybar"
+ },
+ {
+  "id": "v-hy-blur-waybar-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "rules",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua with a layer rule that activates the blur behind waybar, adhering strictly to the same requirements: same values, same keys, same file and program names, and same colors, nothing more, nothing less.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "layer_rule": "waybar",
+    "match": "\"blur\":\\s*true"
+   }
+  ],
+  "parent": "hy-blur-waybar"
+ },
+ {
+  "id": "v-hy-media-keys-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua with multimedia keys: volume +/- 5% and mute via wpctl, usable even when the screen is locked.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind": "XF86AudioRaiseVolume",
+    "match": "wpctl.*5%\\+"
+   },
+   {
+    "bind": "XF86AudioLowerVolume",
+    "match": "wpctl.*5%-"
+   },
+   {
+    "bind": "XF86AudioMute",
+    "match": "wpctl.*mute"
+   },
+   {
+    "bind": "XF86AudioMute",
+    "match": "\"locked\":\\s*true"
+   }
+  ],
+  "parent": "hy-media-keys"
+ },
+ {
+  "id": "v-hy-touchpad-p1",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua : défilement naturel sur le touchpad et sensibilité souris à 0.3.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.touchpad.natural_scroll",
+    "eq": true
+   },
+   {
+    "hypr": "config.input.sensitivity",
+    "eq": 0.3
+   }
+  ],
+  "parent": "hy-touchpad"
+ },
+ {
+  "id": "v-hy-touchpad-p2",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Merci de créer le fichier hypr/hyprland.lua en activant le défilement naturel du touchpad et en réglant la sensibilité de la souris à 0.3.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.touchpad.natural_scroll",
+    "eq": true
+   },
+   {
+    "hypr": "config.input.sensitivity",
+    "eq": 0.3
+   }
+  ],
+  "parent": "hy-touchpad"
+ },
+ {
+  "id": "v-hy-touchpad-p3",
+  "tags": [
+   "hypr",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua with natural scrolling enabled for the touchpad and mouse sensitivity set to 0.3.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.input.touchpad.natural_scroll",
+    "eq": true
+   },
+   {
+    "hypr": "config.input.sensitivity",
+    "eq": 0.3
+   }
+  ],
+  "parent": "hy-touchpad"
+ },
+ {
+  "id": "v-mod-gaps-p1",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Voici une demande de configuration Linux précise : réduis les gaps avec 2 unités à l'intérieur et 4 unités à l'extérieur, sans modifier aucun autre paramètre.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 2
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 4
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "us"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + 5",
+    "match": "workspace"
+   }
+  ],
+  "parent": "mod-gaps"
+ },
+ {
+  "id": "v-mod-gaps-p2",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Configure Linux to reduce the gaps: 2 inside and 4 outside. Do not change anything else.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.gaps_in",
+    "eq": 2
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 4
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "us"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + 5",
+    "match": "workspace"
+   }
+  ],
+  "parent": "mod-gaps"
+ },
+ {
+  "id": "v-mod-layout-p1",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Change le layout en master à la place de dwindle.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.layout",
+    "eq": "master"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-layout"
+ },
+ {
+  "id": "v-mod-layout-p2",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Merci de modifier le layout pour qu'il soit du type master, et non du type dwindle.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.layout",
+    "eq": "master"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-layout"
+ },
+ {
+  "id": "v-mod-layout-p3",
+  "tags": [
+   "hypr",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Set the layout to master instead of dwindle.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "hypr": "config.general.layout",
+    "eq": "master"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-layout"
+ },
+ {
+  "id": "v-mod-rule-p1",
+  "tags": [
+   "hypr",
+   "modify",
+   "rules",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Ouvre la calc (org.gnome.Calculator) en flottant.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "Calculator",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "window_rule": "hyprland-run",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-rule"
+ },
+ {
+  "id": "v-mod-rule-p2",
+  "tags": [
+   "hypr",
+   "modify",
+   "rules",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Configure l'ouverture flottante pour org.gnome.Calculator.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "Calculator",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "window_rule": "hyprland-run",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-rule"
+ },
+ {
+  "id": "v-mod-rule-p3",
+  "tags": [
+   "hypr",
+   "modify",
+   "rules",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Ajoute une règle flottante à org.gnome.Calculator.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "window_rule": "Calculator",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "window_rule": "hyprland-run",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-rule"
+ },
+ {
+  "id": "v-mod-wb-add-p1",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Mets la batterie à droite de ta waybar sans rien toucher d'autre.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "has": "battery"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "pulseaudio"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   }
+  ],
+  "parent": "mod-wb-add"
+ },
+ {
+  "id": "v-mod-wb-add-p2",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Ajoute l'icône de la batterie à droite de la waybar, tout en conservant exactement le reste inchangé.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "has": "battery"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "pulseaudio"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   }
+  ],
+  "parent": "mod-wb-add"
+ },
+ {
+  "id": "v-mod-wb-add-p3",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Configure ta waybar pour afficher la batterie à sa droite, sans modifier aucun autre élément.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-right",
+    "has": "battery"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "pulseaudio"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   },
+   {
+    "waybar": "modules-center",
+    "has": "clock"
+   }
+  ],
+  "parent": "mod-wb-add"
+ },
+ {
+  "id": "v-mod-wb-move-p1",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Glisse l'horloge à gauche, juste après les workspaces.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-center",
+    "lacks": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   }
+  ],
+  "parent": "mod-wb-move"
+ },
+ {
+  "id": "v-mod-wb-move-p2",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Pourriez-vous s'il vous plaît repositionner l'horloge sur le côté gauche de l'écran, immédiatement après la zone des workspaces ?",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-center",
+    "lacks": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   }
+  ],
+  "parent": "mod-wb-move"
+ },
+ {
+  "id": "v-mod-wb-move-p3",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Please move the clock to the left, after the workspaces.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "modules-left",
+    "has": "clock"
+   },
+   {
+    "waybar": "modules-left",
+    "has": "hyprland/workspaces"
+   },
+   {
+    "waybar": "modules-center",
+    "lacks": "clock"
+   },
+   {
+    "waybar": "modules-right",
+    "has": "network"
+   }
+  ],
+  "parent": "mod-wb-move"
+ },
+ {
+  "id": "v-mod-wb-bottom-p1",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Mets ta waybar en bas et fais-la 36 px haute.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "height",
+    "eq": 36
+   },
+   {
+    "waybar": "modules-right",
+    "has": "pulseaudio"
+   }
+  ],
+  "parent": "mod-wb-bottom"
+ },
+ {
+  "id": "v-mod-wb-bottom-p2",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Place la waybar en bas de l'écran avec une hauteur de 36.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "height",
+    "eq": 36
+   },
+   {
+    "waybar": "modules-right",
+    "has": "pulseaudio"
+   }
+  ],
+  "parent": "mod-wb-bottom"
+ },
+ {
+  "id": "v-mod-wb-bottom-p3",
+  "tags": [
+   "waybar",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Put your waybar at the bottom of the screen and set its height to 36.",
+  "checks": [
+   {
+    "only": [
+     "waybar/"
+    ]
+   },
+   {
+    "waybar": "position",
+    "eq": "bottom"
+   },
+   {
+    "waybar": "height",
+    "eq": 36
+   },
+   {
+    "waybar": "modules-right",
+    "has": "pulseaudio"
+   }
+  ],
+  "parent": "mod-wb-bottom"
+ },
+ {
+  "id": "v-mod-bind-conflict-p1",
+  "tags": [
+   "hypr",
+   "modify",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "SUPER+E pour ouvrir Firefox.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind_any": "firefox"
+   },
+   {
+    "no_conflicts": true
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-bind-conflict"
+ },
+ {
+  "id": "v-mod-bind-conflict-p2",
+  "tags": [
+   "hypr",
+   "modify",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Pourriez-vous ajouter le raccourci SUPER+E afin de lancer Firefox ?",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind_any": "firefox"
+   },
+   {
+    "no_conflicts": true
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-bind-conflict"
+ },
+ {
+  "id": "v-mod-bind-conflict-p3",
+  "tags": [
+   "hypr",
+   "modify",
+   "binds",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "basic",
+  "request": "Add a SUPER+E shortcut to launch Firefox.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "bind_any": "firefox"
+   },
+   {
+    "no_conflicts": true
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   }
+  ],
+  "parent": "mod-bind-conflict"
+ },
+ {
+  "id": "v-mig-conf-p1",
+  "tags": [
+   "hypr",
+   "migrate",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "conf",
+  "request": "Pourriez-vous migrer votre configuration Hyprland (hypr/hyprland.conf) vers du Lua en conservant exactement les mêmes valeurs, touches, noms de fichiers, programmes et couleurs ? Voici la demande en anglais : Migrate my hypr/hyprland.conf config to Lua.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "file": "hypr/hyprland.lua"
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "fr"
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 20
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + SHIFT + 2",
+    "match": "^window\\.move .*\"workspace\": 2"
+   },
+   {
+    "bind": "SUPER + mouse:272",
+    "match": "^window\\.drag"
+   },
+   {
+    "window_rule": "pavucontrol",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "exec": "nm-applet"
+   }
+  ],
+  "parent": "mig-conf"
+ },
+ {
+  "id": "v-mig-conf-p2",
+  "tags": [
+   "hypr",
+   "migrate",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "conf",
+  "request": "Migra ma config hypr/hyprland.conf vers Lua.Styles: un par reformulation,dans cet ordre: -en tutoyant,de façon familière et courte -de façon plus détaillée et polie,en vouvoyant -en anglais Réponds uniquement par un tableau JSON de chaînes.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "file": "hypr/hyprland.lua"
+   },
+   {
+    "hypr": "config.input.kb_layout",
+    "eq": "fr"
+   },
+   {
+    "hypr": "config.general.gaps_out",
+    "eq": 20
+   },
+   {
+    "bind": "SUPER + Q",
+    "match": "kitty"
+   },
+   {
+    "bind": "SUPER + SHIFT + 2",
+    "match": "^window\\.move .*\"workspace\": 2"
+   },
+   {
+    "bind": "SUPER + mouse:272",
+    "match": "^window\\.drag"
+   },
+   {
+    "window_rule": "pavucontrol",
+    "match": "\"float\":\\s*true"
+   },
+   {
+    "exec": "nm-applet"
+   }
+  ],
+  "parent": "mig-conf"
+ },
+ {
+  "id": "v-eco-idle-p1",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hypridle.conf afin de verrouiller l'écran avec hyprlock après 5 minutes d'inactivité, d'éteindre l'écran après 10 minutes (en le rallumant à son retour) et de verrouiller également avant la mise en veille.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "file": "hypr/hypridle.conf"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:timeout",
+    "has": 300
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:timeout",
+    "has": 600
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=300",
+    "match": "(loginctl lock-session|hyprlock)"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=600",
+    "match": "hl\\.dsp\\.dpms"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-resume",
+    "where": "timeout=600",
+    "match": "hl\\.dsp\\.dpms"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "general:before_sleep_cmd",
+    "match": "(loginctl lock-session|hyprlock)"
+   }
+  ],
+  "parent": "eco-idle"
+ },
+ {
+  "id": "v-eco-idle-p2",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hypridle.conf: lock the screen with hyprlock after 5 minutes of inactivity, turn off the screen after 10 minutes (and wake it up upon return), and also lock before sleep.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "file": "hypr/hypridle.conf"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:timeout",
+    "has": 300
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:timeout",
+    "has": 600
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=300",
+    "match": "(loginctl lock-session|hyprlock)"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-timeout",
+    "where": "timeout=600",
+    "match": "hl\\.dsp\\.dpms"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "listener:on-resume",
+    "where": "timeout=600",
+    "match": "hl\\.dsp\\.dpms"
+   },
+   {
+    "conf": "hypr/hypridle.conf",
+    "key": "general:before_sleep_cmd",
+    "match": "(loginctl lock-session|hyprlock)"
+   }
+  ],
+  "parent": "eco-idle"
+ },
+ {
+  "id": "v-eco-lock-p1",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hyprlock.conf avec un fond flouté issu d'une capture d'écran, afficher l'heure en grand au centre, et placer un champ de mot de passe arrondi juste en dessous.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "file": "hypr/hyprlock.conf"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "background:path",
+    "has": "screenshot"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "background:blur_passes",
+    "match": "^[1-9]"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "label:text",
+    "match": "(\\$TIME|date)"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "input-field:rounding",
+    "match": "^(-1|[1-9]\\d*)$"
+   }
+  ],
+  "parent": "eco-lock"
+ },
+ {
+  "id": "v-eco-lock-p2",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprlock.conf: blurred background from a screenshot, large clock in the center, and a rounded password input field below.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "file": "hypr/hyprlock.conf"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "background:path",
+    "has": "screenshot"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "background:blur_passes",
+    "match": "^[1-9]"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "label:text",
+    "match": "(\\$TIME|date)"
+   },
+   {
+    "conf": "hypr/hyprlock.conf",
+    "key": "input-field:rounding",
+    "match": "^(-1|[1-9]\\d*)$"
+   }
+  ],
+  "parent": "eco-lock"
+ },
+ {
+  "id": "v-eco-paper-p1",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer le fichier hypr/hyprpaper.conf afin d'afficher l'image /usr/share/hypr/wall0.png comme fond d'écran sur tous les écrans, en désactivant le splash.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "conf": "hypr/hyprpaper.conf",
+    "key": "wallpaper:path",
+    "match": "wall0\\.png"
+   },
+   {
+    "conf": "hypr/hyprpaper.conf",
+    "key": "splash",
+    "has": "false"
+   },
+   {
+    "conf": "hypr/hyprpaper.conf",
+    "key": "preload",
+    "match": "^$"
+   }
+  ],
+  "parent": "eco-paper"
+ },
+ {
+  "id": "v-eco-paper-p2",
+  "tags": [
+   "ecosystem",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprpaper.conf: background /usr/share/hypr/wall0.png on all screens, without splash.",
+  "checks": [
+   {
+    "only": [
+     "hypr/"
+    ]
+   },
+   {
+    "conf": "hypr/hyprpaper.conf",
+    "key": "wallpaper:path",
+    "match": "wall0\\.png"
+   },
+   {
+    "conf": "hypr/hyprpaper.conf",
+    "key": "splash",
+    "has": "false"
+   },
+   {
+    "conf": "hypr/hyprpaper.conf",
+    "key": "preload",
+    "match": "^$"
+   }
+  ],
+  "parent": "eco-paper"
+ },
+ {
+  "id": "v-theme-static-p1",
+  "tags": [
+   "theme",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée hypr/hyprland.lua et une waybar avec les couleurs du fond d'écran /usr/share/hypr/wall0.png pour : bordure active, fond et texte de la barre, workspace actif.",
+  "checks": [
+   {
+    "only": [
+     "hypr/",
+     "waybar/"
+    ]
+   },
+   {
+    "palette": "/usr/share/hypr/wall0.png",
+    "files": [
+     "hypr/hyprland.lua"
+    ],
+    "min": 1
+   },
+   {
+    "palette": "/usr/share/hypr/wall0.png",
+    "files": [
+     "waybar/style.css",
+     "waybar/config.jsonc"
+    ],
+    "min": 2
+   }
+  ],
+  "parent": "theme-static"
+ },
+ {
+  "id": "v-theme-static-p2",
+  "tags": [
+   "theme",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Pourriez-vous créer le fichier hypr/hyprland.lua ainsi qu'une waybar dont les couleurs (bordure active, fond et texte de la barre, workspace actif) sont extraites du fond d'écran situé à l'adresse /usr/share/hypr/wall0.png ?",
+  "checks": [
+   {
+    "only": [
+     "hypr/",
+     "waybar/"
+    ]
+   },
+   {
+    "palette": "/usr/share/hypr/wall0.png",
+    "files": [
+     "hypr/hyprland.lua"
+    ],
+    "min": 1
+   },
+   {
+    "palette": "/usr/share/hypr/wall0.png",
+    "files": [
+     "waybar/style.css",
+     "waybar/config.jsonc"
+    ],
+    "min": 2
+   }
+  ],
+  "parent": "theme-static"
+ },
+ {
+  "id": "v-theme-static-p3",
+  "tags": [
+   "theme",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create hypr/hyprland.lua and a waybar with colors from the wallpaper at /usr/share/hypr/wall0.png for: active border, bar background and text, active workspace.",
+  "checks": [
+   {
+    "only": [
+     "hypr/",
+     "waybar/"
+    ]
+   },
+   {
+    "palette": "/usr/share/hypr/wall0.png",
+    "files": [
+     "hypr/hyprland.lua"
+    ],
+    "min": 1
+   },
+   {
+    "palette": "/usr/share/hypr/wall0.png",
+    "files": [
+     "waybar/style.css",
+     "waybar/config.jsonc"
+    ],
+    "min": 2
+   }
+  ],
+  "parent": "theme-static"
+ },
+ {
+  "id": "v-theme-matugen-p1",
+  "tags": [
+   "theme",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "matugen",
+  "request": "Veuillez ajouter un template matugen afin que les couleurs de mon Waybar s'adaptent au fond d'écran ; ce script doit générer le fichier ~/.config/waybar/colors.css contenant des déclarations @define-color.",
+  "checks": [
+   {
+    "only": [
+     "matugen/"
+    ]
+   },
+   {
+    "file_match": "matugen/config.toml",
+    "match": "output_path\\s*=\\s*[\\x27\"][^\\x27\"]*waybar/colors\\.css"
+   },
+   {
+    "file_match": "matugen/config.toml",
+    "match": "\\[templates\\.hyprland\\]"
+   },
+   {
+    "glob_match": "matugen/templates/**/*",
+    "match": "@define-color\\s+\\S+\\s+\\{\\{\\s*colors\\.[^}]+\\}\\}\\s*;"
+   }
+  ],
+  "parent": "theme-matugen"
+ },
+ {
+  "id": "v-theme-matugen-p2",
+  "tags": [
+   "theme",
+   "modify",
+   "variant",
+   "paraphrase"
+  ],
+  "seed": "matugen",
+  "request": "Add a matugen template so that my Waybar colors follow the wallpaper: it must generate ~/.config/waybar/colors.css with @define-colors.",
+  "checks": [
+   {
+    "only": [
+     "matugen/"
+    ]
+   },
+   {
+    "file_match": "matugen/config.toml",
+    "match": "output_path\\s*=\\s*[\\x27\"][^\\x27\"]*waybar/colors\\.css"
+   },
+   {
+    "file_match": "matugen/config.toml",
+    "match": "\\[templates\\.hyprland\\]"
+   },
+   {
+    "glob_match": "matugen/templates/**/*",
+    "match": "@define-color\\s+\\S+\\s+\\{\\{\\s*colors\\.[^}]+\\}\\}\\s*;"
+   }
+  ],
+  "parent": "theme-matugen"
+ },
+ {
+  "id": "v-qs-clock-p1",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Quickshell, crée une barre en haut sur tous les écrans affichant l'heure au centre (HH:mm).",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "file": "quickshell"
+   },
+   {
+    "qml": "PanelWindow"
+   },
+   {
+    "qml": "top:\\s*true"
+   },
+   {
+    "qml": "Quickshell\\.screens"
+   },
+   {
+    "qml": "(SystemClock|new Date)"
+   },
+   {
+    "qml": "(hh|HH):mm"
+   }
+  ],
+  "parent": "qs-clock"
+ },
+ {
+  "id": "v-qs-clock-p2",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Pourriez-vous créer le widget Quickshell : une barre située en haut sur tous les écrans, avec l'heure au centre au format HH:mm ?",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "file": "quickshell"
+   },
+   {
+    "qml": "PanelWindow"
+   },
+   {
+    "qml": "top:\\s*true"
+   },
+   {
+    "qml": "Quickshell\\.screens"
+   },
+   {
+    "qml": "(SystemClock|new Date)"
+   },
+   {
+    "qml": "(hh|HH):mm"
+   }
+  ],
+  "parent": "qs-clock"
+ },
+ {
+  "id": "v-qs-clock-p3",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a Quickshell widget: a bar at the top of all screens displaying the time in the center in HH:mm format.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "file": "quickshell"
+   },
+   {
+    "qml": "PanelWindow"
+   },
+   {
+    "qml": "top:\\s*true"
+   },
+   {
+    "qml": "Quickshell\\.screens"
+   },
+   {
+    "qml": "(SystemClock|new Date)"
+   },
+   {
+    "qml": "(hh|HH):mm"
+   }
+  ],
+  "parent": "qs-clock"
+ },
+ {
+  "id": "v-qs-workspaces-p1",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Crée une Quickshell en bas avec les workspaces Hyprland cliquables, le workspace actif en violet.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "bottom:\\s*true"
+   },
+   {
+    "qml": "Hyprland\\.workspaces"
+   },
+   {
+    "qml": "(\\.activate\\(\\)|dispatch)"
+   },
+   {
+    "qml": "(focused|active)"
+   },
+   {
+    "qml_hue": [
+     255,
+     300
+    ]
+   }
+  ],
+  "parent": "qs-workspaces"
+ },
+ {
+  "id": "v-qs-workspaces-p2",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Pouvez-vous créer une barre Quickshell en bas incluant les workspaces Hyprland cliquables, tout en s'assurant que le workspace actif soit affiché en violet ?",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "bottom:\\s*true"
+   },
+   {
+    "qml": "Hyprland\\.workspaces"
+   },
+   {
+    "qml": "(\\.activate\\(\\)|dispatch)"
+   },
+   {
+    "qml": "(focused|active)"
+   },
+   {
+    "qml_hue": [
+     255,
+     300
+    ]
+   }
+  ],
+  "parent": "qs-workspaces"
+ },
+ {
+  "id": "v-qs-workspaces-p3",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a Quickshell bar at the bottom with clickable Hyprland workspaces, with the active workspace in violet.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "bottom:\\s*true"
+   },
+   {
+    "qml": "Hyprland\\.workspaces"
+   },
+   {
+    "qml": "(\\.activate\\(\\)|dispatch)"
+   },
+   {
+    "qml": "(focused|active)"
+   },
+   {
+    "qml_hue": [
+     255,
+     300
+    ]
+   }
+  ],
+  "parent": "qs-workspaces"
+ },
+ {
+  "id": "v-qs-battery-p1",
+  "tags": [
+   "quickshell",
+   "new",
+   "services",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "quickshell: petite barre en haut à droite qui affiche le pourcentage de batterie via UPower; Veuillez créer ce widget, sans ajouter ni retirer aucun élément.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "import Quickshell\\.Services\\.UPower"
+   },
+   {
+    "qml": "UPower\\.displayDevice"
+   },
+   {
+    "qml": "percentage"
+   },
+   {
+    "qml": "right:\\s*true"
+   }
+  ],
+  "parent": "qs-battery"
+ },
+ {
+  "id": "v-qs-volume-p1",
+  "tags": [
+   "quickshell",
+   "new",
+   "services",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Veuillez créer un widget Quickshell qui affiche le volume de la sortie audio par défaut (Pipewire) et permet de couper ou de rétablir le son au clic.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "import Quickshell\\.Services\\.Pipewire"
+   },
+   {
+    "qml": "defaultAudioSink"
+   },
+   {
+    "qml": "PwObjectTracker\\s*\\{[^}]*objects\\s*:\\s*\\[[^\\]]*Pipewire\\.defaultAudioSink"
+   },
+   {
+    "qml": "muted"
+   },
+   {
+    "qml": "(onClicked|TapHandler)"
+   }
+  ],
+  "parent": "qs-volume"
+ },
+ {
+  "id": "v-qs-volume-p2",
+  "tags": [
+   "quickshell",
+   "new",
+   "services",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a Quickshell widget that displays the default audio output volume (Pipewire) and cuts or restores sound on click.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "import Quickshell\\.Services\\.Pipewire"
+   },
+   {
+    "qml": "defaultAudioSink"
+   },
+   {
+    "qml": "PwObjectTracker\\s*\\{[^}]*objects\\s*:\\s*\\[[^\\]]*Pipewire\\.defaultAudioSink"
+   },
+   {
+    "qml": "muted"
+   },
+   {
+    "qml": "(onClicked|TapHandler)"
+   }
+  ],
+  "parent": "qs-volume"
+ },
+ {
+  "id": "v-qs-launcher-p1",
+  "tags": [
+   "quickshell",
+   "new",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a Quickshell bar at the top with a button on the left that launches 'rofi -show drun' on click.\"",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "(Process|execDetached)"
+   },
+   {
+    "qml": "rofi"
+   },
+   {
+    "qml": "drun"
+   },
+   {
+    "qml": "(onClicked|TapHandler)"
+   }
+  ],
+  "parent": "qs-launcher"
+ },
+ {
+  "id": "v-qs-floating-p1",
+  "tags": [
+   "quickshell",
+   "new",
+   "style",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Create a floating Quickshell bar at the top: detached from the screen edges by 10 px, with 12 px rounded corners and a #1e1e2e background.",
+  "checks": [
+   {
+    "only": [
+     "quickshell/"
+    ]
+   },
+   {
+    "qml": "margins"
+   },
+   {
+    "qml": "margins[^}]*(top|left|right)\\s*:\\s*10"
+   },
+   {
+    "qml": "radius:\\s*12"
+   },
+   {
+    "qml": "(?i)#1e1e2e"
+   }
+  ],
+  "parent": "qs-floating"
+ },
+ {
+  "id": "v-q-follow-mouse-p1",
+  "tags": [
+   "question",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Quel option Hyprland active le focus suivi de la souris ? Réponds sans créer de fichier.",
+  "checks": [
+   {
+    "only": []
+   },
+   {
+    "answer": "follow_mouse"
+   }
+  ],
+  "parent": "q-follow-mouse"
+ },
+ {
+  "id": "v-q-follow-mouse-p2",
+  "tags": [
+   "question",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Quelle est l'option Hyprland qui permet au focus de suivre la souris ? Réponds sans générer de fichier.",
+  "checks": [
+   {
+    "only": []
+   },
+   {
+    "answer": "follow_mouse"
+   }
+  ],
+  "parent": "q-follow-mouse"
+ },
+ {
+  "id": "v-q-follow-mouse-p3",
+  "tags": [
+   "question",
+   "variant",
+   "paraphrase"
+  ],
+  "request": "Which Hyprland option makes the focus follow the mouse? Respond without creating a file.",
+  "checks": [
+   {
+    "only": []
+   },
+   {
+    "answer": "follow_mouse"
+   }
+  ],
+  "parent": "q-follow-mouse"
+ }
+]

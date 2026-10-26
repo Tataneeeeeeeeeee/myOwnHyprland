@@ -1,0 +1,244 @@
+{
+ "date": "20261026-131752",
+ "model": "hypr-agent",
+ "summary": {
+  "cases": 6,
+  "valid": 1.0,
+  "first_try": 0.6666666666666666,
+  "conform": 0.6666666666666666,
+  "checks": 0.8947368421052632,
+  "avg_seconds": 52.800000000000004,
+  "model": "hypr-agent",
+  "think": false,
+  "repeat": 1,
+  "label": "variants-test"
+ },
+ "filter": {
+  "pattern": "^(v-hy-gaps-1|v-hy-kb-1|v-wb-pos-module-1|v-mod-gaps-1|v-hy-rules-p1|v-q-follow-mouse-p1)$",
+  "tag": null
+ },
+ "source": "variants",
+ "runs": [
+  {
+   "id": "v-hy-gaps-1",
+   "tags": [
+    "hypr",
+    "new",
+    "variant",
+    "template"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 3,
+   "total": 3,
+   "seconds": 55.0,
+   "model_calls": 4,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.general.gaps_in = 2",
+     "ok": true,
+     "got": "2"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 6",
+     "ok": true,
+     "got": "6"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-131752/v-hy-gaps-1"
+  },
+  {
+   "id": "v-hy-kb-1",
+   "tags": [
+    "hypr",
+    "new",
+    "variant",
+    "template"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": true,
+   "passed": 2,
+   "total": 2,
+   "seconds": 73.9,
+   "model_calls": 8,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'de'",
+     "ok": true,
+     "got": "de"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-131752/v-hy-kb-1"
+  },
+  {
+   "id": "v-wb-pos-module-1",
+   "tags": [
+    "waybar",
+    "new",
+    "variant",
+    "template"
+   ],
+   "valid": true,
+   "first_try": false,
+   "conform": false,
+   "passed": 3,
+   "total": 4,
+   "seconds": 102.6,
+   "model_calls": 9,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['waybar/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "waybar position = 'bottom'",
+     "ok": false,
+     "got": "0"
+    },
+    {
+     "label": "waybar modules-left ∋ 'hyprland/workspaces'",
+     "ok": true,
+     "got": "[\"hyprland/workspaces\"]"
+    },
+    {
+     "label": "waybar modules-right ∋ 'battery'",
+     "ok": true,
+     "got": "[\"battery\", \"tray\"]"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-131752/v-wb-pos-module-1"
+  },
+  {
+   "id": "v-mod-gaps-1",
+   "tags": [
+    "hypr",
+    "modify",
+    "variant",
+    "template"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 5,
+   "total": 5,
+   "seconds": 40.7,
+   "model_calls": 6,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "hypr config.general.gaps_in = 8",
+     "ok": true,
+     "got": "8"
+    },
+    {
+     "label": "hypr config.general.gaps_out = 12",
+     "ok": true,
+     "got": "12"
+    },
+    {
+     "label": "bind SUPER + Q ~ /kitty/",
+     "ok": true,
+     "got": "[\"exec_cmd [\\\"kitty\\\"]\"]"
+    },
+    {
+     "label": "hypr config.input.kb_layout = 'us'",
+     "ok": true,
+     "got": "us"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-131752/v-mod-gaps-1"
+  },
+  {
+   "id": "v-hy-rules-p1",
+   "tags": [
+    "hypr",
+    "new",
+    "rules",
+    "variant",
+    "paraphrase"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": false,
+   "passed": 2,
+   "total": 3,
+   "seconds": 32.8,
+   "model_calls": 5,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous ['hypr/']",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "window_rule pavucontrol ~ /\"float\":\\s*true/",
+     "ok": true,
+     "got": "[{\"float\": true, \"match\": {\"class\": \"org.pulseaudio.pavucontrol\"}, \"name\": \"p…"
+    },
+    {
+     "label": "window_rule firefox ~ /\"workspace\":\\s*\"?2/",
+     "ok": false,
+     "got": "[{\"workspace\": \"w[2]\", \"match\": {\"class\": \"firefox\"}, \"name\": \"firefox_worksp…"
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-131752/v-hy-rules-p1"
+  },
+  {
+   "id": "v-q-follow-mouse-p1",
+   "tags": [
+    "question",
+    "variant",
+    "paraphrase"
+   ],
+   "valid": true,
+   "first_try": true,
+   "conform": true,
+   "passed": 2,
+   "total": 2,
+   "seconds": 11.8,
+   "model_calls": 1,
+   "fixes": 0,
+   "checks": [
+    {
+     "label": "fichiers sous aucun",
+     "ok": true,
+     "got": ""
+    },
+    {
+     "label": "réponse ~ /follow_mouse/",
+     "ok": true,
+     "got": ""
+    }
+   ],
+   "error": "",
+   "workspace": "/home/ethan/delivery/MY/myOwnHyprland/evals/runs/20261026-131752/v-q-follow-mouse-p1"
+  }
+ ]
+}
