@@ -1,4 +1,4 @@
-"""Chemins et réglages du projet."""
+"""Project paths and settings."""
 
 import os
 from pathlib import Path
@@ -17,13 +17,13 @@ CONFIG_HOME = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
 CHAT_MODEL = os.environ.get("MYHYPR_MODEL", "hypr-agent")
 EMBED_MODEL = os.environ.get("MYHYPR_EMBED", "nomic-embed-text")
 
-MAX_STEPS = 25          # appels au modèle max par demande
-MAX_FIX_ROUNDS = 4      # relances automatiques si la validation échoue
+MAX_STEPS = 25          # max model calls per request
+MAX_FIX_ROUNDS = 4      # automatic retries when validation fails
 TOOL_OUTPUT_LIMIT = 6000
-NUM_CTX = 32768         # doit correspondre à PARAMETER num_ctx du Modelfile
-SYSTEM_TOKENS = 1700    # taille approximative du prompt système
+NUM_CTX = 32768         # must match PARAMETER num_ctx in the Modelfile
+SYSTEM_TOKENS = 1700    # approximate system prompt size
 
-# Délai max entre deux morceaux de réponse du modèle (s) : au-delà, la connexion est considérée comme morte
-# (ex. après une mise en veille) et l'appel est retenté au lieu d'attendre indéfiniment.
+# Max delay between two chunks of the model's response (s): beyond it, the connection is considered dead
+# (e.g. after a suspend) and the call is retried instead of waiting forever.
 OLLAMA_READ_TIMEOUT = 300
 OLLAMA_RETRIES = 2

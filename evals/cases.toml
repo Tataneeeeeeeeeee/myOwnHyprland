@@ -1,33 +1,33 @@
-# Banc d'évaluation de l'agent : `uv run myhypr eval`
+# Agent evaluation bench: `uv run myhypr eval`
 #
-# Chaque cas = une demande + des vérifications déterministes sur les fichiers produits.
-#   seed = "basic"        part de evals/fixtures/basic/ (sinon dossier vide)
+# Each case = one request + deterministic checks on the files produced.
+#   seed = "basic"        starts from evals/fixtures/basic/ (otherwise an empty directory)
 #
-# Vérifications disponibles (une clé principale par ligne, + eq / has / lacks / match) :
-#   { only = ["waybar/"] }                     fichiers écrits/modifiés uniquement sous ces préfixes ([] = aucun)
-#   { file = "waybar/style.css" }              le fichier existe
-#   { waybar = "position", eq = "bottom" }     valeur dans config.jsonc (chemin pointé)
+# Available checks (one main key per line, + eq / has / lacks / match):
+#   { only = ["waybar/"] }                     files written/modified only under these prefixes ([] = none)
+#   { file = "waybar/style.css" }              the file exists
+#   { waybar = "position", eq = "bottom" }     value in config.jsonc (dotted path)
 #   { waybar = "modules-right", has = "battery" }   / lacks = "..."
-#   { waybar = "custom/power.on-click", match = "wlogout" }   regex sur la valeur
-#   { css = 'regex' }  /  { css_not = 'regex' }  sur waybar/style.css
-#   { hypr = "config.input.kb_layout", eq = "fr" }   valeur extraite en exécutant le Lua (evals/hl_mock.lua)
-#   { bind = "SUPER + Return", match = "kitty" }     un bind sur ces touches dont l'action matche
-#   { window_rule = "pavucontrol", match = '"float":\s*true' }   règle dont le match contient le texte
+#   { waybar = "custom/power.on-click", match = "wlogout" }   regex on the value
+#   { css = 'regex' }  /  { css_not = 'regex' }  on waybar/style.css
+#   { hypr = "config.input.kb_layout", eq = "fr" }   value extracted by running the Lua (evals/hl_mock.lua)
+#   { bind = "SUPER + Return", match = "kitty" }     a bind on these keys whose action matches
+#   { window_rule = "pavucontrol", match = '"float":\s*true' }   rule whose match contains the text
 #   { layer_rule = "waybar", match = '"blur":\s*true' }
-#   { hypr = "...colors", hue = [255, 300] }   au moins une couleur dans cette plage de teinte (violet)
-#   { qml = 'regex' } / { qml_not = 'regex' }  sur tous les .qml produits sous quickshell/
-#   { qml_hue = [255, 300] }                   au moins une couleur de cette teinte dans le QML
-#   { bind_any = 'firefox' }                  au moins un raccourci dont l'action matche
-#   { no_conflicts = true }                    aucune combinaison avec deux actions différentes
-#   { conf = "hypr/hypridle.conf", key = "listener:timeout", has = 300 }   valeur dans un .conf hyprlang
-#   { conf = "…", key = "general:lock_cmd", match = 'hyprlock' }    (match = '^$' : la clé ne doit pas exister)
-#   { conf = "…", key = "listener:on-timeout", where = "timeout=300", match = '…' }   dans le bloc où timeout = 300
-#   { palette = "img.png", files = ["…"], min = 2 }   au moins N couleurs de la palette matugen de l'image
-#   { file_match = "chemin", match = '…' } / { glob_match = "motif/**/*", match = '…' }
-#   { exec = "waybar" }                        lancé au démarrage (hl.exec_cmd / hl.on)
-#   { answer = "follow_mouse" }                regex sur la réponse texte finale
+#   { hypr = "...colors", hue = [255, 300] }   at least one colour in this hue range (purple)
+#   { qml = 'regex' } / { qml_not = 'regex' }  on every .qml produced under quickshell/
+#   { qml_hue = [255, 300] }                   at least one colour of this hue in the QML
+#   { bind_any = 'firefox' }                  at least one keybind whose action matches
+#   { no_conflicts = true }                    no key combination bound to two different actions
+#   { conf = "hypr/hypridle.conf", key = "listener:timeout", has = 300 }   value in a hyprlang .conf
+#   { conf = "…", key = "general:lock_cmd", match = 'hyprlock' }    (match = '^$': the key must not exist)
+#   { conf = "…", key = "listener:on-timeout", where = "timeout=300", match = '…' }   in the block where timeout = 300
+#   { palette = "img.png", files = ["…"], min = 2 }   at least N colours from the image's matugen palette
+#   { file_match = "path", match = '…' } / { glob_match = "pattern/**/*", match = '…' }
+#   { exec = "waybar" }                        launched at startup (hl.exec_cmd / hl.on)
+#   { answer = "follow_mouse" }                regex on the final text answer
 
-# ------------------------------------------------------------------ Waybar, création
+# ------------------------------------------------------------------ Waybar, creation
 
 [[case]]
 id = "wb-bottom"
@@ -120,7 +120,7 @@ checks = [
   { css = 'font-size\s*:\s*12px' },
 ]
 
-# --------------------------------------------------------------- Hyprland, création
+# --------------------------------------------------------------- Hyprland, creation
 
 [[case]]
 id = "hy-basics"
@@ -229,7 +229,7 @@ checks = [
   { hypr = "config.input.sensitivity", eq = 0.3 },
 ]
 
-# ------------------------------------------------- Modification d'une config existante
+# ------------------------------------------------- Modifying an existing config
 
 [[case]]
 id = "mod-gaps"
@@ -335,7 +335,7 @@ checks = [
   { exec = "nm-applet" },
 ]
 
-# ------------------------------------------------------------- Écosystème Hypr (hyprlang)
+# ------------------------------------------------------------- Hypr ecosystem (hyprlang)
 
 [[case]]
 id = "eco-idle"
@@ -376,7 +376,7 @@ checks = [
   { conf = "hypr/hyprpaper.conf", key = "preload", match = '^$' },
 ]
 
-# ------------------------------------------------------------- Thème tiré du fond d'écran
+# ------------------------------------------------------------- Wallpaper-based theme
 
 [[case]]
 id = "theme-static"

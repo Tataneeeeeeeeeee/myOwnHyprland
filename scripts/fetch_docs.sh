@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Clone ou met à jour les wikis utilisés par le RAG, puis réindexe.
+# Clones or updates the wikis used by the RAG, then reindexes.
 set -euo pipefail
 cd "$(dirname "$0")/../docs/raw"
 

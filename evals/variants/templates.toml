@@ -1,6 +1,6 @@
-# Modèles paramétrés : chaque [[template]] × chaque ligne de `values` = une nouvelle demande pour le dataset.
-# Dans request et checks, {nom} est remplacé par la valeur ; une valeur exactement "{nom}" garde son type (nombre…).
-# Mêmes vérifications que evals/cases.toml. Générer : uv run myhypr variants generate
+# Parameterised templates: each [[template]] × each row of `values` = a new request for the dataset.
+# In request and checks, {name} is replaced by the value; a value that is exactly "{name}" keeps its type (number…).
+# Same checks as evals/cases.toml. Generate with: uv run myhypr variants generate
 
 [[template]]
 id = "hy-gaps"

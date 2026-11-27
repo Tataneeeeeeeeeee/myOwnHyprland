@@ -1,8 +1,8 @@
-"""Détection des conflits de raccourcis : deux binds sur la même combinaison, dans le même sous-mode.
+"""Keybind conflict detection: two binds on the same combo, in the same submap.
 
-Deux sources :
-- la config Lua d'un dossier (exécutée avec la fausse API hl, cf. hl_mock.lua) → conflits AVANT d'appliquer ;
-- la session Hyprland en cours (`hyprctl binds -j`) → conflits de la config réellement chargée.
+Two sources:
+- a directory's Lua config (run with the fake hl API, see hl_mock.lua) → conflicts BEFORE applying;
+- the running Hyprland session (`hyprctl binds -j`) → conflicts in the config actually loaded.
 """
 
 import json
@@ -23,12 +23,12 @@ MODMASK = {1: "SHIFT", 2: "CAPS", 4: "CTRL", 8: "ALT", 16: "MOD2", 32: "MOD3", 6
 
 @dataclass(frozen=True)
 class Bind:
-    combo: str          # « SUPER + SHIFT + Q » normalisé
+    combo: str          # normalized "SUPER + SHIFT + Q"
     submap: str
-    trigger: str        # appui | relâchement | souris | appui long
+    trigger: str        # "appui" (press) | "relâchement" (release) | "souris" (mouse) | "appui long" (long press)
     action: str
-    where: str          # fichier:ligne (config) ou description (session)
-    text: str = ""      # ligne de code exacte (config) : à copier telle quelle dans edit_file
+    where: str          # file:line (config) or description (session)
+    text: str = ""      # exact code line (config): to copy verbatim into edit_file
 
     @property
     def key(self) -> tuple:
@@ -39,7 +39,7 @@ def normalize(keys: str) -> str:
     parts = []
     for token in (t for t in re.split(r"\s*[+,]\s*", str(keys).strip()) if t):
         words = token.split()
-        # « SUPER SHIFT » (style hyprlang) → deux modificateurs ; « switch:on:Lid Switch » reste une seule touche
+        # "SUPER SHIFT" (hyprlang style) → two modifiers; "switch:on:Lid Switch" stays a single key
         parts += words if all(w.upper() in MOD_ALIASES for w in words) else [token]
     mods = sorted({MOD_ALIASES[p.upper()] for p in parts if p.upper() in MOD_ALIASES}, key=MOD_ORDER.index)
     rest = [p for p in parts if p.upper() not in MOD_ALIASES]
@@ -65,7 +65,7 @@ def _action(action) -> str:
 
 
 def from_config(entry: Path) -> list[Bind]:
-    """Raccourcis déclarés par une config Lua (sans la charger dans Hyprland)."""
+    """Keybinds declared by a Lua config (without loading it into Hyprland)."""
     if not entry.exists():
         return []
     try:
@@ -86,7 +86,7 @@ def from_config(entry: Path) -> list[Bind]:
 
 
 def from_session() -> list[Bind]:
-    """Raccourcis de la config chargée par la session Hyprland en cours."""
+    """Keybinds of the config loaded by the running Hyprland session."""
     try:
         r = subprocess.run(["hyprctl", "binds", "-j"], capture_output=True, text=True, timeout=5)
         binds = json.loads(r.stdout)
@@ -111,12 +111,12 @@ def _groups(binds: list[Bind]) -> dict[tuple, list[Bind]]:
 
 
 def conflicts(binds: list[Bind]) -> dict[tuple, list[Bind]]:
-    """Même combinaison, actions DIFFÉRENTES : une seule des deux se déclenchera vraiment."""
+    """Same combo, DIFFERENT actions: only one of them will actually fire."""
     return {k: v for k, v in _groups(binds).items() if len({b.action for b in v}) > 1}
 
 
 def duplicates(binds: list[Bind]) -> dict[tuple, list[Bind]]:
-    """Même combinaison, même action : inoffensif, juste redondant."""
+    """Same combo, same action: harmless, just redundant."""
     return {k: v for k, v in _groups(binds).items() if len({b.action for b in v}) == 1}
 
 
@@ -131,7 +131,7 @@ def describe(found: dict[tuple, list[Bind]]) -> list[str]:
 
 
 def lookup(entry: Path, keys: str) -> str:
-    """La combinaison est-elle libre ? Sinon : qui l'utilise, où, avec quelle ligne exacte."""
+    """Is the combo free? If not: who uses it, where, and the exact line."""
     combo = normalize(keys)
     uses = [b for b in from_config(entry) if b.combo == combo]
     if not uses:
@@ -144,7 +144,7 @@ def lookup(entry: Path, keys: str) -> str:
 
 
 def report(entry: Path) -> str:
-    """Texte pour l'agent : conflits + nombre de raccourcis analysés."""
+    """Text for the agent: conflicts + number of keybinds analyzed."""
     binds = from_config(entry)
     found = conflicts(binds)
     dup = duplicates(binds)

@@ -1,4 +1,4 @@
-"""Banc d'évaluation : lance les cas de evals/cases.toml et mesure validité + conformité."""
+"""Evaluation bench: runs the cases in evals/cases.toml and measures validity + conformity."""
 
 import json
 import os
@@ -64,7 +64,7 @@ def norm_keys(keys: str) -> str:
 
 
 def bind_repr(b: dict) -> str:
-    """'window.move [{"workspace": 1}] {"locked": true}' — indépendant de l'ordre des clés."""
+    """'window.move [{"workspace": 1}] {"locked": true}' — independent of key order."""
     action = b.get("action")
     if isinstance(action, dict) and "dsp" in action:
         text = f"{action['dsp']} {json.dumps(action.get('args', []), sort_keys=True, ensure_ascii=False)}"
@@ -76,7 +76,7 @@ def bind_repr(b: dict) -> str:
 
 
 def hues(value) -> list[float]:
-    """Teintes (0-360°) de toutes les couleurs trouvées : #rrggbb, rgba(rrggbbaa), rgb(r,g,b), 0xaarrggbb."""
+    """Hues (0-360°) of every color found: #rrggbb, rgba(rrggbbaa), rgb(r,g,b), 0xaarrggbb."""
     import colorsys
     text = json.dumps(value) if not isinstance(value, str) else value
     out = []
@@ -94,7 +94,7 @@ def hues(value) -> list[float]:
 
 
 def compare(value, check: dict) -> tuple[bool, str]:
-    """Applique eq / has / lacks / match à une valeur extraite."""
+    """Applies eq / has / lacks / match to an extracted value."""
     if value is KeyError or value is None:
         return False, "absent"
     shown = json.dumps(value, ensure_ascii=False) if not isinstance(value, str) else value
@@ -123,7 +123,7 @@ def compare(value, check: dict) -> tuple[bool, str]:
     return True, shown
 
 
-# ----------------------------------------------------------------------------- vérifications
+# ----------------------------------------------------------------------------- checks
 
 @dataclass
 class CheckResult:
@@ -174,7 +174,7 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
             from .ecosystem import parse
             conf = ws / check["conf"]
             entries = parse(conf, []) if conf.exists() else []
-            if "where" in check:  # « timeout=300 » : seulement les blocs qui contiennent cette valeur
+            if "where" in check:  # "timeout=300": only the blocks that contain this value
                 wk, _, wv = check["where"].partition("=")
                 blocks = {e.block for e in entries if e.key == wk and e.value == wv}
                 entries = [e for e in entries if e.block in blocks]
@@ -184,7 +184,7 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
             if "has" in check:
                 ok = str(check["has"]) in values
             else:
-                # « match = '^$' » sur une clé absente = la clé ne doit pas exister
+                # "match = '^$'" on a missing key = the key must not exist
                 ok = any(re.search(check["match"], v) for v in values) if values else check["match"] == "^$"
         elif "palette" in check:
             from .palette import hexes, palette
@@ -237,7 +237,7 @@ def run_checks(case: dict, ws: Path, changed: list[str], answer: str) -> list[Ch
     return out
 
 
-# ----------------------------------------------------------------------------- exécution
+# ----------------------------------------------------------------------------- execution
 
 @dataclass
 class CaseRun:
@@ -304,7 +304,7 @@ def run_case(case: dict, model: str, think: bool, out_dir: Path) -> CaseRun:
 
 
 def load_cases(pattern: str | None, tag: str | None, source: str = "bench") -> list[dict]:
-    """source : "bench" (evals/cases.toml), "variants" (evals/variants/generated.json) ou "all"."""
+    """source: "bench" (evals/cases.toml), "variants" (evals/variants/generated.json) or "all"."""
     cases = []
     if source in ("bench", "all"):
         cases += tomllib.loads((EVALS / "cases.toml").read_text())["case"]
@@ -318,7 +318,7 @@ def load_cases(pattern: str | None, tag: str | None, source: str = "bench") -> l
     return cases
 
 
-# ----------------------------------------------------------------------------- rapport
+# ----------------------------------------------------------------------------- report
 
 def summarize(runs: list[CaseRun]) -> dict:
     n = len(runs) or 1
@@ -333,7 +333,7 @@ def summarize(runs: list[CaseRun]) -> dict:
 
 
 def previous_result(model: str) -> dict | None:
-    """Dernier run complet (sans filtre) du même modèle, pour afficher les écarts."""
+    """Latest full (unfiltered) run of the same model, to show the deltas."""
     for f in sorted(RESULTS.glob("*.json"), reverse=True):
         data = json.loads(f.read_text())
         if data["model"] == model and not any(data.get("filter", {}).values()) \
@@ -378,7 +378,7 @@ def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_M
          repeat: int = 1, live: bool = True, label: str = "", source: str = "bench"):
     if not live:
         os.environ["MYHYPR_NO_LIVE"] = "1"
-    os.environ.setdefault("MYHYPR_NO_SYSTEM", "1")  # banc reproductible d'une machine à l'autre
+    os.environ.setdefault("MYHYPR_NO_SYSTEM", "1")  # bench reproducible across machines
     os.environ.setdefault("MYHYPR_WALLPAPER", "/usr/share/hypr/wall0.png")
     cases = load_cases(pattern, tag, source)
     if source != "bench":
@@ -395,11 +395,11 @@ def main(pattern: str | None = None, tag: str | None = None, model: str = CHAT_M
 
 
 def _inhibit_sleep(why: str):
-    """Bloque la veille automatique pendant le run (un run de plusieurs heures coupé par hypridle reste bloqué)."""
+    """Blocks automatic sleep during the run (a multi-hour run interrupted by hypridle gets stuck)."""
     if not shutil.which("systemd-inhibit"):
         return None
     try:
-        # « tail --pid » s'arrête dès que le banc meurt, même tué (kill, Ctrl+C, plantage) : le verrou ne survit jamais
+        # "tail --pid" exits as soon as the bench dies, even when killed (kill, Ctrl+C, crash): the lock never outlives it
         return subprocess.Popen(["systemd-inhibit", "--what=idle:sleep", "--who=myOwnHyprland", f"--why={why}",
                                  "--mode=block", "tail", f"--pid={os.getpid()}", "-f", "/dev/null"],
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -438,7 +438,7 @@ def _run_all(cases, model, think, repeat, pattern, tag, label, source, live):
 
 
 def rescore(result_file: str):
-    """Recalcule les vérifications d'un run existant (après correction du banc), sans relancer le modèle."""
+    """Recomputes the checks of an existing run (after fixing the bench), without rerunning the model."""
     path = Path(result_file).resolve()
     data = json.loads(path.read_text())
     cases = {c["id"]: c for c in load_cases(None, None, "all")}

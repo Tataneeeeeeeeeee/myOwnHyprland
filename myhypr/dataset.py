@@ -1,11 +1,11 @@
-"""Dataset de fine-tuning : exemples validés à la main (via /keep ou la revue des candidats du banc).
+"""Fine-tuning dataset: examples validated by hand (via /keep or the bench candidate review).
 
-Format d'une ligne de data/dataset.jsonl :
-- request    : la demande
-- messages   : version simple (demande → fichiers finaux), compatible Unsloth / TRL
-- trajectory : la conversation complète de l'agent (appels d'outils et résultats) pour apprendre à les utiliser
-- files      : contenu final des fichiers créés ou modifiés ; answer : réponse texte finale
-- meta       : origine (ui / banc), cas, 1er coup, nombre d'appels…
+Format of a data/dataset.jsonl line:
+- request    : the request
+- messages   : simple version (request → final files), Unsloth / TRL compatible
+- trajectory : the agent's full conversation (tool calls and results) to learn how to use them
+- files      : final content of the files created or modified; answer: final text answer
+- meta       : origin (ui / bench), case, first try, number of calls…
 """
 
 import json
@@ -16,7 +16,7 @@ from .config import DATASET
 
 
 def written_files(result: Result) -> dict[str, str]:
-    """Contenu final de chaque fichier écrit ou modifié par l'agent pendant la session."""
+    """Final content of every file written or modified by the agent during the session."""
     paths: list[str] = []
     for m in result.messages:
         for call in m.get("tool_calls", []):
@@ -44,7 +44,7 @@ def add_entry(request: str, messages: list[dict], files: dict[str, str], answer:
 
 
 def add(result: Result) -> None:
-    """Depuis l'interface (/keep)."""
+    """From the UI (/keep)."""
     files = written_files(result)
     add_entry(result.request, result.messages, files, result.summary,
               {"source": f"ui:{result.workspace.name}", "duration": round(result.duration, 1)})
@@ -57,7 +57,7 @@ def rows() -> list[dict]:
 
 
 def remove(index: int) -> dict:
-    """Retire l'exemple n° index (1 = premier). Renvoie l'exemple retiré."""
+    """Removes example number index (1 = first). Returns the removed example."""
     all_rows = rows()
     removed = all_rows.pop(index - 1)
     DATASET.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in all_rows))

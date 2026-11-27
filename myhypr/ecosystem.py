@@ -1,12 +1,12 @@
-"""Validation STATIQUE des configs hyprlock / hypridle / hyprpaper (restées en hyprlang).
+"""STATIC validation of hyprlock / hypridle / hyprpaper configs (still in hyprlang).
 
-Ces outils n'ont pas d'option de vérification, et les lancer agirait sur la session (verrouillage, veille,
-fond d'écran). On vérifie donc sans les exécuter :
-- syntaxe hyprlang (accolades, « clé = valeur ») ;
-- catégories et clés connues, d'après les tableaux du wiki installé (schéma construit automatiquement) ;
-- types simples (int, float, bool) ;
-- fichiers référencés (images de hyprpaper, fonds et images de hyprlock) ;
-- commandes : binaire présent, et `hyprctl dispatch` à l'ancienne (Hyprland Lua attend une expression hl.dsp).
+These tools have no verify option, and running them would affect the session (lock, sleep,
+wallpaper). So we check without running them:
+- hyprlang syntax (braces, "key = value");
+- known categories and keys, from the tables of the installed wiki (schema built automatically);
+- simple types (int, float, bool);
+- referenced files (hyprpaper images, hyprlock backgrounds and images);
+- commands: binary present, and old-style `hyprctl dispatch` (Lua Hyprland expects an hl.dsp expression).
 """
 
 import difflib
@@ -23,7 +23,7 @@ from .migrate import Converter, strip_comment
 
 WIKI = DOCS_RAW / "hyprland-wiki" / "content" / "hypr-ecosystem" / "user"
 
-# Titre de section du wiki → catégorie de config ("" = racine)
+# Wiki section title → config category ("" = top level)
 SECTIONS = {
     "hyprlock": {"General": "general", "Authentication": "auth", "Animations": "animations",
                  "Background": "background", "Image": "image", "Shape": "shape", "Input Field": "input-field",
@@ -32,7 +32,7 @@ SECTIONS = {
     "hyprpaper": {"Setting wallpapers": "wallpaper", "Misc Options": ""},
 }
 WIDGETS = {"background", "image", "shape", "input-field", "label"}
-# Clés décrites dans le texte du wiki plutôt que dans les tableaux
+# Keys described in the wiki text rather than in the tables
 EXTRA = {
     "hyprlock": {"*widget": {"monitor": "string", "halign": "string", "valign": "string", "zindex": "int",
                              "position": "vec2"},
@@ -47,7 +47,7 @@ PATH_KEYS = {("hyprpaper", "wallpaper", "path"), ("hyprlock", "background", "pat
 
 @lru_cache(maxsize=None)
 def schema(tool: str) -> dict[str, dict[str, str]]:
-    """{catégorie: {clé: type}} extrait des tableaux | `clé` | description | type | défaut | du wiki."""
+    """{category: {key: type}} extracted from the wiki's | `key` | description | type | default | tables."""
     page = WIKI / f"{tool}.md"
     out: dict[str, dict[str, str]] = {}
     if not page.exists():
@@ -65,7 +65,7 @@ def schema(tool: str) -> dict[str, dict[str, str]]:
             out.setdefault(current, {})[key] = typ
     for cat, keys in EXTRA.get(tool, {}).items():
         out.setdefault(cat, {}).update(keys)
-    if "*widget" in out:  # propriétés partagées par tous les widgets de hyprlock
+    if "*widget" in out:  # properties shared by all hyprlock widgets
         for w in WIDGETS:
             out.setdefault(w, {}).update(out["*widget"])
         del out["*widget"]
@@ -82,15 +82,15 @@ def detect_tool(path: Path) -> str | None:
 
 @dataclass
 class Entry:
-    category: str    # « listener », « input-field », « » pour la racine, « auth » …
+    category: str    # "listener", "input-field", "" for the top level, "auth" …
     key: str
     value: str
     line: int
-    block: int = 0   # identifiant du bloc { } englobant (deux « listener { } » = deux blocs)
+    block: int = 0   # id of the enclosing { } block (two "listener { }" = two blocks)
 
 
 def parse(path: Path, issues: list[str], variables: dict[str, str] | None = None, depth: int = 0) -> list[Entry]:
-    """Lecture hyprlang minimale (sections imbriquées, $variables, source)."""
+    """Minimal hyprlang reader (nested sections, $variables, source)."""
     variables = {} if variables is None else variables
     entries, stack, blocks = [], [], []
     counter = [0]
@@ -150,7 +150,7 @@ def _type_ok(typ: str, value: str) -> bool:
 
 
 def _old_dispatch(cmd: str) -> str | None:
-    """« hyprctl dispatch dpms off » → suggestion Lua, ou None si la commande est déjà au bon format."""
+    """"hyprctl dispatch dpms off" → Lua suggestion, or None if the command is already in the right format."""
     m = re.search(r"hyprctl\s+dispatch\s+([^'\"\s]\S*)\s*([^&|;]*)", cmd)
     if not m or m.group(1).startswith("hl."):
         return None
@@ -166,7 +166,7 @@ def _old_dispatch(cmd: str) -> str | None:
 
 
 def verify(path: Path) -> str:
-    """« ok » ou erreurs (bloquantes) puis avertissements (non bloquants)."""
+    """"ok", or errors (blocking) followed by warnings (non-blocking)."""
     tool = detect_tool(path)
     if tool is None:
         return f"ERREUR : impossible de savoir si {path.name} est pour hyprlock, hypridle ou hyprpaper"
@@ -190,7 +190,7 @@ def verify(path: Path) -> str:
             errors.append(f"{where}: catégorie « {base or '(racine)'} » inconnue pour {tool}"
                           + (f" → vouliez-vous dire « {hint[0]} » ?" if hint else f". Connues : {', '.join(known)}"))
             continue
-        # hyprlock écrit « pam:enabled » dans auth { } ou auth { pam { enabled } } : on accepte les deux
+        # hyprlock writes "pam:enabled" in auth { } or auth { pam { enabled } }: accept both
         sub = e.category.split(":")[1:]
         key = ":".join([*sub, e.key])
         keys = sch[base]

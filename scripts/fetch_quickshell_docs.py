@@ -1,7 +1,7 @@
-"""Récupère la doc Quickshell (guide + référence des types) de la version INSTALLÉE → docs/raw/quickshell/.
+"""Fetches the Quickshell docs (guide + type reference) for the INSTALLED version → docs/raw/quickshell/.
 
-Le site redirige par défaut vers une vieille version : on lit `qs --version` et on vise /docs/v<version>/.
-Usage : uv run python scripts/fetch_quickshell_docs.py
+By default the site redirects to an old version, so we read `qs --version` and target /docs/v<version>/.
+Usage: uv run python scripts/fetch_quickshell_docs.py
 """
 
 import html
@@ -32,7 +32,7 @@ def get(url: str) -> str:
 
 
 def to_text(page: str) -> str:
-    """Extrait le contenu principal d'une page de doc et le convertit en texte façon Markdown."""
+    """Extracts the main content of a docs page and converts it to Markdown-like text."""
     start = page.find('class="docs-content')
     if start < 0:
         return ""
@@ -40,13 +40,13 @@ def to_text(page: str) -> str:
     ends = [i for i in (page.find('id="toc"', start), page.find("</main>", start), page.find("<footer", start)) if i > 0]
     body = page[start:min(ends)] if ends else page[start:]
     body = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", body, flags=re.S)
-    body = re.sub(r"<button[^>]*>.*?</button>", "", body, flags=re.S)       # boutons « copier »
+    body = re.sub(r"<button[^>]*>.*?</button>", "", body, flags=re.S)       # "copy" buttons
     body = re.sub(r"<h[1-6][^>]*>", "\n## ", body)
     body = re.sub(r"<pre[^>]*>", "\n```qml\n", body).replace("</pre>", "\n```\n")
     body = re.sub(r"<(br|/p|/div|/section|/li|/h[1-6])[^>]*>", "\n", body)
     body = re.sub(r"<li[^>]*>", "\n- ", body)
     text = html.unescape(re.sub(r"<[^>]+>", "", body))
-    text = re.sub(r"\{ this\.classList.*?\">", "", text, flags=re.S)        # reste du JS de copie
+    text = re.sub(r"\{ this\.classList.*?\">", "", text, flags=re.S)        # leftover copy-button JS
     text = re.sub(r"\n\s*Go to\s*\n", " → ", text)
     text = re.sub(r"[ \t]+", " ", text)
     return re.sub(r"\n\s*\n+", "\n\n", text).strip()

@@ -1,232 +1,239 @@
 # myOwnHyprland
 
-Agent IA **100 % local** (Ollama + qwen3.5:9b) qui écrit, valide et corrige des configs Hyprland (Lua, 0.56+),
-Waybar et des widgets **Quickshell** (QML).
+A **100% local** AI agent (Ollama + qwen3.5:9b) that writes, validates and fixes Hyprland configs (Lua, 0.56+),
+Waybar configs and **Quickshell** widgets (QML).
+
+> The agent and its interface speak **French**: prompts, answers and UI messages are in French. The French
+> quotes below are shown as they appear in the app, with an English gloss.
 
 ```
-demande ─► RAG (wiki Hyprland + wiki Waybar + stubs hl.*) ─► qwen3.5 + outils
+request ─► RAG (Hyprland wiki + Waybar wiki + hl.* stubs) ─► qwen3.5 + tools
                                                               │
-        ┌──────────── erreurs ◄── Hyprland --verify-config ◄──┤ write_file
-        │                       ◄── waybar (test live 3 s) ◄──┘
+        ┌──────────── errors ◄─── Hyprland --verify-config ◄──┤ write_file
+        │                     ◄─── waybar (3 s live test)  ◄──┘
         ▼
-   corrige ─► valide ─► relecture de la demande ─► workspaces/<date>/ ─► (apply) ~/.config
-                                                     └─► dataset.jsonl (si tu valides l'exemple)
+   fix ─► validate ─► re-read the request ─► workspaces/<date>/ ─► (apply) ~/.config
+                                                └─► dataset.jsonl (if you approve the example)
 ```
 
 ## Installation
 
-**Prérequis** : Hyprland 0.55+ (config Lua), [Ollama](https://ollama.com) (avec ~8 Go de VRAM idéalement),
-[uv](https://docs.astral.sh/uv), git, lua. Optionnels : waybar, quickshell (+ qt6-declarative pour qmllint),
-matugen, gh (connecté, pour récupérer des exemples sur GitHub).
+**Requirements**: Hyprland 0.55+ (Lua config), [Ollama](https://ollama.com) (ideally with ~8 GB of VRAM),
+[uv](https://docs.astral.sh/uv), git, lua. Optional: waybar, quickshell (+ qt6-declarative for qmllint),
+matugen, gh (logged in, to fetch examples from GitHub).
 
 ```bash
-git clone <ce dépôt> ~/myOwnHyprland && cd ~/myOwnHyprland
-./install.sh           # modèles, doc de TES versions, exemples, index, lanceur « myhypr » + entrée de menu
-./install.sh --bind    # idem + raccourci Hyprland (première combinaison libre de ta session, avec confirmation)
+git clone <this repo> ~/myOwnHyprland && cd ~/myOwnHyprland
+./install.sh           # models, docs for YOUR versions, examples, index, "myhypr" launcher + menu entry
+./install.sh --bind    # same + a Hyprland keybind (first free combination in your session, with confirmation)
 ```
 
-Le script est **relançable sans risque** : il ne refait que ce qui manque. `./install.sh --update` met à jour la
-doc (wiki Hyprland, wiki Waybar, doc Quickshell de la version installée) et les exemples, puis réindexe.
+The script is **safe to re-run**: it only redoes what is missing. `./install.sh --update` updates the docs
+(Hyprland wiki, Waybar wiki, Quickshell docs for the installed version) and the examples, then reindexes.
 
-Le raccourci est écrit dans `~/.config/hypr/myhypr.lua` (fenêtre flottante centrée) et branché par une seule
-ligne `require("myhypr")`, ajoutée dans `custom.lua` si ta config le charge, sinon dans `hyprland.lua` ;
-sauvegarde `.bak-myhypr` et validation `--verify-config` avant de garder la modification.
+The keybind is written to `~/.config/hypr/myhypr.lua` (centred floating window) and hooked in with a single
+`require("myhypr")` line, added to `custom.lua` if your config loads it, otherwise to `hyprland.lua`; a
+`.bak-myhypr` backup is made and the change is checked with `--verify-config` before it is kept.
 
-`myhypr doctor` vérifie tout : dépendances, modèles, contexte du modèle, doc qui correspond aux versions
-installées, index à jour, lanceur, raccourci.
+`myhypr doctor` checks everything: dependencies, models, model context size, docs matching the installed
+versions, up-to-date index, launcher, keybind.
 
-## Utilisation
+## Usage
 
-### Interface conversationnelle (recommandé)
+### Chat interface (recommended)
 
 ```bash
-uv run myhypr            # ou : alias myhypr='uv run --project ~/delivery/MY/myOwnHyprland myhypr'
+uv run myhypr            # or: alias myhypr='uv run --project ~/delivery/MY/myOwnHyprland myhypr'
 ```
 
-On discute avec l'agent comme dans Claude Code : streaming des réponses, appels d'outils visibles
-(`● Write(...)`, `⎿ ✓ config ok`), la conversation est gardée entre les messages (« maintenant mets l'horloge
-à gauche »). Tab complète les commandes, Ctrl+C interrompt l'agent, Ctrl+D quitte.
+You chat with the agent in an interactive terminal session: answers are streamed, tool calls are shown as they
+happen (`● Write(...)`, `⎿ ✓ config ok`), and the conversation carries over between messages (« maintenant mets
+l'horloge à gauche », "now put the clock on the left"). Tab completes commands, Ctrl+C interrupts the agent,
+Ctrl+D quits.
 
-| Commande | Effet |
-|----------|-------|
-| `/from hypr waybar` | part d'une copie de ta config actuelle |
-| `/files`, `/show <f>`, `/diff` | voir ce que l'agent a produit |
-| `/apply`, `/restore <backup>` | appliquer dans `~/.config` (diff + confirmation + sauvegarde) / revenir en arrière |
-| `/keep`, `/dataset` | garder le dernier résultat pour le fine-tuning |
-| `/new`, `/think`, `/model`, `/search` | nouvelle conversation, raisonnement on/off, changer de modèle, tester le RAG |
+| Command | Effect |
+|---------|--------|
+| `/from hypr waybar` | start from a copy of your current config |
+| `/files`, `/show <f>`, `/diff` | see what the agent produced |
+| `/apply`, `/restore <backup>` | apply to `~/.config` (diff + confirmation + backup) / roll back |
+| `/keep`, `/dataset` | keep the last result for fine-tuning |
+| `/new`, `/think`, `/model`, `/search` | new conversation, reasoning on/off, switch model, test the RAG |
 
-### En ligne de commande
+### Command line
 
 ```bash
 uv run myhypr ask "waybar minimaliste, workspaces à gauche, horloge au centre"
 uv run myhypr ask "ajoute un blur sur waybar et des animations plus rapides" --from-current hypr waybar
-uv run myhypr ask "..." --think            # raisonnement qwen activé (plus lent, parfois meilleur)
+uv run myhypr ask "..." --think            # qwen reasoning enabled (slower, sometimes better)
 
-uv run myhypr search "layer rule blur"     # tester ce que le RAG retrouve
-uv run myhypr apply 20261022-112657        # copie dans ~/.config (sauvegarde auto dans data/backups)
-uv run myhypr restore <backup>             # retour arrière
-uv run myhypr dataset                      # avancement du dataset de fine-tuning
+uv run myhypr search "layer rule blur"     # test what the RAG retrieves
+uv run myhypr apply 20261022-112657        # copy into ~/.config (automatic backup in data/backups)
+uv run myhypr restore <backup>             # roll back
+uv run myhypr dataset                      # fine-tuning dataset progress
 ```
 
-L'agent travaille **toujours** dans `workspaces/<date>/` (miroir de `~/.config`). Rien ne touche ta config
-tant que tu ne lances pas `/apply`, qui fait une **application à chaud sécurisée** :
-1. diff + confirmation, puis sauvegarde dans `data/backups/<date>/` (y compris la liste des dossiers créés) ;
-2. copie dans `~/.config` (les liens symboliques vers un dépôt de dotfiles sont respectés) ;
-3. `hyprctl reload` puis `hyprctl configerrors` : toute **nouvelle** erreur → restauration automatique ;
-4. Waybar rechargée par `SIGUSR2` si elle utilise `~/.config/waybar` (sinon tu es prévenu), et restauration si elle s'arrête ;
-5. « Garder ? » : sans « o » dans les 20 s, tout est restauré (comme les réglages d'écran — utile si la
-   nouvelle config casse le clavier ou l'affichage).
-`/restore <date>` reste disponible ensuite.
+(The example requests are in French, since that is the agent's language: "minimalist waybar, workspaces on the
+left, clock in the centre" and "add blur to waybar and faster animations".)
 
-## Migration hyprland.conf → Lua
+The agent **always** works in `workspaces/<date>/` (a mirror of `~/.config`). Nothing touches your config
+until you run `/apply`, which performs a **safe live apply**:
+1. diff + confirmation, then a backup in `data/backups/<date>/` (including the list of created directories);
+2. copy into `~/.config` (symlinks into a dotfiles repo are respected);
+3. `hyprctl reload` then `hyprctl configerrors`: any **new** error → automatic restore;
+4. Waybar is reloaded with `SIGUSR2` if it uses `~/.config/waybar` (otherwise you are warned), and restored if it stops;
+5. « Garder ? » ("Keep?"): without an "o" (oui, yes) within 20 s, everything is restored (like display settings
+   dialogs — handy if the new config breaks the keyboard or the display).
+`/restore <date>` remains available afterwards.
 
-Depuis la 0.55, Hyprland se configure en Lua (hyprlock, hypridle, hyprpaper restent en hyprlang).
-`myhypr/migrate.py` convertit de façon **déterministe** tout ce qui a une correspondance sûre : sections,
-`$variables` (y compris `$bg-dir` → `bg_dir`, variables partagées entre fichiers), `bind*` et leurs drapeaux
+## Migrating hyprland.conf → Lua
+
+Since 0.55, Hyprland is configured in Lua (hyprlock, hypridle and hyprpaper stay on hyprlang).
+`myhypr/migrate.py` **deterministically** converts everything that has a safe equivalent: sections,
+`$variables` (including `$bg-dir` → `bg_dir`, and variables shared across files), `bind*` and their flags
 (`bindel` → `{ repeating, locked }`, `bindd` → description, `bindm`), ~40 dispatchers (`killactive`,
-`movetoworkspacesilent` → `follow = false`, `hyprctl dispatch X` dans un exec…), sous-modes, `monitor`, `exec-once`,
-`env`, les deux syntaxes de `windowrule`, `layerrule`, `workspace`, `bezier`/`animation`, `gestures` → `hl.gesture`,
-`device`, `source` (un module Lua par fichier). Le reste devient `-- TODO migration` avec la ligne d'origine.
+`movetoworkspacesilent` → `follow = false`, `hyprctl dispatch X` inside an exec…), submaps, `monitor`, `exec-once`,
+`env`, both `windowrule` syntaxes, `layerrule`, `workspace`, `bezier`/`animation`, `gestures` → `hl.gesture`,
+`device`, `source` (one Lua module per file). Everything else becomes `-- TODO migration` with the original line.
 
 ```bash
-uv run myhypr migrate ~/.config/hypr/hyprland.conf   # sans IA → workspaces/<date>/hypr
-uv run myhypr   puis   /migrate                       # avec l'agent : conversion + correction + validation
+uv run myhypr migrate ~/.config/hypr/hyprland.conf   # no AI → workspaces/<date>/hypr
+uv run myhypr   then   /migrate                      # with the agent: conversion + fixes + validation
 ```
 
-Testé sur de vraies configs : JaKooLit/Hyprland-Dots (46 fichiers, 502 lignes, 9 TODO), prasanthrangan/hyprdots
-(309 lignes, 0 TODO), linuxmobile/hyprland-dots (216 lignes, 2 TODO). Les erreurs restantes viennent d'options
-supprimées depuis (`pseudotile`, `drop_shadow`…), que l'agent corrige avec la liste des clés valides.
+Tested on real configs: JaKooLit/Hyprland-Dots (46 files, 502 lines, 9 TODOs), prasanthrangan/hyprdots
+(309 lines, 0 TODOs), linuxmobile/hyprland-dots (216 lines, 2 TODOs). The remaining errors come from options
+removed since then (`pseudotile`, `drop_shadow`…), which the agent fixes using the list of valid keys.
 
-## Écosystème Hypr : hyprlock, hypridle, hyprpaper
+## Hypr ecosystem: hyprlock, hypridle, hyprpaper
 
-Ils restent en hyprlang (`hypr/hyprlock.conf`, `hypridle.conf`, `hyprpaper.conf`). Aucun n'a d'option de
-vérification et les lancer agirait sur la session (verrouillage, veille, fond) : `verify_hyprtools` les valide
-**sans les exécuter** — options et types d'après les tableaux du wiki (schéma construit automatiquement, avec
-suggestion en cas de faute), fichiers d'images, binaires des commandes, `hyprctl dispatch` à l'ancienne
-(→ conversion `hl.dsp.*` proposée), `listener` sans `timeout`, ancienne syntaxe de hyprpaper (`preload`),
-formats de date dans un label hyprlock (→ `$TIME`). La détection du système indique ce qui tourne déjà
-(ex. `awww-daemon` : le fond d'écran n'est pas géré par hyprpaper).
+These stay on hyprlang (`hypr/hyprlock.conf`, `hypridle.conf`, `hyprpaper.conf`). None of them has a
+config-check option, and launching them would affect the session (locking, idle, wallpaper), so
+`verify_hyprtools` validates them **without running them**: options and types taken from the wiki tables (schema
+built automatically, with suggestions for typos), image files, command binaries, old-style `hyprctl dispatch`
+(→ suggested `hl.dsp.*` conversion), `listener` without `timeout`, old hyprpaper syntax (`preload`),
+date formats in a hyprlock label (→ `$TIME`). System detection reports what is already running
+(e.g. `awww-daemon`: the wallpaper is not managed by hyprpaper).
 
-La validation ne porte que sur les fichiers **modifiés pendant la demande** : un vieux fichier inutilisé du
-dossier de travail ne bloque pas une autre demande.
+Validation only covers files **modified during the request**: an old unused file in the workspace
+does not block another request.
 
-## Thème tiré du fond d'écran (matugen)
+## Wallpaper-based theming (matugen)
 
-- `/palette` (ou l'outil `wallpaper_palette`) : palette Material 3 du fond affiché (détecté via awww / swww /
-  hyprpaper) ou d'une image, calculée par `matugen --dry-run` — rien n'est écrit ni relancé.
-- **Couleurs fixes** : l'agent reprend ces couleurs exactes (bordure primary → tertiary, fond surface, texte
-  on_surface…).
-- **Couleurs qui suivent le fond** : l'agent ajoute un template dans `matugen/` (`[templates.x]` +
-  `{{colors.<rôle>.default.hex}}`). `verify_matugen` rend les templates dans un **bac à sable** (`--prefix`,
-  hooks retirés : aucun fichier réel modifié, kitty pas relancé), vérifie qu'aucun `{{…}}` ne reste, valide le
-  Lua généré avec Hyprland et le CSS généré (`@define-color …;`).
-- La détection liste les fichiers **générés** par ta config matugen : l'agent modifie le template, jamais le
-  fichier généré (sinon matugen l'écraserait au prochain changement de fond).
+- `/palette` (or the `wallpaper_palette` tool): Material 3 palette of the current wallpaper (detected via awww / swww /
+  hyprpaper) or of an image, computed with `matugen --dry-run` — nothing is written or restarted.
+- **Fixed colours**: the agent reuses those exact colours (border primary → tertiary, surface background,
+  on_surface text…).
+- **Colours that follow the wallpaper**: the agent adds a template in `matugen/` (`[templates.x]` +
+  `{{colors.<role>.default.hex}}`). `verify_matugen` renders the templates in a **sandbox** (`--prefix`,
+  hooks stripped: no real file is modified, kitty is not restarted), checks that no `{{…}}` is left, and validates
+  the generated Lua with Hyprland and the generated CSS (`@define-color …;`).
+- Detection lists the files **generated** by your matugen config: the agent edits the template, never the
+  generated file (otherwise matugen would overwrite it on the next wallpaper change).
 
-## Quickshell (widgets QML)
+## Quickshell (QML widgets)
 
-- Une config = un dossier `quickshell/<nom>/shell.qml` dans le dossier de travail ; après `/apply`, lance-la avec
-  `qs -p ~/.config/quickshell/<nom>` (ta config ml4w occupe `~/.config/quickshell/shell.qml`, donc les noms de
-  config `qs -c` sont ignorés par Quickshell : passe par `-p`).
-- Doc : `scripts/fetch_quickshell_docs.py` récupère guide + 138 types de **la version installée** (`qs --version`).
-- Validation (`verify_quickshell`) : `qmllint` (Qt6) limité aux signaux fiables (syntaxe, faute de propriété avec
-  suggestion), puis lancement réel `qs -p` de 4 s (échec de chargement, ReferenceError, TypeError…). Des indices
-  ciblés corrigent les erreurs QML fréquentes (`centerIn` sans `anchors.`, `fontSize` au lieu de `font.pixelSize`…).
-- Exemples : exemples officiels quickshell-examples, ta config ml4w, la barre de caelestia (filtrés par qmllint).
+- One config = one `quickshell/<name>/shell.qml` directory in the workspace; after `/apply`, launch it with
+  `qs -p ~/.config/quickshell/<name>` (your ml4w config occupies `~/.config/quickshell/shell.qml`, so Quickshell
+  ignores `qs -c` config names: use `-p`).
+- Docs: `scripts/fetch_quickshell_docs.py` fetches the guide + 138 types for **the installed version** (`qs --version`).
+- Validation (`verify_quickshell`): `qmllint` (Qt6) restricted to reliable signals (syntax, misspelled property with
+  a suggestion), then a real 4 s `qs -p` launch (load failure, ReferenceError, TypeError…). Targeted hints
+  fix common QML mistakes (`centerIn` without `anchors.`, `fontSize` instead of `font.pixelSize`…).
+- Examples: the official quickshell-examples, your ml4w config, the caelestia bar (filtered by qmllint).
 
-## Banc d'évaluation
+## Evaluation bench
 
-Avant de toucher au prompt, à la doc ou au modèle : mesurer. `evals/cases.toml` contient 31 demandes fixes
-(Waybar, Hyprland, Quickshell, modification d'une config existante, question) avec des vérifications déterministes.
-Les configs Lua sont **exécutées** avec une fausse API `hl` (`evals/hl_mock.lua`) : on vérifie le sens
-(« SUPER+Return lance kitty », `input.kb_layout == "fr"`), pas une regex sur le texte.
+Before touching the prompt, the docs or the model: measure. `evals/cases.toml` contains 31 fixed requests
+(Waybar, Hyprland, Quickshell, modifying an existing config, questions) with deterministic checks.
+Lua configs are **executed** against a fake `hl` API (`evals/hl_mock.lua`): we check the meaning
+("SUPER+Return launches kitty", `input.kb_layout == "fr"`), not a regex on the text.
 
 ```bash
-uv run myhypr eval                       # tout (~40 min)
-uv run myhypr eval '^wb-'                # seulement les cas Waybar
-uv run myhypr eval --tag modify          # seulement les modifications de config existante
-uv run myhypr eval -n 3                  # 3 répétitions par cas (le modèle n'est pas déterministe)
+uv run myhypr eval                       # everything (~40 min)
+uv run myhypr eval '^wb-'                # Waybar cases only
+uv run myhypr eval --tag modify          # existing-config modifications only
+uv run myhypr eval -n 3                  # 3 repetitions per case (the model is not deterministic)
 uv run myhypr eval --model hypr-agent-ft --label apres-finetune
 ```
 
-Mesures : **valide** (passe la validation), **1er coup** (sans aucune correction), **conforme** (toutes les
-vérifications OK), temps. Un run complet s'affiche avec l'écart par rapport au précédent run complet du même
-modèle. Résultats dans `evals/results/` (versionnés), fichiers produits dans `evals/runs/` (non versionnés).
+Metrics: **valid** (passes validation), **first try** (with no fixes at all), **compliant** (all checks
+pass), time. A full run is shown alongside the difference from the previous full run of the same
+model. Results go in `evals/results/` (committed), produced files in `evals/runs/` (not committed).
 
-Ajouter un cas : un bloc `[[case]]` dans `cases.toml` (la syntaxe des vérifications est en tête de fichier).
-Pour partir d'une config existante : `seed = "basic"` (→ `evals/fixtures/basic/`).
+Adding a case: a `[[case]]` block in `cases.toml` (the check syntax is documented at the top of the file).
+To start from an existing config: `seed = "basic"` (→ `evals/fixtures/basic/`).
 
-## Les 5 étapes
+## The 5 stages
 
-| # | Étape | État | Où |
-|---|-------|------|----|
-| 1 | Prompt système spécialisé (syntaxe Lua `hl.*`) | ✅ | `Modelfile` |
-| 2 | RAG sur la doc de **ta** version | ✅ | `myhypr/rag.py`, `docs/` |
-| 3 | Agent + outils + validation auto + relecture | ✅ | `myhypr/agent.py`, `myhypr/tools.py` |
-| 4 | Collecte du dataset (exemples validés **et** relus par toi) | 🔄 en cours | `data/dataset.jsonl` |
-| 5 | Fine-tuning LoRA → GGUF → Ollama | ⏳ quand ≥ 300 exemples | voir plus bas |
+| # | Stage | Status | Where |
+|---|-------|--------|-------|
+| 1 | Specialised system prompt (Lua `hl.*` syntax) | ✅ | `Modelfile` |
+| 2 | RAG over the docs for **your** version | ✅ | `myhypr/rag.py`, `docs/` |
+| 3 | Agent + tools + automatic validation + review | ✅ | `myhypr/agent.py`, `myhypr/tools.py` |
+| 4 | Dataset collection (examples validated **and** reviewed by you) | 🔄 in progress | `data/dataset.jsonl` |
+| 5 | LoRA fine-tuning → GGUF → Ollama | ⏳ once ≥ 300 examples | see below |
 
-### Étape 4 — construire le dataset
-Après chaque `ask` réussi, l'outil demande si tu gardes l'exemple. **Ne réponds « o » que si tu as vérifié
-le résultat toi-même** : la validation garantit une syntaxe correcte, pas que la demande soit respectée
-(ex. observé : couleurs « violet-cyan » demandées, cyan-vert produites). Un dataset de 300 bons exemples vaut
-mieux que 3000 moyens.
+### Stage 4 — building the dataset
+After each successful `ask`, the tool asks whether you want to keep the example. **Only answer "o" (yes) if you
+have checked the result yourself**: validation guarantees correct syntax, not that the request was honoured
+(observed example: "violet-cyan" colours requested, cyan-green produced). A dataset of 300 good examples is worth
+more than 3000 mediocre ones.
 
-### Exemples de configs réelles (`docs/examples/`)
-`uv run python scripts/fetch_examples.py` puis `uv run myhypr index` construit une base d'exemples :
-- **ml4w** (ta config locale) : variantes d'animations, décorations, raccourcis (avec AZERTY), modules et thèmes Waybar ;
-- **GitHub** : ~45 dotfiles Hyprland en Lua trouvés via la recherche de code, plus Waybar d'Alexays, HyDE et JaKooLit.
+### Real-world config examples (`docs/examples/`)
+`uv run python scripts/fetch_examples.py` then `uv run myhypr index` builds a base of examples:
+- **ml4w** (your local config): animation, decoration and keybind variants (including AZERTY), Waybar modules and themes;
+- **GitHub**: ~45 Lua Hyprland dotfiles found via code search, plus Waybar configs from Alexays, HyDE and JaKooLit.
 
-Filtre strict : un Lua n'entre que s'il passe `Hyprland --verify-config` sur ta version (la plupart des
-dotfiles publics sont encore en ancienne syntaxe `.conf`, qui ferait régresser l'agent). Les fichiers tiers ne
-sont pas versionnés ; `docs/examples/SOURCES.md` liste les origines. Tes propres exemples : dépose-les dans
-`docs/examples/perso/` (versionné) puis `myhypr index`.
+Strict filter: a Lua file only gets in if it passes `Hyprland --verify-config` on your version (most public
+dotfiles still use the old `.conf` syntax, which would make the agent regress). Third-party files are not
+committed; `docs/examples/SOURCES.md` lists where they come from. Your own examples: drop them in
+`docs/examples/perso/` (committed), then run `myhypr index`.
 
-À chaque demande, l'agent reçoit 3 passages de doc + 2 exemples réels. `MYHYPR_NO_EXAMPLES=1` désactive les
-exemples (pour mesurer leur apport avec le banc).
+For each request, the agent receives 3 doc passages + 2 real examples. `MYHYPR_NO_EXAMPLES=1` disables the
+examples (to measure their contribution with the bench).
 
-### Candidats issus du banc
-`uv run myhypr candidates` puis, dans l'interface, `/candidates` : les sorties **conformes** de tous les runs du
-banc, **re-notées avec les vérifications actuelles** (les anciens scores ont pu être faussés par des vérifications
-corrigées depuis) et revalidées, dédoublonnées, au plus 3 par demande, les plus propres d'abord (1er coup, peu
-d'appels). Pour chacune : la demande, les fichiers (ou le diff pour une modification), la réponse ; `o` garder,
-`n` rejeter, `v` tout voir, `s` passer, `q` arrêter. Les décisions sont mémorisées (`data/candidates.json`).
-Chaque exemple gardé contient la **trajectoire complète** (appels d'outils) en plus de « demande → fichiers ».
-`/dataset list` et `/dataset remove N` pour faire le ménage.
+### Candidates from the bench
+`uv run myhypr candidates` then, in the interface, `/candidates`: the **compliant** outputs from every bench run,
+**re-scored with the current checks** (older scores may have been skewed by checks that have since been
+fixed) and re-validated, deduplicated, at most 3 per request, cleanest first (first try, few calls). For each
+one: the request, the files (or the diff for a modification), the answer; `o` keep, `n` reject, `v` view all,
+`s` skip, `q` quit (the prompt itself is in French). Decisions are remembered
+(`data/candidates.json`). Each kept example contains the **full trajectory** (tool calls) in addition to
+"request → files". `/dataset list` and `/dataset remove N` to clean up.
 
-### Variantes : plus de diversité pour le dataset
+### Variants: more diversity for the dataset
 ```bash
 uv run myhypr variants generate --paraphrases 3   # → evals/variants/generated.json
-uv run myhypr eval --variants                      # les joue (≈ 2 h 30) ; jamais comptées comme référence
-uv run myhypr   puis   /candidates                 # les sorties conformes arrivent dans la revue
+uv run myhypr eval --variants                      # runs them (≈ 2 h 30); never counted as a baseline
+uv run myhypr   then   /candidates                 # compliant outputs show up in the review
 ```
-- **Modèles paramétrés** (`evals/variants/templates.toml`) : la même demande avec d'autres valeurs (gaps, clavier,
-  touche → application, règles, décor, position de barre, délais de veille, modifications…), vérifications ajustées.
-- **Reformulations** par le modèle de base (familier, poli, anglais, style SMS). Filtre strict : rejet si un chiffre,
-  un chemin (casse exacte), une couleur, une combinaison de touches ou un terme vérifié disparaît, ou si la phrase
-  est tournée comme si c'était l'agent qui parlait.
+- **Parameterised templates** (`evals/variants/templates.toml`): the same request with other values (gaps, keyboard,
+  key → application, rules, decoration, bar position, idle timeouts, modifications…), with adjusted checks.
+- **Paraphrases** by the base model (casual, polite, English, text-speak). Strict filter: rejected if a number,
+  a path (exact case), a colour, a key combination or a checked term disappears, or if the sentence
+  is phrased as if the agent were the one speaking.
 
-### Étape 5 — fine-tuning (plus tard)
-- Outil : [Unsloth](https://github.com/unslothai/unsloth), QLoRA 4 bits sur le modèle de base Qwen3.5-9B (HF).
-- VRAM : ta RTX 5070 Laptop a 8 Go → juste pour un 9B ; si ça ne passe pas, Colab/Kaggle (T4 16 Go gratuit).
-- Format : `data/dataset.jsonl` est déjà au format `messages` (user → assistant) attendu par Unsloth/TRL.
-- Export : `model.save_pretrained_gguf(..., quantization_method="q4_k_m")`, puis remplacer `FROM` dans le
-  Modelfile par le `.gguf` et `ollama create hypr-agent-ft -f Modelfile`.
-- Évaluation : relancer les mêmes demandes avec `--model hypr-agent` et `--model hypr-agent-ft`, comparer
-  le taux de validation au premier essai et la conformité aux demandes.
+### Stage 5 — fine-tuning (later)
+- Tool: [Unsloth](https://github.com/unslothai/unsloth), 4-bit QLoRA on the Qwen3.5-9B base model (HF).
+- VRAM: your RTX 5070 Laptop has 8 GB → just enough for a 9B; if it doesn't fit, Colab/Kaggle (free 16 GB T4).
+- Format: `data/dataset.jsonl` is already in the `messages` format (user → assistant) expected by Unsloth/TRL.
+- Export: `model.save_pretrained_gguf(..., quantization_method="q4_k_m")`, then replace `FROM` in the
+  Modelfile with the `.gguf` and run `ollama create hypr-agent-ft -f Modelfile`.
+- Evaluation: rerun the same requests with `--model hypr-agent` and `--model hypr-agent-ft`, and compare
+  the first-try validation rate and compliance with the requests.
 
 ## Structure
 
 ```
-Modelfile            prompt système + paramètres du modèle
-myhypr/rag.py        découpage + embeddings (nomic-embed-text) + recherche cosinus (numpy)
-myhypr/tools.py      outils de l'agent + validateurs Hyprland / Waybar
-myhypr/agent.py      boucle générer → valider → corriger → relire
-myhypr/dataset.py    sessions réussies → dataset.jsonl
-myhypr/tui.py        interface conversationnelle (rich + prompt_toolkit)
-myhypr/ops.py        apply / restore / diff sur ~/.config
-myhypr/cli.py        commandes
-docs/raw/            wikis clonés (non versionnés) ; docs/examples/ = tes configs de référence
-data/                index, sessions (traces complètes), backups, dataset
-workspaces/          sorties de l'agent, une par demande
+Modelfile            system prompt + model parameters
+myhypr/rag.py        chunking + embeddings (nomic-embed-text) + cosine search (numpy)
+myhypr/tools.py      agent tools + Hyprland / Waybar validators
+myhypr/agent.py      generate → validate → fix → review loop
+myhypr/dataset.py    successful sessions → dataset.jsonl
+myhypr/tui.py        chat interface (rich + prompt_toolkit)
+myhypr/ops.py        apply / restore / diff on ~/.config
+myhypr/cli.py        commands
+docs/raw/            cloned wikis (not committed); docs/examples/ = your reference configs
+data/                index, sessions (full traces), backups, dataset
+workspaces/          agent outputs, one per request
 ```

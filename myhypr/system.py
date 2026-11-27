@@ -1,7 +1,7 @@
-"""Détection du système : écrans, périphériques, GPU, logiciels installés, version et format de config.
+"""System detection: monitors, input devices, GPU, installed software, Hyprland version and config format.
 
-Le résumé est injecté dans la première demande de chaque session pour que l'agent écrive une config adaptée
-à la machine (bon nom d'écran, bonne disposition clavier, variables NVIDIA si besoin, logiciels réellement installés).
+The summary is injected into the first request of each session so the agent writes a config suited to the
+machine (correct monitor name, correct keyboard layout, NVIDIA variables if needed, software actually installed).
 """
 
 import json
@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .config import CONFIG_HOME
 
-# Catégorie → binaires candidats (le premier trouvé est cité en premier)
+# Category → candidate binaries (the first one found is listed first)
 SOFTWARE = {
     "terminal": ["kitty", "alacritty", "foot", "wezterm", "ghostty", "konsole", "gnome-terminal"],
     "lanceur": ["rofi", "wofi", "fuzzel", "walker", "anyrun", "tofi", "hyprlauncher"],
@@ -33,7 +33,7 @@ SOFTWARE = {
     "plugins Hyprland": ["hyprpm"],
     "écosystème Hypr": ["hyprpicker", "hyprsunset", "hyprctl"],
 }
-# Agents polkit souvent installés hors du PATH
+# Polkit agents often installed outside PATH
 POLKIT_PATHS = ["/usr/lib/hyprpolkitagent/hyprpolkitagent", "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
                 "/usr/libexec/polkit-gnome-authentication-agent-1", "/usr/lib/polkit-kde-authentication-agent-1"]
 
@@ -71,7 +71,7 @@ def _nvidia_driver() -> str | None:
 
 @lru_cache(maxsize=1)
 def detect() -> dict:
-    """Instantané de la machine (mis en cache pour la durée du processus)."""
+    """Snapshot of the machine (cached for the lifetime of the process)."""
     info: dict = {}
     v = _run_json("hyprctl", "version", "-j") or {}
     hypr_dir = CONFIG_HOME / "hypr"
@@ -129,7 +129,7 @@ def detect() -> dict:
 
 
 def summary(info: dict | None = None) -> str:
-    """Résumé compact (≈ 300 tokens) pour le contexte de l'agent."""
+    """Compact summary (≈ 300 tokens) for the agent's context."""
     info = info or detect()
     h, e, g = info["hyprland"], info["entrees"], info["gpu"]
     lines = [f"Hyprland {h['version']} · config actuelle : {h['format_config']}"

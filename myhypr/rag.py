@@ -1,4 +1,4 @@
-"""Étape 2 — RAG : indexation de la doc (wiki Hyprland, wiki Waybar, stubs Lua) et recherche."""
+"""Step 2 — RAG: indexing the docs (Hyprland wiki, Waybar wiki, Lua stubs) and search."""
 
 import json
 import os
@@ -14,14 +14,14 @@ MAX_CHARS = 1800
 HYPR_STUBS = Path("/usr/share/hypr/stubs/hl.meta.lua")
 HYPR_EXAMPLE = Path("/usr/share/hypr/hyprland.lua")
 
-# Pages du wiki Hyprland sans intérêt pour écrire une config
+# Hyprland wiki pages irrelevant to writing a config
 HYPR_SKIP = ("nix/", "contributing-and-debugging/", "community/", "version-selector")
-# Pages Waybar utiles (le reste = vitrines de configs perso)
+# Useful Waybar pages (the rest = personal config showcases)
 WAYBAR_KEEP = re.compile(r"^(Module|Configuration|Styling|Examples|FAQ|States|Writing-Modules|Tray-Applets)")
 
 
 def _split(text: str, max_chars: int = MAX_CHARS) -> list[str]:
-    """Découpe un bloc trop long en morceaux, en coupant sur les lignes vides."""
+    """Splits an overlong block into pieces, cutting on blank lines."""
     if len(text) <= max_chars:
         return [text]
     parts, cur = [], ""
@@ -30,7 +30,7 @@ def _split(text: str, max_chars: int = MAX_CHARS) -> list[str]:
             parts.append(cur)
             cur = ""
         cur = f"{cur}\n\n{para}" if cur else para
-        while len(cur) > max_chars:  # paragraphe géant (gros bloc de code)
+        while len(cur) > max_chars:  # huge paragraph (big code block)
             parts.append(cur[:max_chars])
             cur = cur[max_chars:]
     if cur.strip():
@@ -40,7 +40,7 @@ def _split(text: str, max_chars: int = MAX_CHARS) -> list[str]:
 
 def _chunk_markdown(path: Path, source: str) -> list[dict]:
     text = path.read_text(errors="ignore")
-    text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.S)  # front-matter Hugo
+    text = re.sub(r"^---\n.*?\n---\n", "", text, flags=re.S)  # Hugo front matter
     chunks, title, buf = [], path.stem, []
 
     def flush():
@@ -89,13 +89,13 @@ def collect_chunks() -> list[dict]:
     for md in sorted(qs_docs.rglob("*.md")):
         chunks += _chunk_markdown(md, f"quickshell/{md.relative_to(qs_docs).as_posix()}")
 
-    # Les stubs = référence exacte de l'API Lua installée (une classe par chunk)
+    # The stubs = exact reference of the installed Lua API (one class per chunk)
     if HYPR_STUBS.exists():
         chunks += _chunk_lua_blocks(HYPR_STUBS, "hl.meta.lua", r"\n(?=---@(?:class|alias) )")
     if HYPR_EXAMPLE.exists():
         chunks += _chunk_lua_blocks(HYPR_EXAMPLE, "example hyprland.lua", r"\n(?=-{4,}\n)")
 
-    # Tes propres exemples : docs/examples/**/* (configs que tu aimes)
+    # Your own examples: docs/examples/**/* (configs you like)
     examples = DOCS_RAW.parent / "examples"
     for f in sorted(examples.rglob("*")) if examples.exists() else []:
         if f.is_file() and f.suffix in {".lua", ".jsonc", ".json", ".css", ".qml"}:
@@ -130,7 +130,7 @@ _cache: tuple[np.ndarray, list[dict]] | None = None
 
 
 def search(query: str, k: int = 5, kind: str | None = None) -> list[dict]:
-    """kind = "docs" (doc officielle), "examples" (configs réelles) ou None (tout)."""
+    """kind = "docs" (official docs), "examples" (real configs) or None (everything)."""
     global _cache
     if _cache is None:
         if not (INDEX_DIR / "vectors.npy").exists():
@@ -152,7 +152,7 @@ def search(query: str, k: int = 5, kind: str | None = None) -> list[dict]:
 
 
 def search_mixed(query: str, docs: int = 3, examples: int = 2) -> str:
-    if os.environ.get("MYHYPR_NO_EXAMPLES"):  # pour mesurer l'apport des exemples dans le banc
+    if os.environ.get("MYHYPR_NO_EXAMPLES"):  # to measure the examples' contribution in the bench
         examples = 0
     out = format_hits(search(query, k=docs, kind="docs"))
     ex = search(query, k=examples, kind="examples") if examples else []

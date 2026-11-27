@@ -1,7 +1,7 @@
-"""Outil de dev : pilote l'interface dans un pseudo-terminal et prend des captures PNG (avec pyte + rsvg-convert).
+"""Dev tool: drives the UI in a pseudo-terminal and takes PNG screenshots (with pyte + rsvg-convert).
 
-Usage : uv run --with pyte python scripts/ui_snapshot.py OUT_DIR '[["wait",5],["key","/help\\r"],["snap","aide"]]'
-Étapes : ["wait", s] · ["until", "texte", s] · ["key", "texte"] · ["snap", "nom"]
+Usage: uv run --with pyte python scripts/ui_snapshot.py OUT_DIR '[["wait",5],["key","/help\\r"],["snap","help"]]'
+Steps: ["wait", s] · ["until", "text", s] · ["key", "text"] · ["snap", "name"]
 """
 import fcntl, html, json, os, pty, select, struct, subprocess, sys, termios, time
 import pyte
@@ -29,7 +29,7 @@ def pump(t, until=None):
             except OSError:
                 return
             stream.feed(data)
-            if b"\x1b[6n" in data:  # répond aux demandes de position du curseur (prompt_toolkit)
+            if b"\x1b[6n" in data:  # answer cursor position requests (prompt_toolkit)
                 os.write(fd, f"\x1b[{screen.cursor.y + 1};{screen.cursor.x + 1}R".encode())
         if until and until in "\n".join(screen.display):
             pump(0.8)

@@ -1,10 +1,10 @@
-"""Construit docs/examples/ : configs réelles servant d'exemples au RAG.
+"""Builds docs/examples/: real-world configs used as examples by the RAG.
 
-Sources : ta config ml4w locale + dotfiles publics sur GitHub (via `gh`).
-Règle d'or : un fichier Lua n'entre que s'il passe `Hyprland --verify-config` sur TA version
-(pas d'ancienne syntaxe hyprlang, pas de fonction inventée). Les JSON Waybar doivent se parser.
+Sources: your local ml4w config + public dotfiles on GitHub (via `gh`).
+Golden rule: a Lua file only gets in if it passes `Hyprland --verify-config` on YOUR version
+(no old hyprlang syntax, no made-up functions). Waybar JSON files must parse.
 
-Usage : uv run python scripts/fetch_examples.py
+Usage: uv run python scripts/fetch_examples.py
 """
 
 import hashlib
@@ -24,7 +24,7 @@ from myhypr.tools import _qmllint, _strip_jsonc, verify_hyprland_file  # noqa: E
 OUT = ROOT / "docs" / "examples"
 HOME_CFG = Path.home() / ".config"
 
-# Dépôts Waybar choisis à la main : (dépôt, chemins de fichiers ou de dossiers)
+# Hand-picked Waybar repos: (repo, file or directory paths)
 WAYBAR_REMOTE = {
     "Alexays/Waybar": ["resources/config.jsonc", "resources/style.css"],
     "HyDE-Project/HyDE": ["Configs/.local/share/waybar/modules/"],
@@ -78,7 +78,7 @@ def lua_ok(path: Path) -> bool:
 
 
 def json_ok(text: str) -> bool:
-    """JSON(C) valide et non vide (certains dépôts ont des fichiers `{}` de remplacement)."""
+    """Valid, non-empty JSON(C) (some repos have placeholder `{}` files)."""
     try:
         return bool(json.loads(_strip_jsonc(text)))
     except json.JSONDecodeError:
@@ -94,7 +94,7 @@ def save(rel: str, content: bytes, kind: str):
     kept[kind] += 1
 
 
-# ------------------------------------------------------------------------------- locale (ml4w)
+# ------------------------------------------------------------------------------- local (ml4w)
 
 def local_ml4w():
     hypr = (HOME_CFG / "hypr").resolve()
@@ -112,8 +112,8 @@ def local_ml4w():
             save(f"ml4w/waybar/themes/{theme.name}/config.jsonc", cfg.read_bytes(), "waybar")
         for css in sorted(theme.rglob("style.css")):
             save(f"ml4w/waybar/themes/{css.relative_to(waybar / 'themes')}", css.read_bytes(), "css")
-    sources.append(f"- **ml4w (local)** `{hypr}` · {kept['lua'] - n0} fichiers Lua · "
-                   f"{kept['waybar'] - w0} configs Waybar · {kept['css'] - c0} CSS")
+    sources.append(f"- **ml4w (local)** `{hypr}` · {kept['lua'] - n0} Lua files · "
+                   f"{kept['waybar'] - w0} Waybar configs · {kept['css'] - c0} CSS")
 
 
 # ------------------------------------------------------------------------------- Hyprland Lua (GitHub)
@@ -125,7 +125,7 @@ def find_lua_repos() -> dict[str, str]:
     for it in items:
         repo, path = it["repository"]["full_name"], it["path"]
         if "omarchy" in repo.lower() or not path.endswith("hyprland.lua"):
-            continue  # thèmes Omarchy = seulement des couleurs
+            continue  # Omarchy themes = colours only
         repos.setdefault(repo, path)
     return repos
 
@@ -161,27 +161,28 @@ def remote_lua():
             whole_ok = main.exists() and verify_hyprland_file(main) == "config ok"
             before = kept["lua"]
             for f in files:
-                # Config complète valide → tous ses fichiers ; sinon seulement ceux valides seuls
+                # Whole config valid → all of its files; otherwise only the files that are valid on their own
                 if (whole_ok and "hl." in f.read_text(errors="ignore")) or lua_ok(f):
                     save(f"github/{repo.replace('/', '__')}/hypr/{f.relative_to(tmp)}", f.read_bytes(), "lua")
             n = kept["lua"] - before
             status = "config complète valide" if whole_ok else "fichiers valides seuls"
             print(f"  {'✓' if n else '✗'} {repo:<40} {n:>3} fichiers ({status})")
             if n:
-                sources.append(f"- [{repo}](https://github.com/{repo}) `{entry}` · {n} fichiers Lua ({status})")
+                status_en = "whole config valid" if whole_ok else "individually valid files"
+                sources.append(f"- [{repo}](https://github.com/{repo}) `{entry}` · {n} Lua file{'s' * (n != 1)} ({status_en})")
 
 
 # ------------------------------------------------------------------------------- Quickshell
 
-# (dépôt, regex des chemins à prendre)
+# (repo, regex of the paths to take)
 QS_REMOTE = {
-    "quickshell-mirror/quickshell-examples": r".*\.qml$",           # exemples officiels, petits et ciblés
-    "caelestia-dots/shell": r"^modules/bar/.*\.qml$",              # barre d'une config populaire
+    "quickshell-mirror/quickshell-examples": r".*\.qml$",           # official examples, small and focused
+    "caelestia-dots/shell": r"^modules/bar/.*\.qml$",              # the bar of a popular config
 }
 
 
 def qml_files_ok(root: Path) -> list[Path]:
-    """Fichiers QML sans erreur fiable (syntaxe, faute de propriété) selon qmllint."""
+    """QML files with no reliable error (syntax, misspelled property) according to qmllint."""
     bad = {line.split(":", 1)[0] for line in _qmllint(root)}
     return [f for f in sorted(root.rglob("*.qml")) if f.relative_to(root).as_posix() not in bad]
 
@@ -192,7 +193,7 @@ def quickshell_examples():
         before = kept["qml"]
         for f in qml_files_ok(local):
             save(f"ml4w/quickshell/{f.relative_to(local)}", f.read_bytes(), "qml")
-        sources.append(f"- **ml4w (local)** `{local}` · {kept['qml'] - before} fichiers QML")
+        sources.append(f"- **ml4w (local)** `{local}` · {kept['qml'] - before} QML files")
         print(f"  ✓ ml4w quickshell (local)                   {kept['qml'] - before} fichiers QML")
     for repo, pattern in QS_REMOTE.items():
         tree = gh(f"repos/{repo}/git/trees/HEAD?recursive=1")
@@ -211,7 +212,7 @@ def quickshell_examples():
         n = kept["qml"] - before
         print(f"  {'✓' if n else '✗'} {repo:<40} {n} fichiers QML (sur {len(paths)})")
         if n:
-            sources.append(f"- [{repo}](https://github.com/{repo}) · {n} fichiers QML Quickshell")
+            sources.append(f"- [{repo}](https://github.com/{repo}) · {n} Quickshell QML file{'s' * (n != 1)}")
 
 
 # ------------------------------------------------------------------------------- Waybar (GitHub)
@@ -239,7 +240,7 @@ def remote_waybar():
                 save(f"github/{repo.replace('/', '__')}/waybar/{safe}", content, "waybar")
         w, c = kept["waybar"] - before[0], kept["css"] - before[1]
         print(f"  ✓ {repo:<40} {w} configs Waybar, {c} CSS")
-        sources.append(f"- [{repo}](https://github.com/{repo}) · {w} configs/modules Waybar · {c} CSS")
+        sources.append(f"- [{repo}](https://github.com/{repo}) · {w} Waybar configs/modules · {c} CSS")
 
 
 def main():
@@ -255,10 +256,10 @@ def main():
     print("== Quickshell")
     quickshell_examples()
     (OUT / "SOURCES.md").write_text(
-        "# Sources des exemples\n\nGénéré par `scripts/fetch_examples.py`. Les fichiers eux-mêmes ne sont pas "
-        "versionnés (configs tierces) : relance le script pour les récupérer.\n\n"
-        "Filtre : Lua validé par `Hyprland --verify-config` de la version installée, JSON Waybar parsé, "
-        "QML sans erreur de syntaxe ni faute de propriété (qmllint).\n\n"
+        "# Example sources\n\nGenerated by `scripts/fetch_examples.py`. The files themselves are not "
+        "committed (third-party configs): re-run the script to fetch them.\n\n"
+        "Filter: Lua validated by `Hyprland --verify-config` on the installed version, Waybar JSON that parses, "
+        "QML with no syntax error or misspelled property (qmllint).\n\n"
         + "\n".join(sources) + "\n")
     print(f"\nTotal : {kept['lua']} Lua · {kept['waybar']} configs Waybar · {kept['css']} CSS · "
           f"{kept['qml']} QML → {OUT}")

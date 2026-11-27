@@ -1,4 +1,4 @@
-"""Identité visuelle de l'UI : palette Catppuccin Mocha, styles rich / prompt_toolkit, logo."""
+"""UI visual identity: Catppuccin Mocha palette, rich / prompt_toolkit styles, logo."""
 
 from prompt_toolkit.styles import Style
 from rich.text import Text
@@ -68,7 +68,7 @@ def _hex(c: str) -> tuple[int, int, int]:
 
 
 def gradient(text: str, stops: list[str] = GRADIENT, style: str = "bold") -> Text:
-    """Texte coloré en dégradé horizontal (comme une bordure active Hyprland)."""
+    """Text coloured with a horizontal gradient (like a Hyprland active border)."""
     out = Text()
     visible = max(1, len(text.rstrip()) - 1)
     for i, ch in enumerate(text):

@@ -1,4 +1,4 @@
-"""Point d'entrée : myhypr index | ask | apply | dataset."""
+"""Entry point: myhypr index | ask | apply | dataset."""
 
 import argparse
 import sys

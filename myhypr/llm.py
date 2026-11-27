@@ -1,5 +1,5 @@
-"""Client Ollama partagé, avec délais d'expiration (sans eux, une connexion coupée — mise en veille, plantage du
-serveur — bloque l'appel pour toujours)."""
+"""Shared Ollama client, with timeouts (without them, a dropped connection — suspend, server crash — blocks the
+call forever)."""
 
 import httpx
 import ollama

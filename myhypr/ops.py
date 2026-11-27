@@ -1,4 +1,4 @@
-"""Opérations sur ~/.config partagées par la CLI et l'UI : apply, restore, diff."""
+"""Operations on ~/.config shared by the CLI and the UI: apply, restore, diff."""
 
 import difflib
 import json
@@ -16,7 +16,7 @@ from .tools import Workspace
 
 
 def seed(ws: Workspace, names: list[str]) -> list[str]:
-    """Copie des dossiers de ~/.config dans le dossier de travail. Renvoie ceux copiés."""
+    """Copies directories from ~/.config into the working directory. Returns those copied."""
     done = []
     for name in names:
         src = CONFIG_HOME / name
@@ -27,11 +27,11 @@ def seed(ws: Workspace, names: list[str]) -> list[str]:
 
 
 def apply(ws: Workspace) -> Path:
-    """Copie les fichiers du dossier de travail dans ~/.config après sauvegarde. Renvoie la sauvegarde."""
+    """Copies the working directory's files into ~/.config after a backup. Returns the backup."""
     files = ws.files()
     backup = BACKUPS_DIR / time.strftime("%Y%m%d-%H%M%S")
     n = 1
-    while backup.exists():  # deux applications dans la même seconde
+    while backup.exists():  # two applies within the same second
         n += 1
         backup = BACKUPS_DIR / f"{time.strftime('%Y%m%d-%H%M%S')}-{n}"
     backup.mkdir(parents=True)
@@ -40,7 +40,7 @@ def apply(ws: Workspace) -> Path:
         if (CONFIG_HOME / top).exists():
             shutil.copytree(CONFIG_HOME / top, backup / top, symlinks=True)
         else:
-            absent.append(top)  # créé par /apply : à supprimer si on restaure
+            absent.append(top)  # created by /apply: delete on restore
     (backup / ABSENT).write_text(json.dumps(absent))
     for f in files:
         dst = CONFIG_HOME / f
@@ -49,7 +49,7 @@ def apply(ws: Workspace) -> Path:
     return backup
 
 
-ABSENT = ".absent.json"  # dossiers de ~/.config qui n'existaient pas avant /apply
+ABSENT = ".absent.json"  # ~/.config directories that didn't exist before /apply
 
 
 def backups() -> list[str]:
@@ -70,8 +70,8 @@ def restore(name: str) -> list[str]:
             shutil.rmtree(created)
         restored.append(f"{top} (supprimé, n'existait pas avant)")
     for top in sorted(p.name for p in backup.iterdir() if p.is_dir()):
-        # ~/.config/hypr est souvent un lien vers un dépôt de dotfiles (ml4w, stow…) : on garde le lien
-        # et on remplace le contenu du VRAI dossier (rmtree refuse un lien symbolique)
+        # ~/.config/hypr is often a link to a dotfiles repo (ml4w, stow…): keep the link
+        # and replace the contents of the REAL directory (rmtree refuses a symlink)
         dst = (CONFIG_HOME / top).resolve()
         if dst.exists():
             shutil.rmtree(dst)
@@ -81,7 +81,7 @@ def restore(name: str) -> list[str]:
 
 
 def diff(ws: Workspace, only: str | None = None) -> str:
-    """Diff unifié entre ~/.config et le dossier de travail."""
+    """Unified diff between ~/.config and the working directory."""
     out = []
     for f in ws.files():
         if only and not f.startswith(only):
@@ -93,10 +93,10 @@ def diff(ws: Workspace, only: str | None = None) -> str:
     return "".join(out)
 
 
-# --------------------------------------------------------------------------- application à chaud
+# --------------------------------------------------------------------------- live apply
 
 def hypr_errors() -> list[str]:
-    """Erreurs de la config chargée par la session Hyprland en cours (vide si tout va bien)."""
+    """Errors in the config loaded by the running Hyprland session (empty if all is well)."""
     try:
         r = subprocess.run(["hyprctl", "configerrors", "-j"], capture_output=True, text=True, timeout=5)
         return [e.strip() for e in json.loads(r.stdout) if e.strip()]
@@ -112,7 +112,7 @@ def reload_hypr() -> str:
 
 
 def waybar_instances() -> list[tuple[int, str]]:
-    """(pid, fichier de config) des Waybar en cours ; '' si lancée sans -c (= ~/.config/waybar)."""
+    """(pid, config file) of running Waybars; '' if started without -c (= ~/.config/waybar)."""
     out = subprocess.run(["pgrep", "-a", "waybar"], capture_output=True, text=True).stdout
     found = []
     for line in out.splitlines():
@@ -129,7 +129,7 @@ def waybar_instances() -> list[tuple[int, str]]:
 def reload_waybar(pids: list[int]):
     for pid in pids:
         try:
-            os.kill(pid, signal.SIGUSR2)  # Waybar recharge config + style sans redémarrer
+            os.kill(pid, signal.SIGUSR2)  # Waybar reloads config + style without restarting
         except ProcessLookupError:
             pass
 
@@ -137,7 +137,7 @@ def reload_waybar(pids: list[int]):
 @dataclass
 class LiveReport:
     backup: Path
-    steps: list[tuple[str, str]] = field(default_factory=list)   # (niveau ok|info|warn|err, message)
+    steps: list[tuple[str, str]] = field(default_factory=list)   # (level ok|info|warn|err, message)
     rolled_back: bool = False
 
     def add(self, level: str, msg: str):
@@ -145,8 +145,8 @@ class LiveReport:
 
 
 def apply_live(ws: Workspace, keep: Callable[[], bool], wait: float = 1.5) -> LiveReport:
-    """Applique dans ~/.config, recharge à chaud, vérifie, et restaure la sauvegarde si quelque chose casse
-    ou si l'utilisateur ne confirme pas (`keep` renvoie False, ex. délai écoulé)."""
+    """Applies to ~/.config, hot-reloads, checks, and restores the backup if something breaks
+    or the user doesn't confirm (`keep` returns False, e.g. timeout)."""
     files = ws.files()
     tops = {f.split("/", 1)[0] for f in files}
     baseline = hypr_errors() if "hypr" in tops else []

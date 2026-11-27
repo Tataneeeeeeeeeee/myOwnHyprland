@@ -1,4 +1,4 @@
-"""Interface conversationnelle : `uv run myhypr`."""
+"""Conversational interface: `uv run myhypr`."""
 
 import asyncio
 import difflib
@@ -79,7 +79,7 @@ def elapsed(seconds: float) -> str:
     return f"{seconds:.0f}s" if seconds < 60 else f"{int(seconds // 60)}m{int(seconds % 60):02d}s"
 
 
-# --------------------------------------------------------------------------- complétion
+# --------------------------------------------------------------------------- completion
 
 class SlashCompleter(Completer):
     def __init__(self, app: "App"):
@@ -103,10 +103,10 @@ class SlashCompleter(Completer):
                 yield Completion(c, -len(word))
 
 
-# --------------------------------------------------------------------------- rendu d'un tour
+# --------------------------------------------------------------------------- rendering a turn
 
 def row(icon: str, icon_style: str, body, meta: Text | str = "") -> Table:
-    """Une ligne d'activité alignée : icône · contenu · méta à droite."""
+    """An aligned activity row: icon · content · meta on the right."""
     t = Table.grid(padding=(0, 1))
     t.add_column(width=2, no_wrap=True)
     t.add_column(ratio=1)
@@ -116,7 +116,7 @@ def row(icon: str, icon_style: str, body, meta: Text | str = "") -> Table:
 
 
 class Ticker:
-    """Spinner + phase + chrono, recalculé à chaque rafraîchissement du Live."""
+    """Spinner + phase + timer, recomputed on every Live refresh."""
     FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
     def __init__(self, renderer: "Renderer"):
@@ -132,7 +132,7 @@ class Ticker:
         line.append("  ·  ctrl+c pour interrompre", style=C["surface2"])
         if not r.buf.strip():
             return line
-        # Texte en cours de génération : seulement la fin, pour ne jamais dépasser l'écran
+        # Text being generated: only the tail, so it never overflows the screen
         height = max(4, console.size.height - 6)
         lines = r.buf.strip().splitlines()[-height:]
         preview = Text("\n".join(lines), style=f"italic {C['overlay1']}")
@@ -140,7 +140,7 @@ class Ticker:
 
 
 class Renderer:
-    """Transforme les événements de l'agent en affichage."""
+    """Turns the agent's events into display."""
 
     def __init__(self, ws: Workspace):
         self.ws = ws
@@ -159,7 +159,7 @@ class Renderer:
         self.live.stop()
 
     def print(self, *items, kind: str = "tool"):
-        """Ligne vide entre deux groupes de nature différente (narration, outils, statut, réponse) : plus aéré."""
+        """Blank line between two groups of different kinds (narration, tools, status, reply): more breathing room."""
         if self.last_kind is not None and kind != self.last_kind:
             self.live.console.print()
         self.live.console.print(*items)
@@ -176,7 +176,7 @@ class Renderer:
             body.add_row(Text("◆", style=f"bold {C['mauve']}"), Markdown(text, code_theme=CODE_THEME))
             self.print(Padding(body, (0, 0, 0, 1)), kind="answer")
         else:
-            # Narration intermédiaire : repliée et discrète
+            # Intermediate narration: collapsed and subdued
             plain = re.sub(r"\*\*|__|`|^#+\s*|^\s*[-*]\s+", "", text, flags=re.M)
             lines = [ln for ln in plain.splitlines() if ln.strip()]
             shown = "\n".join(lines[:2]) + (f"  (+{len(lines) - 2} lignes)" if len(lines) > 2 else "")
@@ -189,7 +189,7 @@ class Renderer:
     def on_thinking(self):
         self.phase = "Réflexion…"
 
-    # ---- outils
+    # ---- tools
     def on_tool_call(self, name: str, args: dict):
         self.flush(final=False)
         self.before = None
@@ -291,7 +291,7 @@ class Renderer:
                                                  "d'une conversation vide", style=C["peach"])), kind="status")
 
 
-# --------------------------------------------------------------------------- application
+# --------------------------------------------------------------------------- app
 
 class App:
     def __init__(self, model: str = CHAT_MODEL):
@@ -306,7 +306,7 @@ class App:
             reserve_space_for_menu=8,
         )
 
-    # ---- état
+    # ---- state
     def new_workspace(self):
         old = getattr(self, "ws", None)
         if old and not old.files():
@@ -330,7 +330,7 @@ class App:
         return parts
 
     def prompt_message(self):
-        """Ligne de séparation avec l'état intégré à droite, puis le curseur."""
+        """Separator line with the status inlined on the right, then the cursor."""
         status = self.status_parts()
         used = sum(len(t) for _, t in status) + 4
         return [("class:rule", "─" * max(4, self.width() - used) + " "), *status,
@@ -376,7 +376,7 @@ class App:
         console.print(tips, "")
 
     def echo_user(self, line: str):
-        """Remplace la zone de saisie par un bloc message propre."""
+        """Replaces the input area with a clean message block."""
         prompt_rows = 1 + max(1, -(-(len(line) + 2) // self.width()))
         sys.stdout.write(f"\x1b[{prompt_rows}F\x1b[J")
         sys.stdout.flush()
@@ -389,9 +389,9 @@ class App:
             {"workspace": str(self.ws.root), "model": self.model, "messages": self.session.messages},
             ensure_ascii=False, indent=2))
 
-    # ---- un tour de conversation
+    # ---- one conversation turn
     def ask(self, request: str):
-        # Ce que l'utilisateur tape pendant que l'agent travaille ne doit pas casser l'affichage
+        # What the user types while the agent works must not break the display
         tty = termios.tcgetattr(sys.stdin) if sys.stdin.isatty() else None
         if tty:
             quiet = termios.tcgetattr(sys.stdin)
@@ -439,7 +439,7 @@ class App:
     def footer(self, result, secs: float):
         changed = getattr(result, "changed", [])
         if result.ok and not changed:
-            return  # question, description… : rien n'a été modifié, rien à valider
+            return  # question, description…: nothing changed, nothing to validate
         console.print()
         if result.ok:
             n = len(changed)
@@ -461,7 +461,7 @@ class App:
                     console.print(Padding(Text(LOG_PREFIX.sub("", ln), style=C["red"]), (0, 0, 0, 4)))
             console.print(Text("   dis-moi comment corriger, ou reformule la demande", style=C["overlay0"]))
 
-    # ---- commandes
+    # ---- commands
     def confirm(self, question: str) -> bool:
         try:
             ans = PromptSession(style=PT_STYLE).prompt(
@@ -474,7 +474,7 @@ class App:
         console.print(row(icon, style, Text(text, style=style)))
 
     def command(self, line: str) -> bool:
-        """Renvoie False pour quitter."""
+        """Returns False to quit."""
         try:
             cmd, *args = shlex.split(line)
         except ValueError:
@@ -635,7 +635,7 @@ class App:
     def _show_candidate(self, c, full: bool):
         limit = None if full else 40
         for path, content in c.files.items():
-            if path in c.original:  # modification d'une config existante → diff
+            if path in c.original:  # edit to an existing config → diff
                 diff = "".join(difflib.unified_diff(c.original[path].splitlines(keepends=True),
                                                     content.splitlines(keepends=True), f"avant/{path}", f"après/{path}"))
                 body = Syntax("\n".join(diff.splitlines()[:limit]) if limit else diff, "diff", theme=CODE_THEME,
@@ -760,7 +760,7 @@ class App:
             self.note(f"pour revenir en arrière plus tard : /restore {report.backup.name}")
 
     def keep_changes(self, seconds: int) -> bool:
-        """Comme les réglages d'écran : sans « o » dans le délai, on restaure (config qui casse le clavier…)."""
+        """Like display settings: without « o » before the timeout, restore (config that breaks the keyboard…)."""
         self.note(f"regarde le résultat : garde les changements avec « o » — restauration automatique dans {seconds} s",
                   C["yellow"], "?")
 
@@ -774,7 +774,7 @@ class App:
             return False
         return answer.strip().lower() in ("o", "oui", "y", "yes")
 
-    # ---- boucle
+    # ---- loop
     def run(self):
         console.clear()
         self.banner()

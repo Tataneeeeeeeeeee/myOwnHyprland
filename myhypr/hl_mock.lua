@@ -1,5 +1,5 @@
--- Exécute une config Hyprland Lua avec une fausse API `hl` qui enregistre tout, puis imprime le résultat en JSON.
--- Usage : lua hl_mock.lua chemin/hyprland.lua
+-- Runs a Lua Hyprland config against a fake `hl` API that records everything, then prints the result as JSON.
+-- Usage: lua hl_mock.lua path/hyprland.lua
 
 local entry = assert(arg[1], "usage: lua hl_mock.lua hyprland.lua")
 local dir = entry:match("^(.*)/[^/]*$") or "."
@@ -40,7 +40,7 @@ local function push(list) return function(spec) list[#list + 1] = spec; return h
 hl = setmetatable({
     config = function(t) merge(rec.config, t) end,
     bind = function(keys, action, opts)
-        -- fichier:ligne de l'appel, pour pointer précisément un conflit de raccourcis
+        -- file:line of the call, to pinpoint a keybind conflict
         local info = debug.getinfo(2, "Sl")
         local src = info and info.source and info.source:gsub("^@", "") or "?"
         local prefix = dir .. "/"
@@ -77,7 +77,7 @@ hl = setmetatable({
     exec_cmd = function(cmd) rec.exec[#rec.exec + 1] = cmd end,
     on = function(event, fn)
         rec.events[#rec.events + 1] = event
-        -- On joue les callbacks de démarrage pour capter les hl.exec_cmd qu'ils contiennent
+        -- Run the startup callbacks to capture the hl.exec_cmd calls they contain
         if event == "hyprland.start" or event == "config.reloaded" then
             local ok, err = pcall(fn)
             if not ok then rec.errors[#rec.errors + 1] = tostring(err) end
@@ -86,7 +86,7 @@ hl = setmetatable({
     end,
     dsp = dsp_proxy(""),
 }, {
-    -- Fonctions non modélisées (hl.notification, hl.get_*, …) : on enregistre l'appel et on renvoie un objet neutre
+    -- Unmodeled functions (hl.notification, hl.get_*, …): record the call and return a no-op object
     __index = function(_, name)
         return setmetatable({}, {
             __call = function(_, ...) rec.other[#rec.other + 1] = name; return handle() end,
@@ -100,14 +100,14 @@ for k in pairs(_G) do before[k] = true end
 
 local ok, err = pcall(dofile, entry)
 
--- Variables globales créées par la config (hors fonctions) : souvent une erreur silencieuse
+-- Globals created by the config (excluding functions): often a silent mistake
 rec.globals = {}
 for k, v in pairs(_G) do
     if not before[k] and type(v) ~= "function" then rec.globals[#rec.globals + 1] = k end
 end
 if not ok then rec.errors[#rec.errors + 1] = tostring(err) end
 
--- Encodeur JSON minimal
+-- Minimal JSON encoder
 local function encode(v, seen)
     local t = type(v)
     if t == "nil" then return "null"

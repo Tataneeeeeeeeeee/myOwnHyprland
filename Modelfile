@@ -1,5 +1,5 @@
-# Étape 1 — modèle spécialisé (prompt système + paramètres)
-# Build : ollama create hypr-agent -f Modelfile
+# Step 1 — specialised model (system prompt + parameters)
+# Build: ollama create hypr-agent -f Modelfile
 FROM qwen3.5:9b
 
 PARAMETER temperature 0.3

@@ -1,7 +1,7 @@
-"""Étape 3 — la boucle agent : générer → valider → corriger → relire.
+"""Step 3 — the agent loop: generate → validate → fix → review.
 
-`Session` garde la conversation entre les demandes et émet des événements (texte en streaming,
-appels d'outils, résultats) que la CLI ou l'UI affichent comme elles veulent.
+`Session` keeps the conversation across requests and emits events (streamed text,
+tool calls, results) that the CLI or the UI display however they like.
 """
 
 import json
@@ -28,7 +28,7 @@ class Result:
     summary: str
     messages: list[dict] = field(default_factory=list)
     duration: float = 0.0
-    changed: list[str] = field(default_factory=list)   # fichiers modifiés pendant ce tour
+    changed: list[str] = field(default_factory=list)   # files changed during this turn
 
 
 @dataclass
@@ -59,7 +59,7 @@ class Session:
         if not self.messages and not os.environ.get("MYHYPR_NO_SYSTEM"):
             try:
                 machine = f"Système détecté (détails : outil system_info) :\n{system.summary()}\n\n"
-            except Exception:  # détection best-effort : jamais bloquante
+            except Exception:  # best-effort detection: never blocking
                 machine = ""
         return {"role": "user", "content": (
             f"DEMANDE : {request}\n\n{machine}"
@@ -67,7 +67,7 @@ class Session:
             f"Extraits de documentation pertinents :\n{context}")}
 
     def _chat(self) -> Iterator[Event]:
-        """Un appel au modèle en streaming ; ajoute le message assistant à l'historique."""
+        """One streaming model call; appends the assistant message to the history."""
         if self._compact():
             yield Event("status", "contexte compacté", name="compact")
         for attempt in range(OLLAMA_RETRIES + 1):
@@ -109,9 +109,9 @@ class Session:
         return SYSTEM_TOKENS + chars // 3
 
     def _compact(self) -> bool:
-        """Au-delà de 75 % du contexte, Ollama tronquerait l'entrée EN SILENCE (début de conversation perdu).
-        On remplace d'abord les vieux résultats d'outils et extraits de doc par une mention courte,
-        en gardant intacts les 8 derniers messages."""
+        """Beyond 75% of the context, Ollama would SILENTLY truncate the input (start of conversation lost).
+        First replace old tool results and doc excerpts with a short note,
+        keeping the last 8 messages intact."""
         if self._estimate() < 0.75 * NUM_CTX:
             return False
         changed = False
@@ -157,20 +157,20 @@ class Session:
                     fn = tools.get(name)
                     try:
                         out = fn(**args) if fn else f"ERREUR : outil inconnu {name}"
-                    except Exception as e:  # le modèle doit voir l'erreur pour se corriger
+                    except Exception as e:  # the model must see the error to fix itself
                         out = f"ERREUR : {type(e).__name__}: {e}"
                     out = str(out)[:TOOL_OUTPUT_LIMIT]
                     yield Event("tool_result", out, name=name)
                     self.messages.append({"role": "tool", "tool_name": name, "content": out})
                 continue
 
-            # Le modèle pense avoir fini : on vérifie nous-mêmes
+            # The model thinks it's done: check for ourselves
             summary = msg["content"]
             if self._snapshot() == before:
                 attempted = any(c["function"]["name"] in ("write_file", "edit_file")
                                 for m in self.messages[first:] for c in m.get("tool_calls", []))
                 if attempted and not nudged:
-                    # Toutes ses modifications ont été refusées ou annulées, mais il croit avoir réussi
+                    # All its edits were rejected or reverted, but it thinks it succeeded
                     nudged = True
                     self.messages.append({"role": "user", "content":
                                           "Attention : aucun fichier n'a été modifié pendant ce tour (tes modifications "
@@ -178,7 +178,7 @@ class Session:
                                           "passage avec read_file et refais une modification qui passe, ou explique "
                                           "honnêtement pourquoi tu n'y arrives pas."})
                     continue
-                # Question, description, explication : rien n'a changé → la réponse est la réponse
+                # Question, description, explanation: nothing changed → the reply is the answer
                 yield finish(True, [], summary)
                 return
             changed_now = self._changed(before)
@@ -186,7 +186,7 @@ class Session:
             if not errors and not conflict_reported:
                 new = {k: v for k, v in self._conflicts().items() if k not in conflicts_before}
                 if new:
-                    # Valide pour Hyprland, mais une des deux actions ne se déclenchera jamais
+                    # Valid for Hyprland, but one of the two actions will never fire
                     conflict_reported = True
                     yield Event("status", "nouveau conflit de raccourcis", name="conflict",
                                 args={"lines": binds.describe(new)})
@@ -196,10 +196,10 @@ class Session:
                 migrated = any(c["function"]["name"] == "migrate_hyprlang"
                                for m in self.messages[first:] for c in m.get("tool_calls", []))
                 if reviewed or migrated:
-                    # Migration : conversion déterministe + validation suffisent ; une relecture pousse le modèle
-                    # à reformuler du code correct (observé : 8 modifications inutiles, toutes annulées)
+                    # Migration: deterministic conversion + validation are enough; a review pushes the model
+                    # to rewrite correct code (observed: 8 useless edits, all reverted)
                     break
-                # Valide ≠ conforme : une passe de relecture contre la demande (oublis fréquents sur un 9B)
+                # Valid ≠ compliant: one review pass against the request (frequent omissions on a 9B)
                 reviewed = True
                 yield Event("status", "validation ok → relecture de la demande", name="review")
                 self.messages.append({"role": "user", "content":
@@ -219,7 +219,7 @@ class Session:
                                   "La validation automatique a échoué. Corrige ces erreurs (search_docs si besoin) "
                                   "puis réécris les fichiers concernés :\n\n" + "\n\n".join(errors)})
         else:
-            # Limite d'étapes : on juge l'état final, pas le chemin (une config valide reste valide)
+            # Step limit: judge the final state, not the path (a valid config stays valid)
             errors = self.workspace.validate_all(self._changed(before))
             yield finish(not errors, errors, summary or "(limite d'étapes atteinte)")
             return
@@ -229,7 +229,7 @@ class Session:
 
     @staticmethod
     def _conflict_message(new: dict, binds_before: set) -> str:
-        """Désigne précisément l'ancien et le nouveau raccourci, avec la ligne exacte à neutraliser."""
+        """Points precisely at the old and new binds, with the exact line to disable."""
         parts = ["Ta modification crée un conflit de raccourcis : une même combinaison déclenche deux actions "
                  "différentes, une seule fonctionnera."]
         for (_, combo, _), group in new.items():
@@ -262,14 +262,14 @@ class Session:
         return {p.relative_to(root).as_posix(): hash(p.read_bytes()) for p in root.rglob("*") if p.is_file()}
 
     def cancel_pending(self):
-        """Après un Ctrl+C : retire un appel d'outil resté sans réponse pour garder un historique cohérent."""
+        """After a Ctrl+C: drop a tool call left unanswered to keep the history consistent."""
         while self.messages and self.messages[-1]["role"] == "assistant" and self.messages[-1].get("tool_calls"):
             self.messages.pop()
 
 
 def run(request: str, workspace: Workspace, *, think: bool = False, verbose: bool = True,
         model: str = CHAT_MODEL) -> Result:
-    """Mode non interactif (myhypr ask)."""
+    """Non-interactive mode (myhypr ask)."""
     session = Session(workspace, model=model, think=think)
     for ev in session.turn(request):
         if not verbose:

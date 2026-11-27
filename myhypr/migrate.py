@@ -1,11 +1,11 @@
-"""Migration d'une config Hyprland hyprlang (hyprland.conf) vers Lua (hl.*), version 0.55+.
+"""Migrates a hyprlang Hyprland config (hyprland.conf) to Lua (hl.*), version 0.55+.
 
-Conversion DÉTERMINISTE de tout ce qui a une correspondance sûre (sections, variables, binds, monitor, exec-once,
-env, règles, animations, sources…). Ce qui n'a pas d'équivalent connu est conservé en commentaire
-`-- TODO migration:` avec la ligne d'origine, pour que l'agent (ou toi) le termine. Le résultat se vérifie avec
+DETERMINISTIC conversion of everything with a safe mapping (sections, variables, binds, monitor, exec-once,
+env, rules, animations, sources…). Anything with no known equivalent is kept as a
+`-- TODO migration:` comment with the original line, for the agent (or you) to finish. Check the result with
 `Hyprland --verify-config`.
 
-Seul Hyprland passe à Lua : hyprlock, hypridle, hyprpaper restent en hyprlang (FAQ du wiki).
+Only Hyprland moves to Lua: hyprlock, hypridle, hyprpaper stay in hyprlang (wiki FAQ).
 """
 
 import glob
@@ -15,9 +15,9 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# ----------------------------------------------------------------------------- tables de correspondance
+# ----------------------------------------------------------------------------- mapping tables
 
-# Effets des règles de fenêtre (wiki 0.56). Ancien nom hyprlang = nom Lua sans les « _ ».
+# Window rule effects (wiki 0.56). Old hyprlang name = Lua name without the "_".
 WINDOW_EFFECTS = [
     "allows_input", "animation", "border_color", "border_size", "center", "confine_pointer", "content", "decorate",
     "dim_around", "float", "focus_on_activate", "force_rgbx", "fullscreen", "fullscreen_state", "group",
@@ -57,17 +57,17 @@ MODS_RE = r"SHIFT|CAPS|CONTROL|CTRL|ALT|MOD2|MOD3|MOD4|MOD5|SUPER|WIN|LOGO|META"
 
 
 class Raw(str):
-    """Expression Lua à insérer telle quelle (pas une chaîne)."""
+    """Lua expression inserted verbatim (not a string)."""
 
 
-# ----------------------------------------------------------------------------- valeurs
+# ----------------------------------------------------------------------------- values
 
 def q(s: str) -> str:
     return json.dumps(s, ensure_ascii=False)
 
 
 def strip_comment(line: str) -> str:
-    """En hyprlang, « # » commence un commentaire et « ## » est un « # » littéral."""
+    """In hyprlang, "#" starts a comment and "##" is a literal "#"."""
     out, i = [], 0
     while i < len(line):
         if line[i] == "#":
@@ -97,7 +97,7 @@ def scalar(v: str):
 
 
 def colors(v: str):
-    """« rgba(aaaaaaee) rgba(bbbbbbee) 45deg » → { colors = {...}, angle = 45 } ; une seule couleur → chaîne."""
+    """"rgba(aaaaaaee) rgba(bbbbbbee) 45deg" → { colors = {...}, angle = 45 }; a single color → string."""
     tokens = v.split()
     angle = None
     if tokens and re.fullmatch(r"\d+deg", tokens[-1]):
@@ -139,7 +139,7 @@ def render(v, indent: int = 0) -> str:
 
 
 def inline(table: dict) -> str:
-    """Petite table sur une ligne : { leaf = "windows", enabled = true }."""
+    """Small one-line table: { leaf = "windows", enabled = true }."""
     return "{ " + ", ".join(f"{k} = {render(v)}" for k, v in table.items()) + " }"
 
 
@@ -155,10 +155,10 @@ class Todo:
 
 @dataclass
 class Migration:
-    files: dict[str, str] = field(default_factory=dict)      # chemin relatif .lua → contenu
+    files: dict[str, str] = field(default_factory=dict)      # relative .lua path → content
     todos: list[Todo] = field(default_factory=list)
     converted: int = 0
-    sources: list[str] = field(default_factory=list)          # .conf convertis
+    sources: list[str] = field(default_factory=list)          # converted .conf files
 
     def summary(self) -> str:
         lines = [f"{self.converted} lignes converties dans {len(self.files)} fichier(s) Lua : "
@@ -178,15 +178,15 @@ class Converter:
         self.result = Migration()
         self.rule_n = 0
 
-    # -------------------------------------------------------------- expressions avec $variables
+    # -------------------------------------------------------------- expressions with $variables
     VAR = re.compile(r"\$([A-Za-z_][\w-]*)")
 
     def split_vars(self, text: str) -> list[tuple[str, bool]]:
-        """[(morceau, est_variable)] — hyprlang autorise « - » dans les noms ($bg-dir)."""
+        """[(chunk, is_variable)] — hyprlang allows "-" in names ($bg-dir)."""
         out, pos = [], 0
         for m in self.VAR.finditer(text):
             name = m.group(1)
-            while name and name not in self.vars:      # « $term-suffix » → $term si seul $term existe
+            while name and name not in self.vars:      # "$term-suffix" → $term if only $term exists
                 name = name[:-1].rstrip("-")
             if not name:
                 continue
@@ -205,8 +205,8 @@ class Converter:
         return "".join(self.resolve(self.vars[c], depth + 1) if v else c for c, v in self.split_vars(text))
 
     def expr(self, text: str) -> Raw:
-        """Chaîne hyprlang pouvant contenir des $variables → expression Lua (concaténation)."""
-        # hyprlang ne remplace que les variables définies : « $2 » (awk) ou « $HOME » restent pour le shell
+        """hyprlang string that may contain $variables → Lua expression (concatenation)."""
+        # hyprlang only substitutes defined variables: "$2" (awk) or "$HOME" are left for the shell
         out = []
         for chunk, is_var in self.split_vars(text.strip()):
             if is_var:
@@ -223,14 +223,14 @@ class Converter:
         c = colors(raw)
         return c if c is not None else scalar(raw)
 
-    # -------------------------------------------------------------- fichier
+    # -------------------------------------------------------------- file
     def convert(self, conf: Path, rel_out: str):
         self.used: set[str] = set()
         self.defined_here: set[str] = set()
         self.file = rel_out
         out: list[str] = [f"-- Converti depuis {conf.name} (hyprlang) par myOwnHyprland — à relire",
                           "-- Doc : https://wiki.hypr.land/Configuring/Start/", ""]
-        stack: list[tuple[str, dict]] = []        # sections ouvertes
+        stack: list[tuple[str, dict]] = []        # open sections
         exec_block: list[str] = []
         submap: tuple[str, list[str]] | None = None
 
@@ -265,7 +265,7 @@ class Converter:
                         emit("")
                 continue
 
-            # ouverture / fermeture de section
+            # section open / close
             m = re.fullmatch(r"([\w.:\-\[\]]+)\s*\{", line)
             if m:
                 flush_exec()
@@ -360,7 +360,7 @@ class Converter:
             elif kw == "plugin":
                 emit(f"hl.plugin.load({render(self.expr(val))})")
             elif ":" in key or "." in key:
-                # « general:gaps_in = 5 » au niveau racine
+                # "general:gaps_in = 5" at the top level
                 path = re.split(r"[:]", key)
                 table: dict = {}
                 self.set_path(table, ".".join(path[1:]), self.value(val))
@@ -376,7 +376,7 @@ class Converter:
             emit_target += [f"    {b}" for b in body]
             emit_target.append("end)")
 
-        # variables utilisées ici mais définies dans un autre fichier (hyprlang les partage, Lua non)
+        # variables used here but defined in another file (hyprlang shares them, Lua doesn't)
         missing = sorted(v for v in self.used if v not in self.defined_here)
         header = []
         for v in missing:
@@ -417,7 +417,7 @@ class Converter:
             self.todo(n, f"{name} {{ … }}", "règle en bloc : à réécrire en hl.window_rule / hl.layer_rule", emit)
         else:
             if name == "gestures" and "workspace_swipe" in table:
-                # supprimé en Lua : remplacé par hl.gesture
+                # removed in Lua: replaced by hl.gesture
                 enabled = table.pop("workspace_swipe")
                 fingers = table.pop("workspace_swipe_fingers", 3)
                 if enabled is True:
@@ -432,10 +432,10 @@ class Converter:
     def keys(self, mods: str, key: str) -> Raw:
         tokens = []
         for t in (re.split(r"[\s_]+", mods.strip()) if mods.strip() else []):
-            # hyprlang tolérait les modificateurs collés : « SUPERSHIFT », « CTRLALT »
+            # hyprlang tolerated run-together modifiers: "SUPERSHIFT", "CTRLALT"
             parts = re.findall(MODS_RE, t.upper()) if not t.startswith("$") else []
             tokens += parts if parts and "".join(parts) == t.upper() else [t] if t else []
-        # « $mainMod SHIFT » : les variables restent des variables
+        # "$mainMod SHIFT": variables stay variables
         joined = " + ".join(tokens + [key.strip()])
         return self.expr(joined)
 
@@ -485,7 +485,7 @@ class Converter:
         }
         if d in ("exec", "execr"):
             m = re.fullmatch(r"hyprctl dispatch (\w+)\s*(.*)", a)
-            if m:  # en Lua, « hyprctl dispatch » attend une expression hl.dsp : on appelle le dispatcher directement
+            if m:  # in Lua, "hyprctl dispatch" expects an hl.dsp expression: call the dispatcher directly
                 return self.dispatcher(m.group(1).lower(), m.group(2).strip("'\" "))
             return f"{dsp}.{'exec_cmd' if d == 'exec' else 'exec_raw'}({render(self.expr(a))})"
         if mouse and d == "movewindow":
@@ -561,7 +561,7 @@ class Converter:
     def window_rule(self, val: str, emit, n: int, original: str):
         tokens = [t.strip() for t in val.split(",") if t.strip()]
         match, effects = {}, {}
-        if any(t.startswith("match:") for t in tokens):          # syntaxe hyprlang récente
+        if any(t.startswith("match:") for t in tokens):          # recent hyprlang syntax
             for t in tokens:
                 if t.startswith("match:"):
                     prop, _, v = t[6:].partition(" ")
@@ -570,7 +570,7 @@ class Converter:
                     eff, _, v = t.partition(" ")
                     if not self._effect(effects, eff, v):
                         return self.todo(n, original, f"effet « {eff} » inconnu", emit)
-        else:                                                      # windowrule / windowrulev2 classiques
+        else:                                                      # classic windowrule / windowrulev2
             eff, _, v = tokens[0].partition(" ")
             if not self._effect(effects, eff, v):
                 return self.todo(n, original, f"effet « {eff} » inconnu", emit)
@@ -579,7 +579,7 @@ class Converter:
                 if sep and prop.lower() in MATCH_PROPS:
                     self._match(match, prop, v)
                 else:
-                    match["class"] = t   # windowrule v1 : « float, ^(kitty)$ »
+                    match["class"] = t   # windowrule v1: "float, ^(kitty)$"
         if not match:
             return self.todo(n, original, "règle sans critère de fenêtre", emit)
         emit(f"hl.window_rule({render({'match': match, **effects})})")
@@ -669,7 +669,7 @@ class Converter:
         path = os.path.expandvars(os.path.expanduser(self.resolve(val.strip())))
         own = os.path.expanduser("~/.config/hypr/")
         if path.startswith(own) and not Path(path).resolve().is_relative_to(self.root):
-            path = str(self.root / path[len(own):])   # la config parle de son propre dossier
+            path = str(self.root / path[len(own):])   # the config refers to its own directory
         if not os.path.isabs(path):
             path = str(self.base / path)
         matches = sorted(glob.glob(path)) or [path]
@@ -694,7 +694,7 @@ class Converter:
 
 
 def migrate(conf: Path) -> Migration:
-    """Convertit `conf` (et les fichiers qu'il source dans le même dossier) en Lua. N'écrit rien."""
+    """Converts `conf` (and the files it sources from the same directory) to Lua. Writes nothing."""
     conf = conf.resolve()
     c = Converter(conf.parent)
     c.base = conf.parent

@@ -1,4 +1,4 @@
-"""Étape 3 — outils de l'agent. Tout est confiné au dossier de travail de la session."""
+"""Step 3 — the agent's tools. Everything is confined to the session's working directory."""
 
 import json
 import os
@@ -15,7 +15,7 @@ ANSI = re.compile(r"\x1b\[[0-9;]*m")
 
 
 class Workspace:
-    """Dossier sandbox d'une session : hypr/…, waybar/…, etc. (miroir de ~/.config)."""
+    """A session's sandbox directory: hypr/…, waybar/…, etc. (mirrors ~/.config)."""
 
     def __init__(self, root: Path):
         self.root = root.resolve()
@@ -30,8 +30,8 @@ class Workspace:
     def files(self) -> list[str]:
         return sorted(p.relative_to(self.root).as_posix() for p in self.root.rglob("*") if p.is_file())
 
-    # ------------------------------------------------------------------ outils
-    # Les docstrings servent de schéma pour le tool calling d'Ollama.
+    # ------------------------------------------------------------------ tools
+    # The docstrings serve as the schema for Ollama tool calling.
 
     def write_file(self, path: str, content: str) -> str:
         """Écrit un fichier complet dans le dossier de travail.
@@ -74,8 +74,8 @@ class Workspace:
             return f"ERREUR : texte introuvable dans {path}. Relis le fichier avec read_file et copie le passage exact."
         if count > 1:
             return f"ERREUR : texte trouvé {count} fois dans {path}. Ajoute des lignes de contexte pour le rendre unique."
-        # `old` multi-lignes coupé au milieu d'une ligne → la fin de la ligne survit seule et casse la config
-        # (ex. old finit par « -- hl.work » → il reste « space_rule({…}) » hors commentaire)
+        # Multi-line `old` cut mid-line → the end of the line survives alone and breaks the config
+        # (e.g. old ends with « -- hl.work » → « space_rule({…}) » is left outside the comment)
         j = text.index(old) + len(old)
         line_end = text.find("\n", j)
         rest = text[j:line_end if line_end >= 0 else len(text)]
@@ -83,8 +83,8 @@ class Workspace:
         if "\n" in old.strip("\n") and not old.endswith("\n") and re.search(r"[A-Za-z]", rest):
             fragment = old[old.rfind("\n") + 1:]
             if fragment.strip() and not new.rstrip("\n").endswith(fragment.strip()):
-                # Demi-ligne finale absente de new = artefact de génération : on la retire de old,
-                # la ligne d'origine reste intacte (manie observée de qwen : old finit par « -- hl.work »)
+                # Trailing half-line missing from new = generation artifact: drop it from old,
+                # the original line stays intact (observed qwen habit: old ends with « -- hl.work »)
                 old = old[:old.rfind("\n") + 1]
                 new = new if new.endswith("\n") else new + "\n"
                 if text.count(old) == 1:
@@ -101,7 +101,7 @@ class Workspace:
         return f"OK : {path} modifié ({old.count(chr(10)) + 1} ligne(s) → {new.count(chr(10)) + 1}){repaired}"
 
     def _guard(self, path: str, previous: str | None) -> str | None:
-        """Annule une modification qui casse une config Hyprland qui était valide avant."""
+        """Reverts an edit that breaks a Hyprland config that was valid before."""
         entry = self.root / "hypr" / "hyprland.lua"
         if previous is None or not path.startswith("hypr/") or not path.endswith(".lua") or not entry.exists():
             return None
@@ -111,7 +111,7 @@ class Workspace:
         if after == "config ok":
             return None
         p.write_text(previous)
-        if verify_hyprland_file(entry) != "config ok":  # c'était déjà cassé avant : on garde la modification
+        if verify_hyprland_file(entry) != "config ok":  # it was already broken before: keep the edit
             p.write_text(new)
             return None
         return (f"ERREUR : cette modification casse la config, elle a été ANNULÉE ({path} est inchangé).\n{after}\n"
@@ -309,8 +309,8 @@ class Workspace:
                                          self.wallpaper_palette, self.verify_matugen)}
 
     def validate_all(self, changed: set[str] | None = None) -> list[str]:
-        """Validation automatique. `changed` (fichiers modifiés pendant le tour) limite la validation à ce que
-        l'agent a touché : un vieux fichier inutilisé du dossier de travail ne bloque pas une autre demande."""
+        """Automatic validation. `changed` (files changed during the turn) limits validation to what the agent
+        touched: an old unused file in the working directory doesn't block another request."""
         def touched(prefix: str) -> bool:
             return changed is None or any(f.startswith(prefix) for f in changed)
 
@@ -350,13 +350,13 @@ class Workspace:
         return errors
 
 
-# ---------------------------------------------------------------- validateurs
+# ---------------------------------------------------------------- validators
 
 STUBS = Path("/usr/share/hypr/stubs/hl.meta.lua")
 
 
 def _stub_names() -> tuple[list[str], list[str]]:
-    """(fonctions de hl.*, clés de config valides) lues dans les stubs installés."""
+    """(hl.* functions, valid config keys) read from the installed stubs."""
     if not STUBS.exists():
         return [], []
     text = STUBS.read_text(errors="ignore")
@@ -394,9 +394,9 @@ MOCK = Path(__file__).with_name("hl_mock.lua")
 
 
 def _lint_hypr(entry: Path) -> list[str]:
-    """Erreurs silencieuses : `gaps_in = 10` ou `general = {...}` en variable globale sont du Lua valide
-    mais n'ont AUCUN effet (Hyprland ne lit que les appels hl.*). On exécute la config avec une fausse
-    API hl (hl_mock.lua) pour lister les globales réellement créées."""
+    """Silent errors: `gaps_in = 10` or `general = {...}` as a global variable are valid Lua
+    but have NO effect (Hyprland only reads hl.* calls). Run the config against a fake
+    hl API (hl_mock.lua) to list the globals actually created."""
     if not shutil.which("lua"):
         return []
     try:
@@ -470,10 +470,10 @@ def _strip_jsonc(text: str) -> str:
         else:
             out.append(c)
         i += 1
-    return re.sub(r",(\s*[}\]])", r"\1", "".join(out))  # virgules finales tolérées par waybar
+    return re.sub(r",(\s*[}\]])", r"\1", "".join(out))  # trailing commas tolerated by waybar
 
 
-# Erreurs Waybar dont le message est trompeur pour un petit modèle → indice ajouté au retour
+# Waybar errors whose message misleads a small model → hint appended to the output
 WAYBAR_HINTS = {
     "invalid arg-id": "Indice : un placeholder {xxx} n'existe pas pour ce module (ex. clock n'a ni {time} ni {date} ; "
                       "{:%H:%M} est CORRECT, ne retire pas les accolades). Vérifie format, format-alt, tooltip-format.",
@@ -488,7 +488,7 @@ WAYBAR_HINTS = {
 
 
 def _format_doc(module: str) -> str:
-    """Section FORMAT REPLACEMENTS de la page wiki du module (placeholders valides)."""
+    """FORMAT REPLACEMENTS section of the module's wiki page (valid placeholders)."""
     base, _, sub = module.partition("/")
     wiki = DOCS_RAW / "waybar-wiki"
     page = next((p for p in wiki.glob("Module:-*.md") if p.stem.lower() == f"module:-{base.lower()}"), None)
@@ -505,7 +505,7 @@ def _format_doc(module: str) -> str:
 
 
 def _lint_waybar(conf: dict) -> list[str]:
-    """Erreurs silencieuses que waybar ne signale pas."""
+    """Silent errors that waybar doesn't report."""
     issues = []
     fmt = conf.get("clock", {}).get("format", "") if isinstance(conf.get("clock"), dict) else ""
     if "%" in fmt and "{:" not in fmt:
@@ -563,7 +563,7 @@ QS_IMPORTS = ("Indice : type inconnu = import manquant. PanelWindow, FloatingWin
               "import QtQuick ; RowLayout, ColumnLayout → import QtQuick.Layouts.")
 
 
-# Erreurs QML fréquentes d'un petit modèle → indice précis (règles générales de QML, pas spécifiques à un cas)
+# Common QML errors from a small model → precise hint (general QML rules, not case-specific)
 QML_HINTS = [
     (r'non-existent property "(centerIn|fill|verticalCenter|horizontalCenter|leftMargin|rightMargin|topMargin|'
      r'bottomMargin|margins)"',
@@ -588,8 +588,8 @@ QML_HINTS = [
 
 
 def _qmllint(cfg_dir: Path) -> list[str]:
-    """Seulement ce que qmllint signale de façon fiable : syntaxe, et propriétés inconnues AVEC suggestion
-    (faute de frappe). Le reste (imports qs.*, unqualified…) est trop bruité sur des configs réelles."""
+    """Only what qmllint reports reliably: syntax, and unknown properties WITH a suggestion
+    (typo). The rest (qs.* imports, unqualified…) is too noisy on real configs."""
     if not QMLLINT:
         return []
     issues = []
@@ -632,7 +632,7 @@ def verify_quickshell_dir(cfg_dir: Path) -> str:
             if QS_NOISE.search(line):
                 continue
             if loaded and re.search(r"Unable to assign \[undefined\]", line):
-                # Bénin : une liaison vaut undefined au démarrage (service pas encore prêt), le widget marche
+                # Harmless: a binding is undefined at startup (service not ready yet), the widget works
                 warnings.append(line.strip().replace(str(cfg_dir) + "/", ""))
                 continue
             if re.search(r"ERROR|ReferenceError|TypeError|Error:|Cannot assign|Unable to assign|is not a type|"

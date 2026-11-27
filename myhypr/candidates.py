@@ -1,8 +1,8 @@
-"""Candidats pour le dataset : sorties conformes des runs du banc, à valider à la main avant d'entrer au dataset.
+"""Dataset candidates: conforming outputs from bench runs, to be reviewed by hand before entering the dataset.
 
-Chaque candidat est RE-NOTÉ avec les vérifications actuelles (les anciens scores ont pu être faussés par des
-vérifications corrigées depuis) et sa config Hyprland est revalidée. On garde les trajectoires les plus propres
-(réussies du 1er coup, peu d'appels), au plus MAX_PER_CASE par demande, sans doublons de contenu.
+Each candidate is RE-SCORED with the current checks (old scores may have been skewed by checks fixed
+since) and its Hyprland config is revalidated. We keep the cleanest trajectories (passed on the first
+try, few calls), at most MAX_PER_CASE per request, with no duplicate content.
 """
 
 import hashlib
@@ -24,8 +24,8 @@ class Candidate:
     case: str
     request: str
     seed: str | None
-    files: dict[str, str]          # fichiers créés ou modifiés (contenu final)
-    original: dict[str, str]       # contenu d'origine des fichiers modifiés (cas « seed »)
+    files: dict[str, str]          # files created or modified (final content)
+    original: dict[str, str]       # original content of modified files ("seed" cases)
     answer: str
     messages: list[dict] = field(default_factory=list)
     first_try: bool = False
@@ -47,7 +47,7 @@ def _save_state(state: dict):
 
 
 def harvest() -> list[Candidate]:
-    """Tous les candidats valables (avant filtrage par décision et plafond par demande)."""
+    """All valid candidates (before filtering by decision and per-request cap)."""
     from .tools import verify_hyprland_file
     cases = {c["id"]: c for c in load_cases(None, None, "all")}
     found: dict[str, Candidate] = {}
@@ -66,7 +66,7 @@ def harvest() -> list[Candidate]:
             changed = sorted(f for f in after if before.get(f) != after[f])
             messages = json.loads(session.read_text())
             answer = next((m["content"] for m in reversed(messages) if m["role"] == "assistant" and m["content"]), "")
-            if not all(r.ok for r in run_checks(case, ws, changed, answer)):   # vérifications ACTUELLES
+            if not all(r.ok for r in run_checks(case, ws, changed, answer)):   # CURRENT checks
                 continue
             entry = ws / "hypr" / "hyprland.lua"
             if any(f.startswith("hypr/") and f.endswith(".lua") for f in changed) and entry.exists() \
@@ -88,7 +88,7 @@ def harvest() -> list[Candidate]:
 
 
 def pending() -> list[Candidate]:
-    """Candidats à examiner : les plus propres d'abord, MAX_PER_CASE par demande (acceptés compris)."""
+    """Candidates to review: cleanest first, MAX_PER_CASE per request (accepted ones included)."""
     state = _state()
     accepted = {}
     for v in state.values():

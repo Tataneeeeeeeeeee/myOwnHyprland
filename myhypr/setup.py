@@ -1,11 +1,11 @@
-"""Intégration au bureau et diagnostic : `myhypr setup` et `myhypr doctor`.
+"""Desktop integration and diagnostics: `myhypr setup` and `myhypr doctor`.
 
-setup :
-- lanceur ~/.local/bin/myhypr (utilisable de partout) ;
-- entrée de menu ~/.local/share/applications/myhypr.desktop (rofi, walker, fuzzel…) ;
-- (optionnel, avec confirmation) raccourci Hyprland vers une fenêtre flottante, sur la PREMIÈRE combinaison libre
-  de ta session, dans ~/.config/hypr/myhypr.lua chargé par une ligne `require("myhypr")`.
-doctor : vérifie dépendances, modèles, docs (et qu'elles correspondent aux versions installées), index, intégration.
+setup:
+- launcher ~/.local/bin/myhypr (usable from anywhere);
+- menu entry ~/.local/share/applications/myhypr.desktop (rofi, walker, fuzzel…);
+- (optional, with confirmation) Hyprland keybind to a floating window, on the FIRST free combo
+  in your session, in ~/.config/hypr/myhypr.lua loaded by a `require("myhypr")` line.
+doctor: checks dependencies, models, docs (and that they match the installed versions), index, integration.
 """
 
 import json
@@ -22,7 +22,7 @@ DESKTOP = Path.home() / ".local/share/applications/myhypr.desktop"
 SNIPPET = CONFIG_HOME / "hypr" / "myhypr.lua"
 COMBOS = ["SUPER + CTRL + A", "SUPER + ALT + A", "SUPER + ALT + H", "SUPER + CTRL + H", "SUPER + F1",
           "SUPER + ALT + Y", "SUPER + ALT + RETURN"]
-# terminal → commande qui ouvre une fenêtre de classe « myhypr » (pour la règle de fenêtre flottante)
+# terminal → command that opens a window with class "myhypr" (for the floating window rule)
 TERMINALS = {"kitty": "kitty --class myhypr -e", "foot": "foot --app-id myhypr", "alacritty": "alacritty --class myhypr -e",
              "wezterm": "wezterm start --class myhypr --", "ghostty": "ghostty --class=myhypr -e",
              "konsole": "konsole -e"}
@@ -58,14 +58,14 @@ def install_launcher() -> str:
 def free_combo() -> str | None:
     from .binds import from_config, from_session, normalize
     used = {b.combo for b in from_session() if not b.submap}
-    if not used:  # Hyprland ne tourne pas : on lit la config
+    if not used:  # Hyprland isn't running: read the config
         entry = (CONFIG_HOME / "hypr" / "hyprland.lua").resolve()
         used = {b.combo for b in from_config(entry) if not b.submap}
     return next((c for c in COMBOS if normalize(c) not in used), None)
 
 
 def hook_file() -> Path:
-    """Fichier où ajouter require("myhypr") : custom.lua si la config le charge déjà, sinon hyprland.lua."""
+    """File to add require("myhypr") to: custom.lua if the config already loads it, otherwise hyprland.lua."""
     main = (CONFIG_HOME / "hypr" / "hyprland.lua").resolve()
     custom = CONFIG_HOME / "hypr" / "custom.lua"
     if custom.exists() and re.search(r"require\(\s*[\"']custom[\"']\s*\)", main.read_text(errors="ignore")):
@@ -108,7 +108,7 @@ def install_bind(confirm) -> str:
 # --------------------------------------------------------------------------- doctor
 
 def doctor() -> list[tuple[str, str, str]]:
-    """[(niveau ok|warn|err, élément, détail)]"""
+    """[(level ok|warn|err, item, detail)]"""
     out: list[tuple[str, str, str]] = []
 
     def add(level, item, detail=""):
